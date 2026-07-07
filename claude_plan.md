@@ -30,6 +30,7 @@ This document is the living plan. Section 2 captures decisions made during the i
 | User roles | **Single account, multiple roles** (assumption) | A user can be a guest and later add a host role on the same account, rather than separate account types per role. Admin is an internal-only role, assigned by another admin (never self-service). Flag if you actually want strictly separate account types. |
 | Admin fee | Configurable percentage, stored as a platform setting (not hardcoded) | Exact % is a business decision you can set at launch and change later without a code deploy. |
 | Email provider | Recommend a transactional email API (e.g. Brevo, SendGrid, Mailgun free tier) via Nodemailer, **not** raw SMTP from the VPS's own IP | VPS IPs have poor sender reputation by default; this hurts deliverability (emails land in spam). Swappable later since Nodemailer abstracts the transport. |
+| Admin listing creation | Admins **never own** listings. Creating/editing a listing as an admin requires selecting an existing host account to attach it to (support/on-behalf-of use case), never an admin-owned property | Matches the brief's framing of admins as account/issue/payment handlers, not property owners. Enforced at the schema level: `Property.hostId` must always reference a user with the `host` role, never an admin-only user. |
 
 ---
 
@@ -251,6 +252,10 @@ All delayed jobs are idempotent — guarded by `reminderSentAt`/`ratingPromptSen
 | Trigger refunds | — | — | ✅ |
 
 A user's `roles` array can contain more than one of `guest`/`host`; `admin` is never self-assigned.
+
+**Listing dashboards are separate per role, sharing one underlying form component:**
+- **Host dashboard** (`pages/host/`) — "My Listings", scoped to the host's own `hostId`. Create/edit always sets `hostId` to the logged-in host; includes bookings/earnings views tied to their own properties.
+- **Admin dashboard** (`pages/admin/`) — "All Listings" across every host, plus moderation actions (approve/reject/suspend). Admin create/edit is an on-behalf-of tool: the form requires picking an existing host account to attach the listing to — admins can never be a listing's `hostId` themselves (see §2).
 
 ---
 

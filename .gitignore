@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+mongo_connection_string.txt
+
+# Build output
+dist/
+build/
+apps/web/dist/
+*.tsbuildinfo
+
+# Uploaded media (local disk storage - not committed, must be backed up separately, see claude_plan.md §11)
+apps/api/uploads/
+!apps/api/uploads/.gitkeep
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor / OS
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+Thumbs.db
+
+# Test / coverage
+coverage/
+
+# Docker
+docker-compose.override.yml
