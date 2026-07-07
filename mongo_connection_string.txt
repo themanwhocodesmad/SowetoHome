@@ -1,0 +1,1 @@
+mongodb+srv://sibanyonimthobisiamos_db_user:Maxseen@4@cluster0.cyvhxue.mongodb.net/?appName=Cluster0
