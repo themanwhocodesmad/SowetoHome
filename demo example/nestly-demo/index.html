@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nestly — Find your next stay</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <a class="brand" href="index.html">
+    <svg viewBox="0 0 32 32"><path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z"/></svg>
+    Nestly
+  </a>
+
+  <div class="search-pill">
+    <div class="field">
+      <label>Where</label>
+      <input id="searchLocation" type="text" placeholder="Search destinations" />
+    </div>
+    <div class="field">
+      <label>Check in</label>
+      <input type="text" placeholder="Add dates" />
+    </div>
+    <div class="field">
+      <label>Guests</label>
+      <input type="text" placeholder="Add guests" />
+    </div>
+    <button class="search-btn" id="searchBtn" aria-label="Search">
+      <svg class="icon" style="stroke:white" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </button>
+  </div>
+
+  <div class="nav-actions">
+    <a class="btn" href="dashboard.html">Host Dashboard</a>
+    <button class="btn btn-primary" id="loginBtn">
+      <svg class="icon" style="stroke:white;width:16px;height:16px" viewBox="0 0 24 24"><path d="M4 21v-1a7 7 0 0 1 14 0v1"/><circle cx="11" cy="7" r="4"/></svg>
+      Log in
+    </button>
+  </div>
+</header>
+
+<div class="chip-row" id="chipRow"></div>
+
+<p class="results-bar" id="resultsBar"></p>
+<div class="listing-grid" id="listingGrid"></div>
+
+<footer class="site-footer">
+  Nestly is a demo project with mock data — no real bookings, payments, or hosts. Built as a sample UI.
+</footer>
+
+<div class="overlay" id="modalOverlay">
+  <div class="modal" id="modalContent"></div>
+</div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

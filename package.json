@@ -1,0 +1,31 @@
+{
+  "name": "soweto-stays",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Soweto Stays - property booking platform (MERN, TypeScript)",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:api": "npm run dev -w apps/api",
+    "dev:worker": "npm run dev -w apps/worker",
+    "dev:web": "npm run dev -w apps/web",
+    "build": "npm run build -w packages/shared && npm run build -w packages/db && npm run build -w apps/api && npm run build -w apps/worker && npm run build -w apps/web",
+    "typecheck": "npm run build -w packages/shared && npm run build -w packages/db && npm run typecheck -w apps/api && npm run typecheck -w apps/worker && npm run typecheck -w apps/web",
+    "lint": "eslint .",
+    "test": "npm run test -w apps/api --if-present"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.4.2",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.20.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

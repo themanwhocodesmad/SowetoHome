@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/dist
+**/build
+apps/web/dist
+apps/api/uploads
+.git
+.env
+.env.*
+!.env.example
+mongo_connection_string.txt
+google_oauth.json
+*.log
