@@ -12,9 +12,13 @@ export function Navbar() {
         <svg viewBox="0 0 32 32">
           <path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z" />
         </svg>
-        Soweto Stays
+        Book<span>My</span>Stay
       </Link>
       <nav className="navbar__links">
+        <Link to="/">Properties</Link>
+        <Link to="/services">Services</Link>
+        <Link to="/about">About</Link>
+        <Link to="/contact">Contact</Link>
         {user?.roles.includes('host') && (
           <>
             <Link to="/host/listings">My Listings</Link>

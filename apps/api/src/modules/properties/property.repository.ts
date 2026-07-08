@@ -44,6 +44,7 @@ export const propertyRepository = {
       isAvailable: true,
     };
     if (query.city) filter['location.city'] = new RegExp(query.city, 'i');
+    if (query.province) filter['location.province'] = query.province;
     if (query.guests) filter.maxGuests = { $gte: query.guests };
     if (query.minPrice || query.maxPrice) {
       filter.stayRate = {

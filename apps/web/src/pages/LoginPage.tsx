@@ -7,7 +7,7 @@ export function LoginPage() {
 
   return (
     <div className="login-page">
-      <h1>Sign in to Soweto Stays</h1>
+      <h1>Sign in to BookMyStay</h1>
       {oauthError && <p className="error">Sign-in failed. Please try again.</p>}
       <a className="button" href={googleLoginUrl()}>
         Sign in with Google

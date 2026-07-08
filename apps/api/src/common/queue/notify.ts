@@ -1,9 +1,9 @@
-import type { EmailTemplate } from '@soweto-stays/shared';
+import type { EmailJobPayload, EmailTemplate } from '@soweto-stays/shared';
 import { bookingReminderQueue, emailQueue, ratingPromptQueue } from './queues.js';
 
 export async function enqueueEmail(
   template: EmailTemplate,
-  context: { userId?: string; bookingId?: string },
+  context: EmailJobPayload['context'],
 ): Promise<void> {
   await emailQueue.add('send', { template, context });
 }

@@ -1,4 +1,4 @@
-import { BookingModel, PropertyModel, UserModel } from '@soweto-stays/db';
+import { BookingModel, NewsletterSubscriberModel, PropertyModel, UserModel } from '@soweto-stays/db';
 import type { EmailJobPayload } from '@soweto-stays/shared';
 import { sendMail } from '../mailer.js';
 import { renderTemplate } from '../templates/render.js';
@@ -39,9 +39,9 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       if (!context.userId) return;
       const user = await UserModel.findById(context.userId);
       if (!user) return;
-      const email = renderTemplate('Welcome to Soweto Stays', [
+      const email = renderTemplate('Welcome to BookMyStay', [
         `Hi ${user.name},`,
-        'Welcome to Soweto Stays. You can search stays right away, and list your own place as a host whenever you are ready.',
+        'Welcome to BookMyStay. You can search stays right away, and list your own place as a host whenever you are ready.',
       ]);
       await sendMail(user.email, email.subject, email.html, email.text);
       return;
@@ -120,6 +120,18 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
     case 'admin-listing-pending':
       // Reserved for a future admin-moderation slice - nothing enqueues these yet.
       return;
+
+    case 'newsletter-confirmation': {
+      if (!context.newsletterSubscriberId) return;
+      const subscriber = await NewsletterSubscriberModel.findById(context.newsletterSubscriberId);
+      if (!subscriber) return;
+      const email = renderTemplate('You are subscribed to BookMyStay', [
+        'Thanks for subscribing to BookMyStay updates.',
+        'We will keep you informed about new signature estates and stay offers.',
+      ]);
+      await sendMail(subscriber.email, email.subject, email.html, email.text);
+      return;
+    }
 
     default:
       logger.warn({ template }, 'Unknown email template');

@@ -19,6 +19,7 @@ import { paymentRouter } from './modules/payments/payment.routes.js';
 import { payoutRouter } from './modules/payouts/payout.routes.js';
 import { reviewRouter } from './modules/reviews/review.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
+import { newsletterRouter } from './modules/newsletter/newsletter.routes.js';
 
 export function createApp(): Express {
   configurePassport();
@@ -62,6 +63,7 @@ export function createApp(): Express {
   app.use('/api/payouts', payoutRouter);
   app.use('/api/reviews', reviewRouter);
   app.use('/api/admin', adminRouter);
+  app.use('/api/newsletter', newsletterRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

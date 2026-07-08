@@ -23,3 +23,16 @@ export const ACTIVE_BOOKING_STATUSES: BookingStatus[] = ['pending_payment', 'con
 
 export const PAYOUT_STATUSES = ['pending', 'paid', 'failed'] as const;
 export type PayoutStatus = (typeof PAYOUT_STATUSES)[number];
+
+export const PROVINCES = [
+  'Eastern Cape',
+  'Free State',
+  'Gauteng',
+  'KwaZulu-Natal',
+  'Limpopo',
+  'Mpumalanga',
+  'Northern Cape',
+  'North West',
+  'Western Cape',
+] as const;
+export type Province = (typeof PROVINCES)[number];

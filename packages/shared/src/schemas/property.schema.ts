@@ -45,6 +45,7 @@ export type UpdatePropertyInput = z.infer<typeof updatePropertySchema>;
 
 export const propertySearchQuerySchema = z.object({
   city: z.string().optional(),
+  province: z.string().optional(),
   checkIn: z.string().datetime().optional(),
   checkOut: z.string().datetime().optional(),
   guests: z.coerce.number().int().positive().optional(),

@@ -17,7 +17,7 @@ export function BecomeHostPage() {
   return (
     <div>
       <h1>Become a host</h1>
-      <p>List your property on Soweto Stays and start earning.</p>
+      <p>List your property on BookMyStay and start earning.</p>
       <button type="button" onClick={() => void handleBecomeHost()}>
         Become a host
       </button>

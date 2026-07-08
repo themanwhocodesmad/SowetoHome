@@ -19,6 +19,7 @@ export const EMAIL_TEMPLATES = [
   'host-payout-sent',
   'admin-new-host',
   'admin-listing-pending',
+  'newsletter-confirmation',
 ] as const;
 export type EmailTemplate = (typeof EMAIL_TEMPLATES)[number];
 
@@ -30,6 +31,7 @@ export interface EmailJobPayload {
   context: {
     userId?: string;
     bookingId?: string;
+    newsletterSubscriberId?: string;
   };
 }
 
