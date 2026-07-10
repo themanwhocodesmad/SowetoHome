@@ -7,6 +7,7 @@ export const HOST_NAV_ITEMS = [
 export const ADMIN_NAV_ITEMS = [
   { to: '/admin/listings', label: 'Listings' },
   { to: '/admin/users', label: 'Users' },
+  { to: '/admin/applications', label: 'Applications' },
   { to: '/admin/payouts', label: 'Payouts' },
   { to: '/admin/analytics', label: 'Analytics' },
   { to: '/admin/settings', label: 'Settings' },

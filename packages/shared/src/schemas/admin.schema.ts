@@ -13,6 +13,12 @@ export const suspendUserSchema = z.object({
 });
 export type SuspendUserInput = z.infer<typeof suspendUserSchema>;
 
+export const reviewHostApplicationSchema = z.object({
+  approve: z.boolean(),
+  reason: z.string().max(500).optional(),
+});
+export type ReviewHostApplicationInput = z.infer<typeof reviewHostApplicationSchema>;
+
 export const updatePlatformSettingsSchema = z.object({
   adminFeePercent: z.number().min(0).max(100).optional(),
   cancellationFreeWindowHours: z.number().int().nonnegative().optional(),

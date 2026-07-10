@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import {
   moderatePropertySchema,
+  reviewHostApplicationSchema,
   suspendUserSchema,
   updatePlatformSettingsSchema,
 } from '@soweto-stays/shared';
@@ -14,6 +15,13 @@ adminRouter.use(authenticate, requireRole('admin'));
 
 adminRouter.get('/users', adminController.listUsers);
 adminRouter.post('/users/:id/suspend', validate(suspendUserSchema), adminController.suspendUser);
+
+adminRouter.get('/host-applications', adminController.listHostApplications);
+adminRouter.post(
+  '/host-applications/:id/review',
+  validate(reviewHostApplicationSchema),
+  adminController.reviewHostApplication,
+);
 
 adminRouter.get('/properties', adminController.listProperties);
 adminRouter.post(

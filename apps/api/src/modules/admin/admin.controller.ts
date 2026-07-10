@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type {
   ModeratePropertyInput,
+  ReviewHostApplicationInput,
   SuspendUserInput,
   UpdatePlatformSettingsInput,
 } from '@soweto-stays/shared';
@@ -24,6 +25,21 @@ export const listUsers = asyncHandler(async (req: Request, res: Response) => {
 export const suspendUser = asyncHandler(async (req: Request, res: Response) => {
   const { isSuspended } = req.body as SuspendUserInput;
   const user = await userService.setSuspended(req.params.id as string, isSuspended);
+  ok(res, toUserDto(user));
+});
+
+export const listHostApplications = asyncHandler(async (req: Request, res: Response) => {
+  const page = Number(req.query.page ?? 1);
+  const limit = Number(req.query.limit ?? 20);
+  const status = (req.query.status as string | undefined) ?? 'pending';
+  const { items, total } = await userService.listHostApplications(status, page, limit);
+  paginated(res, items.map((u) => toUserDto(u)), page, limit, total);
+});
+
+// `reason` is validated but, like suspendUser's, not persisted - no moderation audit log in v1.
+export const reviewHostApplication = asyncHandler(async (req: Request, res: Response) => {
+  const { approve } = req.body as ReviewHostApplicationInput;
+  const user = await userService.reviewHostApplication(req.params.id as string, approve);
   ok(res, toUserDto(user));
 });
 

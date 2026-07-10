@@ -70,7 +70,7 @@ export const propertyService = {
   async createByAdmin(targetHostId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
     const targetUser = await userService.getById(targetHostId);
     if (!targetUser.roles.includes('host')) {
-      await userService.addHostRole(targetHostId);
+      await userService.grantHostRole(targetHostId);
     }
     return propertyRepository.create({
       ...input,

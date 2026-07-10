@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { randomUUID } from 'node:crypto';
 import { Types } from 'mongoose';
 import { connectDb, disconnectDb, PropertyModel, UserModel } from '@soweto-stays/db';
@@ -8,20 +9,42 @@ import { logger } from '../common/logger.js';
 
 // Real, freely-licensed (CC0 / CC-BY) photos - not tied to any specific real address, so
 // they're safe to use as generic listing photos rather than depicting someone's actual home.
+// Each entry has a branded SVG in seed-assets/ used as a fallback when the download fails,
+// so the seed always produces a fully-illustrated demo even offline or if a URL dies.
 const PHOTOS = {
-  exteriorBrick: 'https://cdn.stocksnap.io/img-thumbs/960w/CLD6T4J9VZ.jpg',
-  exteriorModern: 'https://cdn.stocksnap.io/img-thumbs/960w/87ONRC5PWV.jpg',
-  exteriorSuburb: 'https://cdn.stocksnap.io/img-thumbs/960w/6KJ12UWOKQ.jpg',
-  exteriorRedRoof:
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Modern_house_exterior_with_red_roof_and_landscaped_garden_under_clear_blue_sky.jpg/960px-Modern_house_exterior_with_red_roof_and_landscaped_garden_under_clear_blue_sky.jpg',
-  loungeBright: 'https://cdn.stocksnap.io/img-thumbs/960w/HIH67XC5G0.jpg',
-  loungeCosy: 'https://cdn.stocksnap.io/img-thumbs/960w/NF6P1OX124.jpg',
-  bedroom: 'https://cdn.stocksnap.io/img-thumbs/960w/XCOZ3XTV7M.jpg',
-  kitchen:
-    'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Modern_kitchen_interior_featuring_wooden_shelving_and_organized_dishware_in_a_cozy_setting.jpg/960px-Modern_kitchen_interior_featuring_wooden_shelving_and_organized_dishware_in_a_cozy_setting.jpg',
-  bathroom: 'https://cdn.stocksnap.io/img-thumbs/960w/SX2H0BU5EG.jpg',
-  pool: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Backyardpool.jpg/960px-Backyardpool.jpg',
+  exteriorBrick: {
+    url: 'https://cdn.stocksnap.io/img-thumbs/960w/CLD6T4J9VZ.jpg',
+    fallback: 'exterior-brick.svg',
+  },
+  exteriorModern: {
+    url: 'https://cdn.stocksnap.io/img-thumbs/960w/87ONRC5PWV.jpg',
+    fallback: 'exterior-modern.svg',
+  },
+  exteriorSuburb: {
+    url: 'https://cdn.stocksnap.io/img-thumbs/960w/6KJ12UWOKQ.jpg',
+    fallback: 'exterior-suburb.svg',
+  },
+  exteriorRedRoof: {
+    url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Modern_house_exterior_with_red_roof_and_landscaped_garden_under_clear_blue_sky.jpg/960px-Modern_house_exterior_with_red_roof_and_landscaped_garden_under_clear_blue_sky.jpg',
+    fallback: 'exterior-redroof.svg',
+  },
+  loungeBright: { url: 'https://cdn.stocksnap.io/img-thumbs/960w/HIH67XC5G0.jpg', fallback: 'lounge-bright.svg' },
+  loungeCosy: { url: 'https://cdn.stocksnap.io/img-thumbs/960w/NF6P1OX124.jpg', fallback: 'lounge-cosy.svg' },
+  bedroom: { url: 'https://cdn.stocksnap.io/img-thumbs/960w/XCOZ3XTV7M.jpg', fallback: 'bedroom.svg' },
+  kitchen: {
+    url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Modern_kitchen_interior_featuring_wooden_shelving_and_organized_dishware_in_a_cozy_setting.jpg/960px-Modern_kitchen_interior_featuring_wooden_shelving_and_organized_dishware_in_a_cozy_setting.jpg',
+    fallback: 'kitchen.svg',
+  },
+  bathroom: { url: 'https://cdn.stocksnap.io/img-thumbs/960w/SX2H0BU5EG.jpg', fallback: 'bathroom.svg' },
+  pool: {
+    url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Backyardpool.jpg/960px-Backyardpool.jpg',
+    fallback: 'pool.svg',
+  },
 } as const;
+
+type PhotoDef = (typeof PHOTOS)[keyof typeof PHOTOS];
+
+const SEED_ASSETS_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../seed-assets');
 
 const DEMO_HOST_ID = new Types.ObjectId('000000000000000000000001');
 
@@ -222,6 +245,17 @@ async function downloadImage(url: string, destDir: string): Promise<string> {
   return filename;
 }
 
+async function materialiseImage(photo: PhotoDef, destDir: string): Promise<string> {
+  try {
+    return await downloadImage(photo.url, destDir);
+  } catch (err) {
+    logger.warn({ err, url: photo.url }, `Download failed - using local placeholder ${photo.fallback}`);
+    const filename = `${randomUUID()}.svg`;
+    await fs.copyFile(path.join(SEED_ASSETS_DIR, photo.fallback), path.join(destDir, filename));
+    return filename;
+  }
+}
+
 async function seedHost() {
   return UserModel.findOneAndUpdate(
     { _id: DEMO_HOST_ID },
@@ -245,8 +279,8 @@ async function seedProperty(def: (typeof DEMO_PROPERTIES)[number]) {
   await fs.mkdir(destDir, { recursive: true });
 
   const images: string[] = [];
-  for (const url of def.images) {
-    const filename = await downloadImage(url, destDir);
+  for (const photo of def.images) {
+    const filename = await materialiseImage(photo, destDir);
     images.push(toPublicImagePath(propertyId, filename));
   }
 

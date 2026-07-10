@@ -4,6 +4,7 @@ import type {
   PaginatedResult,
   PlatformSettingsDto,
   PropertyDto,
+  ReviewHostApplicationInput,
   SuspendUserInput,
   UpdatePlatformSettingsInput,
   UserDto,
@@ -16,6 +17,16 @@ export const adminApi = {
     apiFetch<PaginatedResult<UserDto>>(`/api/admin/users?page=${page}&limit=${limit}`),
   suspendUser: (id: string, input: SuspendUserInput) =>
     apiFetch<UserDto>(`/api/admin/users/${id}/suspend`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+
+  listHostApplications: (page = 1, limit = 20, status = 'pending') =>
+    apiFetch<PaginatedResult<UserDto>>(
+      `/api/admin/host-applications?page=${page}&limit=${limit}&status=${status}`,
+    ),
+  reviewHostApplication: (id: string, input: ReviewHostApplicationInput) =>
+    apiFetch<UserDto>(`/api/admin/host-applications/${id}/review`, {
       method: 'POST',
       body: JSON.stringify(input),
     }),

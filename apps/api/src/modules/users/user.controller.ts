@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import type { UpdateProfileInput } from '@soweto-stays/shared';
+import type { ApplyHostInput, UpdateProfileInput } from '@soweto-stays/shared';
 import { asyncHandler } from '../../common/middleware/asyncHandler.js';
 import { ok } from '../../common/http/respond.js';
 import { userService, toUserDto } from './user.service.js';
@@ -10,9 +10,8 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   ok(res, toUserDto(user));
 });
 
-// Body only carries a { confirm: true } acknowledgement (validated by addHostRoleSchema) -
-// the handler itself needs no fields from it, just the authenticated user's id.
-export const becomeHost = asyncHandler(async (req: Request, res: Response) => {
-  const user = await userService.addHostRole(req.authUser!.id);
+export const applyToHost = asyncHandler(async (req: Request, res: Response) => {
+  const { message } = req.body as ApplyHostInput;
+  const user = await userService.applyToHost(req.authUser!.id, message);
   ok(res, toUserDto(user));
 });

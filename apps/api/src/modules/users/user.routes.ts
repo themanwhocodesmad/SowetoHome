@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { updateProfileSchema, addHostRoleSchema } from '@soweto-stays/shared';
+import { updateProfileSchema, applyHostSchema } from '@soweto-stays/shared';
 import { authenticate } from '../../common/middleware/auth.js';
 import { validate } from '../../common/middleware/validate.js';
 import * as userController from './user.controller.js';
@@ -14,8 +14,8 @@ userRouter.patch(
 );
 
 userRouter.post(
-  '/become-host',
+  '/host-application',
   authenticate,
-  validate(addHostRoleSchema),
-  userController.becomeHost,
+  validate(applyHostSchema),
+  userController.applyToHost,
 );

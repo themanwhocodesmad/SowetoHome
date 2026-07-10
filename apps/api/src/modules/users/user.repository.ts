@@ -18,6 +18,16 @@ export const userRepository = {
     return UserModel.create({ ...input, roles: ['guest'] });
   },
 
+  async listByHostApplicationStatus(status: string, page: number, limit: number) {
+    const skip = (page - 1) * limit;
+    const filter = { 'hostApplication.status': status };
+    const [items, total] = await Promise.all([
+      UserModel.find(filter).sort({ 'hostApplication.appliedAt': 1 }).skip(skip).limit(limit),
+      UserModel.countDocuments(filter),
+    ]);
+    return { items, total };
+  },
+
   async listPaginated(page: number, limit: number) {
     const skip = (page - 1) * limit;
     const [items, total] = await Promise.all([
