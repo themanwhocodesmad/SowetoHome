@@ -10,6 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed": "tsx src/scripts/seed.ts",
     "make-admin": "tsx src/scripts/makeAdmin.ts",
+    "seed:prod": "node dist/scripts/seed.js",
+    "make-admin:prod": "node dist/scripts/makeAdmin.js",
     "test": "echo \"no tests yet\" && exit 0"
   },
   "dependencies": {

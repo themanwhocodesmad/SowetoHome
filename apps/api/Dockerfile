@@ -31,6 +31,9 @@ COPY --from=build /app/packages/db/package.json packages/db/package.json
 COPY --from=build /app/packages/db/dist packages/db/dist
 COPY --from=build /app/apps/api/package.json apps/api/package.json
 COPY --from=build /app/apps/api/dist apps/api/dist
+# seed.ts resolves this relative to its own compiled location - needed for the seed
+# script's offline SVG fallback (see src/scripts/seed.ts).
+COPY --from=build /app/apps/api/seed-assets apps/api/seed-assets
 
 WORKDIR /app/apps/api
 EXPOSE 4000
