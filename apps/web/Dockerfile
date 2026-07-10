@@ -11,6 +11,8 @@ COPY apps/web/package.json apps/web/package.json
 RUN npm ci
 
 FROM deps AS build
+# Build-stage only: see apps/api/Dockerfile - prevents tsc/vite OOM on small (512MB) hosts.
+ENV NODE_OPTIONS=--max-old-space-size=768
 COPY packages/shared packages/shared
 COPY apps/web apps/web
 # Empty VITE_API_URL means "same origin" - correct behind the Caddy reverse proxy, which

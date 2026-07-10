@@ -11,6 +11,8 @@ COPY apps/worker/package.json apps/worker/package.json
 RUN npm ci
 
 FROM deps AS build
+# Build-stage only: see apps/api/Dockerfile - prevents tsc OOM on small (512MB) hosts.
+ENV NODE_OPTIONS=--max-old-space-size=768
 COPY packages/shared packages/shared
 COPY packages/db packages/db
 COPY apps/worker apps/worker

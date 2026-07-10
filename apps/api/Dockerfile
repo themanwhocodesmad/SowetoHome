@@ -11,6 +11,9 @@ COPY apps/api/package.json apps/api/package.json
 RUN npm ci
 
 FROM deps AS build
+# Build-stage only: on small hosts (512MB droplet) Node derives a ~250MB default heap and
+# tsc OOMs. An explicit larger heap can spill into swap; the runtime stage doesn't need it.
+ENV NODE_OPTIONS=--max-old-space-size=768
 COPY packages/shared packages/shared
 COPY packages/db packages/db
 COPY apps/api apps/api
