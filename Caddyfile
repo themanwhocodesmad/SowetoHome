@@ -1,0 +1,25 @@
+# Reverse proxy + automatic HTTPS for the whole stack (see docker-compose.yml). Caddy
+# obtains and renews a Let's Encrypt certificate for {$DOMAIN} on its own - no certbot.
+# With an sslip.io DOMAIN (e.g. 159-203-186-175.sslip.io) this works with zero DNS setup.
+{$DOMAIN} {
+	encode zstd gzip
+
+	# API + uploaded images are served by the api container; everything else is the SPA.
+	# Same origin for web and api means no CORS in production and cookies just work.
+	handle /api/* {
+		reverse_proxy api:4000
+	}
+
+	handle /uploads/* {
+		reverse_proxy api:4000
+	}
+
+	# Deploy verification endpoint (curl https://$DOMAIN/health - see DEPLOY.md).
+	handle /health {
+		reverse_proxy api:4000
+	}
+
+	handle {
+		reverse_proxy web:80
+	}
+}

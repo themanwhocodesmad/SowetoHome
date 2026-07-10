@@ -1,6 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.js';
-import { googleLoginUrl } from '../api/auth.js';
 
 export function Navbar() {
   const { user, logout } = useAuth();

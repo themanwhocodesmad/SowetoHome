@@ -19,4 +19,5 @@ export * from './schemas/review.schema.js';
 export * from './schemas/payout.schema.js';
 export * from './schemas/admin.schema.js';
 export * from './schemas/user.schema.js';
+export * from './schemas/auth.schema.js';
 export * from './schemas/newsletter.schema.js';

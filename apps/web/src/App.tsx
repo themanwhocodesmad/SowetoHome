@@ -7,7 +7,6 @@ import { ServicesPage } from './pages/ServicesPage.js';
 import { ContactPage } from './pages/ContactPage.js';
 import { PropertyDetailPage } from './pages/PropertyDetailPage.js';
 import { LoginPage } from './pages/LoginPage.js';
-import { OAuthCallbackPage } from './pages/OAuthCallbackPage.js';
 import { BecomeHostPage } from './pages/BecomeHostPage.js';
 import { RequireAuth, RequireRole } from './auth/RequireRole.js';
 import { MyBookingsPage } from './pages/guest/MyBookingsPage.js';
@@ -36,7 +35,6 @@ export default function App() {
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/properties/:id" element={<PropertyDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/oauth/callback" element={<OAuthCallbackPage />} />
 
           <Route
             path="/become-host"

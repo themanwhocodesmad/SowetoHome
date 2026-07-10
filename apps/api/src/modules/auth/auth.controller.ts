@@ -1,10 +1,12 @@
 import type { Request, Response } from 'express';
-import { env, isProduction } from '../../common/config/env.js';
+import type { GoogleSignInInput } from '@soweto-stays/shared';
+import { isProduction } from '../../common/config/env.js';
 import { asyncHandler } from '../../common/middleware/asyncHandler.js';
 import { AppError } from '../../common/errors/AppError.js';
 import { ok } from '../../common/http/respond.js';
 import { UserModel, type UserDocument } from '@soweto-stays/db';
-import { toUserDto } from '../users/user.service.js';
+import { toUserDto, userService } from '../users/user.service.js';
+import { verifyGoogleCredential } from './googleIdToken.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from './jwt.js';
 
 export const REFRESH_COOKIE_NAME = 'sowetostays_refresh';
@@ -29,12 +31,14 @@ function issueTokens(res: Response, user: UserDocument): string {
   return accessToken;
 }
 
-export const googleCallback = asyncHandler(async (req: Request, res: Response) => {
-  // Passport's verify callback in passport.ts calls done(null, user) with our own Mongoose
-  // document, but @types/passport types req.user against the (empty) global Express.User.
-  const user = req.user as unknown as UserDocument;
+export const googleSignIn = asyncHandler(async (req: Request, res: Response) => {
+  const { credential } = req.body as GoogleSignInInput;
+  const profile = await verifyGoogleCredential(credential);
+  const user = await userService.findOrCreateFromGoogleProfile(profile);
+  if (user.isSuspended) throw AppError.forbidden('This account has been suspended');
+
   const accessToken = issueTokens(res, user);
-  res.redirect(`${env.CLIENT_URL}/oauth/callback#accessToken=${accessToken}`);
+  ok(res, { accessToken, user: toUserDto(user) });
 });
 
 export const refresh = asyncHandler(async (req: Request, res: Response) => {

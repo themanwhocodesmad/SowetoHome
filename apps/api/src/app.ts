@@ -5,12 +5,10 @@ import express, { type Express } from 'express';
 import mongoSanitize from 'express-mongo-sanitize';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import passport from 'passport';
 import { pinoHttp } from 'pino-http';
 import { env } from './common/config/env.js';
 import { logger } from './common/logger.js';
 import { errorHandler, notFoundHandler } from './common/errors/errorHandler.js';
-import { configurePassport } from './modules/auth/passport.js';
 import { authRouter } from './modules/auth/auth.routes.js';
 import { userRouter } from './modules/users/user.routes.js';
 import { propertyRouter } from './modules/properties/property.routes.js';
@@ -22,9 +20,12 @@ import { adminRouter } from './modules/admin/admin.routes.js';
 import { newsletterRouter } from './modules/newsletter/newsletter.routes.js';
 
 export function createApp(): Express {
-  configurePassport();
-
   const app = express();
+
+  // Exactly one reverse-proxy hop (Caddy) fronts us in production. Without this,
+  // express-rate-limit would key every request on the proxy's IP - one shared bucket
+  // for all users - and req.secure would ignore X-Forwarded-Proto.
+  app.set('trust proxy', 1);
 
   app.use(helmet());
   app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
@@ -33,7 +34,6 @@ export function createApp(): Express {
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(mongoSanitize());
-  app.use(passport.initialize());
 
   // Served directly by Express for now (disk storage per claude_plan.md §2) - a real deploy
   // puts Nginx in front of this path so uploads don't have to round-trip through Node.

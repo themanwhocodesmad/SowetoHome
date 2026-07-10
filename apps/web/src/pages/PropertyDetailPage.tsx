@@ -1,12 +1,11 @@
 import { useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { propertiesApi } from '../api/properties.js';
 import { bookingsApi } from '../api/bookings.js';
 import { reviewsApi } from '../api/reviews.js';
 import { useAuth } from '../auth/AuthContext.js';
 import { apiBaseUrl } from '../api/client.js';
-import { googleLoginUrl } from '../api/auth.js';
 
 export function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -117,7 +116,7 @@ export function PropertyDetailPage() {
           </div>
           {!user ? (
             <p>
-              <a href={googleLoginUrl()}>Sign in with Google</a> to book this property.
+              <Link to="/login">Sign in with Google</Link> to book this property.
             </p>
           ) : (
             <>

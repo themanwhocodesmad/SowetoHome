@@ -1,24 +1,14 @@
 import { Router } from 'express';
-import passport from 'passport';
-import { env } from '../../common/config/env.js';
+import { googleSignInSchema } from '@soweto-stays/shared';
 import { authenticate } from '../../common/middleware/auth.js';
+import { validate } from '../../common/middleware/validate.js';
 import * as authController from './auth.controller.js';
 
 export const authRouter = Router();
 
-authRouter.get(
-  '/google',
-  passport.authenticate('google', { scope: ['profile', 'email'], session: false }),
-);
-
-authRouter.get(
-  '/google/callback',
-  passport.authenticate('google', {
-    session: false,
-    failureRedirect: `${env.CLIENT_URL}/login?error=oauth_failed`,
-  }),
-  authController.googleCallback,
-);
+// GIS credential flow: the frontend's Google button POSTs the ID token here. There is no
+// server-side redirect/callback route - Google never navigates the browser to the API.
+authRouter.post('/google', validate(googleSignInSchema), authController.googleSignIn);
 
 authRouter.post('/refresh', authController.refresh);
 authRouter.post('/logout', authController.logout);

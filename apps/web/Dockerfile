@@ -13,8 +13,12 @@ RUN npm ci
 FROM deps AS build
 COPY packages/shared packages/shared
 COPY apps/web apps/web
-ARG VITE_API_URL=http://localhost:4000
+# Empty VITE_API_URL means "same origin" - correct behind the Caddy reverse proxy, which
+# serves web and api on one domain. Only set it when the API lives on a different origin.
+ARG VITE_API_URL=
 ENV VITE_API_URL=$VITE_API_URL
+ARG VITE_GOOGLE_CLIENT_ID=
+ENV VITE_GOOGLE_CLIENT_ID=$VITE_GOOGLE_CLIENT_ID
 RUN npm run build -w packages/shared && \
     npm run build -w apps/web
 

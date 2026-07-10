@@ -1,17 +1,13 @@
-import { useSearchParams } from 'react-router-dom';
-import { googleLoginUrl } from '../api/auth.js';
+import { useNavigate } from 'react-router-dom';
+import { GoogleSignIn } from '../components/GoogleSignIn.js';
 
 export function LoginPage() {
-  const [searchParams] = useSearchParams();
-  const oauthError = searchParams.get('error');
+  const navigate = useNavigate();
 
   return (
     <div className="login-page">
       <h1>Sign in to BookMyStay</h1>
-      {oauthError && <p className="error">Sign-in failed. Please try again.</p>}
-      <a className="button" href={googleLoginUrl()}>
-        Sign in with Google
-      </a>
+      <GoogleSignIn onSuccess={() => navigate('/', { replace: true })} />
     </div>
   );
 }

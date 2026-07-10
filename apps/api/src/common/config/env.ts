@@ -22,9 +22,10 @@ const envSchema = z.object({
   JWT_ACCESS_EXPIRES_IN: z.string().default('15m'),
   JWT_REFRESH_EXPIRES_IN: z.string().default('30d'),
 
+  // GIS credential flow needs only the client id (as the ID-token audience) - there is no
+  // client secret or callback URL. The same value is baked into the web bundle as
+  // VITE_GOOGLE_CLIENT_ID. If unset, POST /api/auth/google responds 503.
   GOOGLE_CLIENT_ID: z.string().optional(),
-  GOOGLE_CLIENT_SECRET: z.string().optional(),
-  GOOGLE_CALLBACK_URL: z.string().url().default('http://localhost:4000/api/auth/google/callback'),
 
   REDIS_URL: z.string().default('redis://localhost:6379'),
 
