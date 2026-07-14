@@ -10,5 +10,6 @@ export const ADMIN_NAV_ITEMS = [
   { to: '/admin/applications', label: 'Applications' },
   { to: '/admin/payouts', label: 'Payouts' },
   { to: '/admin/analytics', label: 'Analytics' },
+  { to: '/admin/site-images', label: 'Site Images' },
   { to: '/admin/settings', label: 'Settings' },
 ];

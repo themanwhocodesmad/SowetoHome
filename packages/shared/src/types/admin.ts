@@ -11,3 +11,5 @@ export interface PlatformSettingsDto {
   adminFeePercent: number;
   cancellationFreeWindowHours: number;
 }
+
+export type SiteImagesDto = Record<string, string>;

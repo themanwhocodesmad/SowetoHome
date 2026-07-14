@@ -8,6 +8,7 @@ import {
 import { authenticate, requireRole } from '../../common/middleware/auth.js';
 import { validate } from '../../common/middleware/validate.js';
 import * as adminController from './admin.controller.js';
+import { siteImageUpload } from './siteImage.upload.js';
 
 export const adminRouter = Router();
 
@@ -40,3 +41,7 @@ adminRouter.patch(
 );
 
 adminRouter.get('/analytics', adminController.getAnalytics);
+
+adminRouter.get('/site-images', adminController.getSiteImages);
+adminRouter.post('/site-images/:key', siteImageUpload, adminController.uploadSiteImage);
+adminRouter.delete('/site-images/:key', adminController.deleteSiteImage);

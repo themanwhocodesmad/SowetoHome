@@ -5,6 +5,7 @@ import type {
   PlatformSettingsDto,
   PropertyDto,
   ReviewHostApplicationInput,
+  SiteImagesDto,
   SuspendUserInput,
   UpdatePlatformSettingsInput,
   UserDto,
@@ -54,4 +55,16 @@ export const adminApi = {
     }),
 
   getAnalytics: () => apiFetch<AdminAnalyticsDto>('/api/admin/analytics'),
+
+  getSiteImages: () => apiFetch<SiteImagesDto>('/api/admin/site-images'),
+  uploadSiteImage: (key: string, file: File) => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return apiFetch<SiteImagesDto>(`/api/admin/site-images/${key}`, {
+      method: 'POST',
+      body: formData,
+    });
+  },
+  deleteSiteImage: (key: string) =>
+    apiFetch<SiteImagesDto>(`/api/admin/site-images/${key}`, { method: 'DELETE' }),
 };

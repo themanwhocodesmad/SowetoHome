@@ -18,6 +18,7 @@ import { payoutRouter } from './modules/payouts/payout.routes.js';
 import { reviewRouter } from './modules/reviews/review.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
 import { newsletterRouter } from './modules/newsletter/newsletter.routes.js';
+import { siteContentRouter } from './modules/siteContent/siteContent.routes.js';
 
 export function createApp(): Express {
   const app = express();
@@ -64,6 +65,7 @@ export function createApp(): Express {
   app.use('/api/reviews', reviewRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/newsletter', newsletterRouter);
+  app.use('/api/site-content', siteContentRouter);
 
   app.use(notFoundHandler);
   app.use(errorHandler);

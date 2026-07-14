@@ -5,6 +5,7 @@ export interface IPlatformSettings {
   _id: string;
   adminFeePercent: number;
   cancellationFreeWindowHours: number;
+  siteImages: Record<string, string>;
   updatedAt: Date;
 }
 
@@ -23,6 +24,7 @@ const platformSettingsSchema = new Schema<IPlatformSettings>(
       default: CANCELLATION_FREE_WINDOW_HOURS,
       min: 0,
     },
+    siteImages: { type: Schema.Types.Mixed, default: {} },
   },
   { timestamps: { createdAt: false, updatedAt: true } },
 );

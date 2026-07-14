@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { PROVINCES } from '@soweto-stays/shared';
 import { propertiesApi } from '../api/properties.js';
+import { siteContentApi } from '../api/siteContent.js';
 import { apiBaseUrl } from '../api/client.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 
@@ -76,6 +77,11 @@ export function HomePage() {
     queryFn: () => propertiesApi.search(appliedFilters),
   });
 
+  const { data: siteImages } = useQuery({
+    queryKey: ['site-content', 'images'],
+    queryFn: siteContentApi.getImages,
+  });
+
   const handleSearch = () => setAppliedFilters(buildFilters());
 
   const updateDiscovery = (patch: Partial<DiscoveryFilters>) => {
@@ -84,7 +90,9 @@ export function HomePage() {
     setAppliedFilters(buildFilters(patch));
   };
 
-  const heroImage = data?.items[0]?.images[0];
+  // Admin-uploaded photo (see /admin/site-images) takes priority; falls back to the first
+  // listing's photo so the hero still shows something before one is uploaded.
+  const heroImage = siteImages?.homeHero ?? data?.items[0]?.images[0];
 
   return (
     <div className="marketing-page">
@@ -117,7 +125,7 @@ export function HomePage() {
               <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} />
             </label>
             <button type="button" onClick={handleSearch} aria-label="Search">
-              <svg viewBox="0 0 24 24" width="18" height="18" stroke="white" strokeWidth="2" fill="none">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="white" strokeWidth="2" fill="none">
                 <circle cx="11" cy="11" r="7" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>

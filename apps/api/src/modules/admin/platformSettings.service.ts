@@ -36,4 +36,26 @@ export const platformSettingsService = {
     }
     return settings.save();
   },
+
+  async getSiteImages(): Promise<Record<string, string>> {
+    const settings = await getOrCreate();
+    return settings.siteImages ?? {};
+  },
+
+  async setSiteImage(key: string, imagePath: string): Promise<Record<string, string>> {
+    const settings = await getOrCreate();
+    settings.siteImages = { ...settings.siteImages, [key]: imagePath };
+    settings.markModified('siteImages');
+    await settings.save();
+    return settings.siteImages;
+  },
+
+  async clearSiteImage(key: string): Promise<Record<string, string>> {
+    const settings = await getOrCreate();
+    const { [key]: _removed, ...rest } = settings.siteImages ?? {};
+    settings.siteImages = rest;
+    settings.markModified('siteImages');
+    await settings.save();
+    return settings.siteImages;
+  },
 };

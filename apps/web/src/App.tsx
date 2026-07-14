@@ -22,6 +22,7 @@ import { AdminUsersPage } from './pages/admin/AdminUsersPage.js';
 import { AdminHostApplicationsPage } from './pages/admin/AdminHostApplicationsPage.js';
 import { AdminPayoutsPage } from './pages/admin/AdminPayoutsPage.js';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage.js';
+import { AdminSiteImagesPage } from './pages/admin/AdminSiteImagesPage.js';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export default function App() {
@@ -148,6 +149,14 @@ export default function App() {
             element={
               <RequireRole role="admin">
                 <AdminAnalyticsPage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/site-images"
+            element={
+              <RequireRole role="admin">
+                <AdminSiteImagesPage />
               </RequireRole>
             }
           />

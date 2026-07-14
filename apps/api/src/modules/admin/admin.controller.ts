@@ -5,13 +5,16 @@ import type {
   SuspendUserInput,
   UpdatePlatformSettingsInput,
 } from '@soweto-stays/shared';
+import { SITE_IMAGE_KEYS } from '@soweto-stays/shared';
 import { asyncHandler } from '../../common/middleware/asyncHandler.js';
+import { AppError } from '../../common/errors/AppError.js';
 import { ok, paginated } from '../../common/http/respond.js';
 import { userService, toUserDto } from '../users/user.service.js';
 import { propertyService, toPropertyDto } from '../properties/property.service.js';
 import { bookingService, toBookingDto } from '../bookings/booking.service.js';
 import { platformSettingsService } from './platformSettings.service.js';
 import { adminService } from './admin.service.js';
+import { toPublicSiteImagePath } from './siteImage.upload.js';
 
 export const listUsers = asyncHandler(async (req: Request, res: Response) => {
   const page = Number(req.query.page ?? 1);
@@ -86,4 +89,31 @@ export const updateSettings = asyncHandler(async (req: Request, res: Response) =
 export const getAnalytics = asyncHandler(async (_req: Request, res: Response) => {
   const analytics = await adminService.getAnalytics();
   ok(res, analytics);
+});
+
+function assertKnownSiteImageKey(key: string): void {
+  if (!(SITE_IMAGE_KEYS as string[]).includes(key)) {
+    throw AppError.badRequest(`Unknown site image key: ${key}`);
+  }
+}
+
+export const getSiteImages = asyncHandler(async (_req: Request, res: Response) => {
+  const siteImages = await platformSettingsService.getSiteImages();
+  ok(res, siteImages);
+});
+
+export const uploadSiteImage = asyncHandler(async (req: Request, res: Response) => {
+  const key = req.params.key as string;
+  assertKnownSiteImageKey(key);
+  const file = req.file as Express.Multer.File | undefined;
+  if (!file) throw AppError.badRequest('No image file was uploaded');
+  const siteImages = await platformSettingsService.setSiteImage(key, toPublicSiteImagePath(file.filename));
+  ok(res, siteImages);
+});
+
+export const deleteSiteImage = asyncHandler(async (req: Request, res: Response) => {
+  const key = req.params.key as string;
+  assertKnownSiteImageKey(key);
+  const siteImages = await platformSettingsService.clearSiteImage(key);
+  ok(res, siteImages);
 });
