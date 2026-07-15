@@ -180,4 +180,11 @@ export const propertyService = {
     }
     return propertyRepository.search(query, excludedPropertyIds);
   },
+
+  async getFeaturedPublished(propertyIds: string[]): Promise<PropertyDocument[]> {
+    if (propertyIds.length === 0) return [];
+    const properties = await propertyRepository.findPublishedByIds(propertyIds);
+    const byId = new Map(properties.map((p) => [p._id.toString(), p]));
+    return propertyIds.map((id) => byId.get(id)).filter((p): p is PropertyDocument => Boolean(p));
+  },
 };

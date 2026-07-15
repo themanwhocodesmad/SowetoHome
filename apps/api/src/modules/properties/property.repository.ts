@@ -11,6 +11,11 @@ export const propertyRepository = {
     return PropertyModel.findById(id);
   },
 
+  findPublishedByIds(ids: string[]): Promise<PropertyDocument[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    return PropertyModel.find({ _id: { $in: ids }, status: 'published', isAvailable: true });
+  },
+
   // Loosely typed on purpose: callers pass zod-validated DTOs plus a plain string hostId,
   // and Mongoose casts/validates the shape against the schema at write time.
   create(data: Record<string, unknown>): Promise<PropertyDocument> {

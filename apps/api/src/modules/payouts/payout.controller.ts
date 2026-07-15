@@ -13,8 +13,8 @@ export const listForAdmin = asyncHandler(async (req: Request, res: Response) => 
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);
   const status = req.query.status as string | undefined;
-  const { items, total } = await payoutService.listForAdmin(page, limit, status);
-  paginated(res, items.map((p) => toPayoutDto(p)), page, limit, total);
+  const { items, total } = await payoutService.listForAdminEnriched(page, limit, status);
+  paginated(res, items, page, limit, total);
 });
 
 export const markPaid = asyncHandler(async (req: Request, res: Response) => {

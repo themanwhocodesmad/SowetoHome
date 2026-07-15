@@ -14,34 +14,22 @@ const PRICE_BANDS = [
   { label: 'R5,000+', minPrice: 5000, maxPrice: undefined },
 ];
 
-const TRUST_STATS = [
-  { value: '12K+', label: 'Properties Managed' },
-  { value: '98%', label: 'Client Retention' },
-  { value: 'R4.2B', label: 'Portfolio Value' },
-];
-
-const VALUE_STEPS = [
-  {
-    number: '01',
-    title: 'Stay Strategy',
-    copy: 'We match every guest with a signature estate tailored to the occasion, from weekend escapes to extended corporate stays.',
-  },
-  {
-    number: '02',
-    title: 'Acquisition & Handover',
-    copy: 'Our advisory team manages onboarding, styling, and a seamless handover, so every property is booking-ready from day one.',
-  },
-  {
-    number: '03',
-    title: 'Asset Management',
-    copy: 'Ongoing stewardship keeps each estate performing, from guest relations to maintenance and revenue optimisation.',
-  },
-];
-
 interface DiscoveryFilters {
   keyword: string;
   priceBandIndex: number;
   province: string;
+}
+
+function hasActiveSearch(filters: DiscoveryFilters, city: string, checkIn: string, checkOut: string, guests: string) {
+  return Boolean(
+    filters.keyword ||
+      filters.province ||
+      filters.priceBandIndex > 0 ||
+      city ||
+      checkIn ||
+      checkOut ||
+      guests,
+  );
 }
 
 export function HomePage() {
@@ -55,6 +43,11 @@ export function HomePage() {
     province: '',
   });
   const [appliedFilters, setAppliedFilters] = useState({});
+
+  const homepageQuery = useQuery({
+    queryKey: ['site-content', 'homepage'],
+    queryFn: siteContentApi.getHomepage,
+  });
 
   const buildFilters = (overrides: Partial<DiscoveryFilters> = {}) => {
     const next = { ...discovery, ...overrides };
@@ -72,14 +65,12 @@ export function HomePage() {
     };
   };
 
+  const searchActive = hasActiveSearch(discovery, city, checkIn, checkOut, guests);
+
   const { data, isLoading, error } = useQuery({
     queryKey: ['properties', 'search', appliedFilters],
     queryFn: () => propertiesApi.search(appliedFilters),
-  });
-
-  const { data: siteImages } = useQuery({
-    queryKey: ['site-content', 'images'],
-    queryFn: siteContentApi.getImages,
+    enabled: searchActive || !homepageQuery.data?.featuredProperties.length,
   });
 
   const handleSearch = () => setAppliedFilters(buildFilters());
@@ -90,21 +81,27 @@ export function HomePage() {
     setAppliedFilters(buildFilters(patch));
   };
 
-  // Admin-uploaded photo (see /admin/site-images) takes priority; falls back to the first
-  // listing's photo so the hero still shows something before one is uploaded.
-  const heroImage = siteImages?.homeHero ?? data?.items[0]?.images[0];
+  const content = homepageQuery.data?.content;
+  const siteImages = homepageQuery.data?.siteImages;
+  const featuredProperties = homepageQuery.data?.featuredProperties ?? [];
+  const listingItems = searchActive ? data?.items ?? [] : featuredProperties.length > 0 ? featuredProperties : data?.items ?? [];
+  const listingTotal = searchActive ? data?.total ?? 0 : featuredProperties.length > 0 ? featuredProperties.length : data?.total ?? 0;
+
+  const heroImage = siteImages?.homeHero ?? listingItems[0]?.images[0];
+  const valuePropImage = siteImages?.valuePropImage;
 
   return (
     <div className="marketing-page">
       <section className="hero">
         <div className="hero__content">
-          <span className="hero__eyebrow">Premium Vacation &amp; Boutique Stays</span>
+          <span className="hero__eyebrow">{content?.heroEyebrow ?? 'Premium Vacation & Boutique Stays'}</span>
           <h1 className="hero__title">
-            Elevating the standard of <span className="hero__title-accent">modern stays</span>
+            {content?.heroTitle ?? 'Elevating the standard of '}
+            <span className="hero__title-accent">{content?.heroTitleAccent ?? 'modern stays'}</span>
           </h1>
           <p className="hero__subtitle">
-            Discover signature estates and boutique properties, curated and managed end-to-end by
-            BookMyStay&rsquo;s advisory team &mdash; from first search to seamless check-in.
+            {content?.heroSubtitle ??
+              'Discover signature estates and boutique properties, curated and managed end-to-end.'}
           </p>
 
           <div className="search-pill">
@@ -154,7 +151,7 @@ export function HomePage() {
       </section>
 
       <div className="hero__stats">
-        {TRUST_STATS.map((stat) => (
+        {(content?.trustStats ?? []).map((stat) => (
           <div className="hero__stat" key={stat.label}>
             <strong>{stat.value}</strong>
             <span>{stat.label}</span>
@@ -165,8 +162,8 @@ export function HomePage() {
       <section className="discovery" id="discovery">
         <div className="discovery-header">
           <div>
-            <h2>Featured Signature Estates</h2>
-            <p>Hand-picked stays available for booking right now.</p>
+            <h2>{content?.discoveryTitle ?? 'Featured Signature Estates'}</h2>
+            <p>{content?.discoverySubtitle ?? 'Hand-picked stays available for booking right now.'}</p>
           </div>
           <div className="filter-bar">
             <input
@@ -196,47 +193,54 @@ export function HomePage() {
           </div>
         </div>
 
-        {isLoading && <p>Loading properties...</p>}
-        {error && <p className="error">Could not load properties.</p>}
+        {searchActive && isLoading && <p>Loading properties...</p>}
+        {searchActive && error && <p className="error">Could not load properties.</p>}
+        {homepageQuery.isLoading && !searchActive && featuredProperties.length === 0 && (
+          <p>Loading featured stays...</p>
+        )}
 
-        {data && (
+        {listingTotal > 0 && (
           <p className="results-bar">
-            {data.total} stay{data.total === 1 ? '' : 's'}
+            {listingTotal} stay{listingTotal === 1 ? '' : 's'}
+            {!searchActive && featuredProperties.length > 0 ? ' (featured)' : ''}
           </p>
         )}
 
         <div className="property-grid">
-          {data?.items.map((property) => (
+          {listingItems.map((property) => (
             <PropertyCard key={property.id} property={property} />
           ))}
         </div>
-        {data && data.items.length === 0 && <p>No properties match your search yet.</p>}
+        {listingItems.length === 0 && !isLoading && <p>No properties match your search yet.</p>}
       </section>
 
       <section className="value-prop">
         <div className="value-prop__inner">
           <div className="value-prop__grid">
             <div>
-              <span className="value-prop__eyebrow">Strategic Asset Stewardship</span>
+              <span className="value-prop__eyebrow">
+                {content?.valuePropEyebrow ?? 'Strategic Asset Stewardship'}
+              </span>
               <h2 className="value-prop__title">
-                A hands-on approach to every guest stay and every property we manage
+                {content?.valuePropTitle ??
+                  'A hands-on approach to every guest stay and every property we manage'}
               </h2>
+              {valuePropImage && (
+                <img
+                  src={`${apiBaseUrl()}${valuePropImage}`}
+                  alt="Property stewardship"
+                  style={{ marginTop: '1rem', borderRadius: '12px', maxWidth: '100%' }}
+                />
+              )}
             </div>
             <div>
-              <p className="value-prop__copy">
-                Guests get a consistent, concierge-level experience across every stay we list, while
-                owners get an advisory partner who treats their property like an asset, not just a
-                listing.
-              </p>
-              <p className="value-prop__copy">
-                From onboarding through day-to-day operations, our team handles the details so
-                properties perform and guests keep coming back.
-              </p>
+              <p className="value-prop__copy">{content?.valuePropCopy1}</p>
+              <p className="value-prop__copy">{content?.valuePropCopy2}</p>
             </div>
           </div>
 
           <div className="value-prop__steps">
-            {VALUE_STEPS.map((step) => (
+            {(content?.valueSteps ?? []).map((step) => (
               <div className="value-prop__step" key={step.number}>
                 <div className="value-prop__step-number">{step.number}</div>
                 <h3 className="value-prop__step-title">{step.title}</h3>

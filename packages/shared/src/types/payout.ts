@@ -1,4 +1,5 @@
 import type { PayoutStatus } from '../constants/enums.js';
+import type { PayoutDetailsDto } from './user.js';
 
 export interface PayoutDto {
   id: string;
@@ -11,4 +12,13 @@ export interface PayoutDto {
   paidBy?: string;
   notes?: string;
   createdAt: string;
+}
+
+export interface AdminPayoutDto extends PayoutDto {
+  hostName: string;
+  hostEmail: string;
+  hostPayoutDetails?: PayoutDetailsDto;
+  propertyTitle: string;
+  checkIn: string;
+  checkOut: string;
 }

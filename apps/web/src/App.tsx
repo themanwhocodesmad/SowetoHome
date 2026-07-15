@@ -22,7 +22,8 @@ import { AdminUsersPage } from './pages/admin/AdminUsersPage.js';
 import { AdminHostApplicationsPage } from './pages/admin/AdminHostApplicationsPage.js';
 import { AdminPayoutsPage } from './pages/admin/AdminPayoutsPage.js';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage.js';
-import { AdminSiteImagesPage } from './pages/admin/AdminSiteImagesPage.js';
+import { AdminHomepagePage } from './pages/admin/AdminHomepagePage.js';
+import { HostPaymentDetailsPage } from './pages/host/HostPaymentDetailsPage.js';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export default function App() {
@@ -103,6 +104,14 @@ export default function App() {
               </RequireRole>
             }
           />
+          <Route
+            path="/host/payment-details"
+            element={
+              <RequireRole role="host">
+                <HostPaymentDetailsPage />
+              </RequireRole>
+            }
+          />
 
           <Route
             path="/admin/listings"
@@ -153,10 +162,10 @@ export default function App() {
             }
           />
           <Route
-            path="/admin/site-images"
+            path="/admin/homepage"
             element={
               <RequireRole role="admin">
-                <AdminSiteImagesPage />
+                <AdminHomepagePage />
               </RequireRole>
             }
           />

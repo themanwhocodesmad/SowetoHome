@@ -3,6 +3,7 @@ import {
   moderatePropertySchema,
   reviewHostApplicationSchema,
   suspendUserSchema,
+  updateHomepageSchema,
   updatePlatformSettingsSchema,
 } from '@soweto-stays/shared';
 import { authenticate, requireRole } from '../../common/middleware/auth.js';
@@ -45,3 +46,6 @@ adminRouter.get('/analytics', adminController.getAnalytics);
 adminRouter.get('/site-images', adminController.getSiteImages);
 adminRouter.post('/site-images/:key', siteImageUpload, adminController.uploadSiteImage);
 adminRouter.delete('/site-images/:key', adminController.deleteSiteImage);
+
+adminRouter.get('/homepage', adminController.getHomepage);
+adminRouter.patch('/homepage', validate(updateHomepageSchema), adminController.updateHomepage);

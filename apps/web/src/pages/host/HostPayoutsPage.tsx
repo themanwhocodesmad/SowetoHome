@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { payoutsApi } from '../../api/payouts.js';
 import { DashboardLayout } from '../../components/DashboardLayout.js';
@@ -15,7 +16,10 @@ export function HostPayoutsPage() {
       <div className="section-head">
         <h2>My payouts</h2>
       </div>
-      <p className="property-card__sub">Payouts are sent by an admin via manual EFT once a booking is confirmed.</p>
+      <p className="property-card__sub">
+        Payouts are sent by an admin via manual EFT once a booking is confirmed.{' '}
+        <Link to="/host/payment-details">Add your bank details</Link> so they know where to pay you.
+      </p>
 
       {isLoading && <p>Loading...</p>}
       {error && <p className="error">Could not load payouts.</p>}

@@ -1,5 +1,6 @@
 import type {
   AdminAnalyticsDto,
+  AdminHomepageDto,
   ModeratePropertyInput,
   PaginatedResult,
   PlatformSettingsDto,
@@ -7,6 +8,7 @@ import type {
   ReviewHostApplicationInput,
   SiteImagesDto,
   SuspendUserInput,
+  UpdateHomepageInput,
   UpdatePlatformSettingsInput,
   UserDto,
   BookingDto,
@@ -67,4 +69,11 @@ export const adminApi = {
   },
   deleteSiteImage: (key: string) =>
     apiFetch<SiteImagesDto>(`/api/admin/site-images/${key}`, { method: 'DELETE' }),
+
+  getHomepage: () => apiFetch<AdminHomepageDto>('/api/admin/homepage'),
+  updateHomepage: (input: UpdateHomepageInput) =>
+    apiFetch<AdminHomepageDto>('/api/admin/homepage', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
 };

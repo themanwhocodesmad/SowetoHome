@@ -1,11 +1,17 @@
 import { Schema, model, type HydratedDocument } from 'mongoose';
-import { CANCELLATION_FREE_WINDOW_HOURS, DEFAULT_ADMIN_FEE_PERCENT } from '@soweto-stays/shared';
+import {
+  CANCELLATION_FREE_WINDOW_HOURS,
+  DEFAULT_ADMIN_FEE_PERCENT,
+  type HomepageContentDto,
+} from '@soweto-stays/shared';
 
 export interface IPlatformSettings {
   _id: string;
   adminFeePercent: number;
   cancellationFreeWindowHours: number;
   siteImages: Record<string, string>;
+  homepageContent?: HomepageContentDto;
+  featuredPropertyIds: string[];
   updatedAt: Date;
 }
 
@@ -25,6 +31,8 @@ const platformSettingsSchema = new Schema<IPlatformSettings>(
       min: 0,
     },
     siteImages: { type: Schema.Types.Mixed, default: {} },
+    homepageContent: { type: Schema.Types.Mixed, required: false },
+    featuredPropertyIds: { type: [String], default: [] },
   },
   { timestamps: { createdAt: false, updatedAt: true } },
 );

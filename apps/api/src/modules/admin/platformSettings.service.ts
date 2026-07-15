@@ -1,4 +1,9 @@
-import type { UpdatePlatformSettingsInput } from '@soweto-stays/shared';
+import type {
+  HomepageContentDto,
+  UpdateHomepageInput,
+  UpdatePlatformSettingsInput,
+} from '@soweto-stays/shared';
+import { DEFAULT_HOMEPAGE_CONTENT } from '@soweto-stays/shared';
 import {
   PLATFORM_SETTINGS_ID,
   PlatformSettingsModel,
@@ -13,6 +18,12 @@ function getOrCreate(): Promise<PlatformSettingsDocument> {
     { $setOnInsert: { _id: PLATFORM_SETTINGS_ID } },
     { upsert: true, new: true },
   );
+}
+
+export function resolveHomepageContent(
+  stored: HomepageContentDto | undefined | null,
+): HomepageContentDto {
+  return stored ?? DEFAULT_HOMEPAGE_CONTENT;
 }
 
 export const platformSettingsService = {
@@ -57,5 +68,27 @@ export const platformSettingsService = {
     settings.markModified('siteImages');
     await settings.save();
     return settings.siteImages;
+  },
+
+  async getHomepageContent(): Promise<HomepageContentDto> {
+    const settings = await getOrCreate();
+    return resolveHomepageContent(settings.homepageContent);
+  },
+
+  async getFeaturedPropertyIds(): Promise<string[]> {
+    const settings = await getOrCreate();
+    return settings.featuredPropertyIds ?? [];
+  },
+
+  async updateHomepage(input: UpdateHomepageInput): Promise<PlatformSettingsDocument> {
+    const settings = await getOrCreate();
+    if (input.content !== undefined) {
+      settings.homepageContent = input.content;
+      settings.markModified('homepageContent');
+    }
+    if (input.featuredPropertyIds !== undefined) {
+      settings.featuredPropertyIds = input.featuredPropertyIds;
+    }
+    return settings.save();
   },
 };

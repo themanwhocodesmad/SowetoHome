@@ -3,6 +3,7 @@ import type {
   ModeratePropertyInput,
   ReviewHostApplicationInput,
   SuspendUserInput,
+  UpdateHomepageInput,
   UpdatePlatformSettingsInput,
 } from '@soweto-stays/shared';
 import { SITE_IMAGE_KEYS } from '@soweto-stays/shared';
@@ -12,7 +13,7 @@ import { ok, paginated } from '../../common/http/respond.js';
 import { userService, toUserDto } from '../users/user.service.js';
 import { propertyService, toPropertyDto } from '../properties/property.service.js';
 import { bookingService, toBookingDto } from '../bookings/booking.service.js';
-import { platformSettingsService } from './platformSettings.service.js';
+import { platformSettingsService, resolveHomepageContent } from './platformSettings.service.js';
 import { adminService } from './admin.service.js';
 import { toPublicSiteImagePath } from './siteImage.upload.js';
 
@@ -116,4 +117,23 @@ export const deleteSiteImage = asyncHandler(async (req: Request, res: Response) 
   assertKnownSiteImageKey(key);
   const siteImages = await platformSettingsService.clearSiteImage(key);
   ok(res, siteImages);
+});
+
+export const getHomepage = asyncHandler(async (_req: Request, res: Response) => {
+  const settings = await platformSettingsService.getOrCreate();
+  ok(res, {
+    siteImages: settings.siteImages ?? {},
+    content: resolveHomepageContent(settings.homepageContent),
+    featuredPropertyIds: settings.featuredPropertyIds ?? [],
+  });
+});
+
+export const updateHomepage = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdateHomepageInput;
+  const settings = await platformSettingsService.updateHomepage(input);
+  ok(res, {
+    siteImages: settings.siteImages ?? {},
+    content: resolveHomepageContent(settings.homepageContent),
+    featuredPropertyIds: settings.featuredPropertyIds ?? [],
+  });
 });

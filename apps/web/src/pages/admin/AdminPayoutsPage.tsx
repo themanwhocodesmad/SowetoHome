@@ -46,7 +46,10 @@ export function AdminPayoutsPage() {
           <thead>
             <tr>
               <th>Host</th>
+              <th>Property</th>
+              <th>Stay</th>
               <th>Amount</th>
+              <th>Bank details</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -54,8 +57,30 @@ export function AdminPayoutsPage() {
           <tbody>
             {data?.items.map((payout) => (
               <tr key={payout.id}>
-                <td>{payout.hostId}</td>
+                <td>
+                  <strong>{payout.hostName}</strong>
+                  <br />
+                  <span className="property-card__sub">{payout.hostEmail}</span>
+                </td>
+                <td>{payout.propertyTitle}</td>
+                <td>
+                  {new Date(payout.checkIn).toLocaleDateString()} –{' '}
+                  {new Date(payout.checkOut).toLocaleDateString()}
+                </td>
                 <td>R{payout.amount.toFixed(2)}</td>
+                <td>
+                  {payout.hostPayoutDetails ? (
+                    <>
+                      {payout.hostPayoutDetails.bankName}
+                      <br />
+                      {payout.hostPayoutDetails.accountHolder}
+                      <br />
+                      {payout.hostPayoutDetails.accountNumber}
+                    </>
+                  ) : (
+                    <span className="property-card__sub">Host has not saved bank details yet</span>
+                  )}
+                </td>
                 <td>
                   <span className={pillClass(payout.status)}>{payout.status}</span>
                 </td>

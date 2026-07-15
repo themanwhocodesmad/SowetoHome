@@ -12,7 +12,10 @@ export const RATING_PROMPT_AFTER_CHECKOUT_HOURS = 24;
 // to make it editable - no other backend change needed, storage is a flexible key/value map.
 export const SITE_IMAGE_SLOTS = [
   { key: 'homeHero', label: 'Homepage hero photo' },
+  { key: 'valuePropImage', label: 'Value proposition section photo (optional)' },
 ] as const;
+
+export const MAX_FEATURED_LISTINGS = 12;
 
 export type SiteImageKey = (typeof SITE_IMAGE_SLOTS)[number]['key'];
 
