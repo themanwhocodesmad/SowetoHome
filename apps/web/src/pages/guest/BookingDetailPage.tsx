@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { bookingsApi } from '../../api/bookings.js';
-import { paymentsApi, submitPayfastForm } from '../../api/payments.js';
+import { paymentsApi } from '../../api/payments.js';
 import { reviewsApi } from '../../api/reviews.js';
 import { useAuth } from '../../auth/AuthContext.js';
 
@@ -38,7 +38,7 @@ export function BookingDetailPage() {
     setIsPaying(true);
     try {
       const checkout = await paymentsApi.getCheckoutForm(booking.id);
-      submitPayfastForm(checkout);
+      window.location.href = checkout.redirectUrl;
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Could not start payment');
       setIsPaying(false);
@@ -75,7 +75,7 @@ export function BookingDetailPage() {
 
       {isGuest && booking.bookingStatus === 'pending_payment' && (
         <button type="button" disabled={isPaying} onClick={() => void handlePay()}>
-          {isPaying ? 'Redirecting to PayFast...' : 'Pay now'}
+          {isPaying ? 'Redirecting to Yoco...' : 'Pay now'}
         </button>
       )}
 

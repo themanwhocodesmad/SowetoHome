@@ -12,6 +12,7 @@ export * from './types/payout.js';
 export * from './types/review.js';
 export * from './types/admin.js';
 export * from './types/newsletter.js';
+export * from './types/payment.js';
 
 export * from './schemas/property.schema.js';
 export * from './schemas/booking.schema.js';

@@ -52,9 +52,9 @@ These are called out in more detail in [claude_plan.md](claude_plan.md) §3, but
 - **No automated test suite.** Typecheck/lint/build all pass, and the API was smoke-tested locally
   (it boots, validates env, reaches MongoDB Atlas and gracefully degrades without Redis), but there
   are no unit/integration tests yet. Recommended next slice.
-- **PayFast integration is unverified against a live sandbox.** The signature generation and ITN
-  handling follow PayFast's documented pattern, but this environment has no network path to
+- **Yoco integration is unverified against a live sandbox.** The webhook signature verification and
+  checkout flow follow Yoco's documented pattern, but this environment has no network path to
   actually run a sandbox transaction end-to-end. Test a real payment before trusting this with money.
-- **PayFast has no payout/refund API** — sending a host their share, or refunding a guest, is a
+- **Yoco has no payout/refund API wired up** — sending a host their share, or refunding a guest, is a
   manual bank EFT / manual dashboard action that an admin records in the app (see the Payouts admin page).
 - **Emails log instead of send** until `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS` are filled in.

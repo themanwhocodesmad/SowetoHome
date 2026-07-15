@@ -31,7 +31,20 @@ export function createApp(): Express {
   app.use(helmet());
   app.use(cors({ origin: env.CLIENT_URL, credentials: true }));
   app.use(pinoHttp({ logger, autoLogging: env.NODE_ENV !== 'test' }));
-  app.use(express.json({ limit: '1mb' }));
+  app.use(
+    express.json({
+      limit: '1mb',
+      // Yoco's webhook signature covers the exact bytes it sent - stash them before Express
+      // parses/discards the buffer so payment.controller.ts's yocoNotify can verify it later.
+      // express.json()'s verify callback types req as the raw http.IncomingMessage, not
+      // Express's augmented Request, hence the cast.
+      verify: (req, _res, buf) => {
+        if (req.url === '/api/payments/yoco/notify') {
+          (req as express.Request).rawBody = Buffer.from(buf);
+        }
+      },
+    }),
+  );
   app.use(express.urlencoded({ extended: true }));
   app.use(cookieParser());
   app.use(mongoSanitize());

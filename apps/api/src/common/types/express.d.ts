@@ -11,6 +11,9 @@ declare global {
         roles: Role[];
         email: string;
       };
+      // Stashed by express.json()'s verify hook in app.ts, only for the Yoco webhook route -
+      // its signature covers the exact bytes sent, so a re-serialized req.body won't verify.
+      rawBody?: Buffer;
     }
   }
 }

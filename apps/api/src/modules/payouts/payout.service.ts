@@ -42,7 +42,7 @@ export const payoutService = {
     return payoutRepository.listForAdmin(page, limit, status);
   },
 
-  // "manual_eft" per claude_plan.md §3/§8: PayFast has no marketplace payout API, so this
+  // "manual_eft" per claude_plan.md §3/§8: Yoco has no marketplace payout API, so this
   // records that an admin has actually sent the money via a real bank EFT outside the app.
   async markPaid(
     payoutId: string,

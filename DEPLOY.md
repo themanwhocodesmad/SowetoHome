@@ -61,10 +61,14 @@ GOOGLE_CLIENT_ID=955363517043-bdvhectf6cofcqfovbdm36ka4bot12n6.apps.googleuserco
 # Same generator as the JWT secrets
 REDIS_PASSWORD=
 
-PAYFAST_MERCHANT_ID=
-PAYFAST_MERCHANT_KEY=
-PAYFAST_PASSPHRASE=
-PAYFAST_MODE=sandbox
+# From Yoco App > Sales > Payment Gateway (sk_live_... in prod). Get the whsec_... webhook
+# secret by calling the Checkout API directly (not the dashboard UI): POST
+# https://payments.yoco.com/api/webhooks with "Authorization: Bearer <YOCO_SECRET_KEY>" and
+# body {"name": "...", "url": "https://<DOMAIN>/api/payments/yoco/notify"} - the response's
+# "secret" field is shown only once. Re-run this with the live key when going to prod; the
+# test-mode secret above does not carry over.
+YOCO_SECRET_KEY=
+YOCO_WEBHOOK_SECRET=
 
 SMTP_HOST=smtp-relay.brevo.com
 SMTP_PORT=587
@@ -115,5 +119,5 @@ docker compose build && docker compose up -d
 - Redis is password-protected (`REDIS_PASSWORD`) even though it isn't published.
 - Everything is same-origin behind Caddy (`/api` + `/uploads` → api, rest → web SPA), so
   there is no CORS surface in production and the `sameSite=lax` refresh cookie just works.
-- PayFast's ITN webhook (`/api/payments/payfast/notify`) is publicly reachable through
-  Caddy, which is required for payments to confirm.
+- Yoco's webhook (`/api/payments/yoco/notify`) is publicly reachable through Caddy, which is
+  required for payments to confirm.

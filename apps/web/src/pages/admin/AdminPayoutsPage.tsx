@@ -25,7 +25,7 @@ export function AdminPayoutsPage() {
         <h2>Host payouts</h2>
       </div>
       <p className="property-card__sub">
-        PayFast has no marketplace payout API, so sending a host their share means doing a real bank EFT
+        Yoco has no marketplace payout API, so sending a host their share means doing a real bank EFT
         yourself, then marking it paid here.
       </p>
 

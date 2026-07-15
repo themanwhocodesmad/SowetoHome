@@ -123,7 +123,7 @@ export const bookingService = {
     return bookingRepository.listForAdmin(page, limit, status);
   },
 
-  // Idempotent: PayFast's ITN may retry, so re-confirming an already-confirmed booking is a no-op.
+  // Idempotent: Yoco's webhook may retry, so re-confirming an already-confirmed booking is a no-op.
   async confirmPayment(bookingId: string, paymentRef: string): Promise<BookingDocument> {
     const booking = await bookingRepository.findById(bookingId);
     if (!booking) throw AppError.notFound('Booking not found');
@@ -142,7 +142,7 @@ export const bookingService = {
     return bookingRepository.save(booking);
   },
 
-  // Refund execution against PayFast is the payments module's job (see payment.service.ts) -
+  // Refund execution against Yoco is the payments module's job (see payment.service.ts) -
   // this only decides booking-state eligibility per the flat 24-48h rule (claude_plan.md §2).
   async cancel(
     bookingId: string,

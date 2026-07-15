@@ -6,6 +6,5 @@ export const paymentRouter = Router();
 
 paymentRouter.post('/checkout/:bookingId', authenticate, paymentController.checkout);
 
-// Called by PayFast's servers, not our frontend - no user auth applies here (the
-// request is authenticated by signature + the validate() callback in payment.service.ts).
-paymentRouter.post('/payfast/notify', paymentController.notify);
+// Called by Yoco's servers, not our frontend - see payment.controller.ts for the auth note.
+paymentRouter.post('/yoco/notify', paymentController.notify);

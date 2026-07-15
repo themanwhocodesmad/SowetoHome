@@ -13,8 +13,8 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(4000),
   MONGO_URI: z.string().min(1, 'MONGO_URI is required'),
   CLIENT_URL: z.string().url().default('http://localhost:5173'),
-  // Must be a publicly-reachable URL for PayFast's ITN webhook to reach in production;
-  // localhost only works locally if tunnelled (e.g. ngrok) - see README.
+  // Must be a publicly-reachable URL for Yoco's webhook to reach in production; localhost
+  // only works locally if tunnelled (e.g. ngrok) - see README.
   API_PUBLIC_URL: z.string().url().default('http://localhost:4000'),
 
   JWT_ACCESS_SECRET: z.string().min(16, 'JWT_ACCESS_SECRET must be at least 16 characters'),
@@ -29,13 +29,14 @@ const envSchema = z.object({
 
   REDIS_URL: z.string().default('redis://localhost:6379'),
 
-  PAYFAST_MERCHANT_ID: z.string().optional(),
-  PAYFAST_MERCHANT_KEY: z.string().optional(),
-  PAYFAST_PASSPHRASE: z.string().optional(),
-  PAYFAST_MODE: z.enum(['sandbox', 'live']).default('sandbox'),
-  PAYFAST_RETURN_URL: z.string().optional(),
-  PAYFAST_CANCEL_URL: z.string().optional(),
-  PAYFAST_NOTIFY_URL: z.string().optional(),
+  // Yoco (sk_test_... / sk_live_... from Yoco App > Sales > Payment Gateway). Mode is implied
+  // by the key prefix, not a separate setting. Webhook secret (whsec_...) comes from
+  // registering an endpoint for payment.succeeded/payment.failed in the Yoco dashboard.
+  YOCO_SECRET_KEY: z.string().optional(),
+  YOCO_WEBHOOK_SECRET: z.string().optional(),
+  YOCO_SUCCESS_URL: z.string().optional(),
+  YOCO_CANCEL_URL: z.string().optional(),
+  YOCO_FAILURE_URL: z.string().optional(),
 
   SMTP_HOST: z.string().optional(),
   // preprocess so an empty string in .env (rather than the var being absent) doesn't fail coercion
