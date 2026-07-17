@@ -34,3 +34,6 @@ coverage/
 
 # Docker
 docker-compose.override.yml
+
+# Terminal session logs (may contain command output with secrets)
+terminals/
