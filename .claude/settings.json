@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Move-Item \"c:\\\\Users\\\\BonganiChichava\\\\Python\\\\Pannotia\\\\docs\\\\future-plans\\\\plan-defence-hp-and-armoury-participation.md\" \"c:\\\\Users\\\\BonganiChichava\\\\Python\\\\Pannotia\\\\docs\\\\completed-plans\\\\plan-defence-hp-and-armoury-participation.md\")",
+      "Bash(node -e ' *)",
+      "Bash(git -C \"/c/Users/BonganiChichava/Python/Pannotia\" mv \"docs/future-plans/sector-calendar/09-corsair-interdiction.md\" \"docs/future-plans/sector-calendar/09-raider-ambush.md\")",
+      "Bash(echo \"exit: $?\")",
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).jest || 'no inline jest config'\\)\")",
+      "Bash(node -e \"console.log\\(require\\('./package.json'\\).dependencies.zod\\)\")",
+      "Bash(npx eslint *)",
+      "Bash(npx vite *)",
+      "Bash(node -e \"require\\('./src/infrastructure/db/repositories/ark.repository'\\); console.log\\('OK'\\);\")",
+      "Bash(git -C /c/Users/BonganiChichava/Python/Pannotia status --short)",
+      "Bash(grep -n \"^  }\\);$\" resolve-raid.js)",
+      "Bash(python -c ' *)"
+    ],
+    "additionalDirectories": [
+      "C:\\Users\\BONGAN~1\\AppData\\Local\\Temp"
+    ]
+  }
+}
