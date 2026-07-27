@@ -12,9 +12,3 @@ export const updateProfileSchema = z.object({
     .optional(),
 });
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
-
-// Becoming a host is an application reviewed by an admin, not an instant role grant.
-export const applyHostSchema = z.object({
-  message: z.string().max(1000).optional(),
-});
-export type ApplyHostInput = z.infer<typeof applyHostSchema>;

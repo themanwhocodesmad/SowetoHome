@@ -1,17 +1,9 @@
 import type { Role } from '../constants/roles.js';
-import type { HostApplicationStatus } from '../constants/enums.js';
 
 export interface PayoutDetailsDto {
   bankName: string;
   accountNumber: string;
   accountHolder: string;
-}
-
-export interface HostApplicationDto {
-  status: HostApplicationStatus;
-  message?: string;
-  appliedAt: string;
-  reviewedAt?: string;
 }
 
 export interface UserDto {
@@ -22,7 +14,6 @@ export interface UserDto {
   roles: Role[];
   phone?: string;
   isSuspended: boolean;
-  hostApplication?: HostApplicationDto;
   payoutDetails?: PayoutDetailsDto;
   hostRatingAvg: number;
   hostRatingCount: number;

@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import {
   moderatePropertySchema,
-  reviewHostApplicationSchema,
   suspendUserSchema,
   updateHomepageSchema,
   updatePlatformSettingsSchema,
@@ -17,13 +16,7 @@ adminRouter.use(authenticate, requireRole('admin'));
 
 adminRouter.get('/users', adminController.listUsers);
 adminRouter.post('/users/:id/suspend', validate(suspendUserSchema), adminController.suspendUser);
-
-adminRouter.get('/host-applications', adminController.listHostApplications);
-adminRouter.post(
-  '/host-applications/:id/review',
-  validate(reviewHostApplicationSchema),
-  adminController.reviewHostApplication,
-);
+adminRouter.post('/users/:id/grant-host', adminController.grantHost);
 
 adminRouter.get('/properties', adminController.listProperties);
 adminRouter.post(

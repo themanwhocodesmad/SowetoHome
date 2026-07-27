@@ -13,14 +13,6 @@ export function toUserDto(user: UserDocument): UserDto {
     roles: user.roles,
     phone: user.phone,
     isSuspended: user.isSuspended,
-    hostApplication: user.hostApplication
-      ? {
-          status: user.hostApplication.status,
-          message: user.hostApplication.message,
-          appliedAt: user.hostApplication.appliedAt.toISOString(),
-          reviewedAt: user.hostApplication.reviewedAt?.toISOString(),
-        }
-      : undefined,
     hostRatingAvg: user.hostRatingAvg,
     hostRatingCount: user.hostRatingCount,
     guestRatingAvg: user.guestRatingAvg,
@@ -69,20 +61,9 @@ export const userService = {
     return userRepository.save(user);
   },
 
-  // A guest applies to become a host; the role is only added once an admin approves the
-  // application (still a single account with multiple roles - see claude_plan.md §2).
-  async applyToHost(userId: string, message?: string): Promise<UserDocument> {
-    const user = await this.getById(userId);
-    if (user.roles.includes('host')) throw AppError.badRequest('You are already a host');
-    if (user.hostApplication?.status === 'pending') {
-      throw AppError.badRequest('Your host application is already pending review');
-    }
-    user.hostApplication = { status: 'pending', message, appliedAt: new Date() };
-    return userRepository.save(user);
-  },
-
-  // Direct grant, bypassing the application flow - used when an admin creates a listing
-  // on behalf of a user, which is an implicit approval.
+  // Only an admin can turn a user into a host - there is no self-service application
+  // flow. Used directly from the admin Users page, and implicitly when an admin creates
+  // a listing on behalf of a user who isn't a host yet.
   async grantHostRole(userId: string): Promise<UserDocument> {
     const user = await this.getById(userId);
     if (!user.roles.includes('host')) {
@@ -90,24 +71,6 @@ export const userService = {
       await userRepository.save(user);
     }
     return user;
-  },
-
-  async reviewHostApplication(userId: string, approve: boolean): Promise<UserDocument> {
-    const user = await this.getById(userId);
-    if (user.hostApplication?.status !== 'pending') {
-      throw AppError.badRequest('User has no pending host application');
-    }
-    user.hostApplication.status = approve ? 'approved' : 'rejected';
-    user.hostApplication.reviewedAt = new Date();
-    if (approve && !user.roles.includes('host')) {
-      user.roles = [...user.roles, 'host'];
-    }
-    user.markModified('hostApplication');
-    return userRepository.save(user);
-  },
-
-  async listHostApplications(status: string, page: number, limit: number) {
-    return userRepository.listByHostApplicationStatus(status, page, limit);
   },
 
   async setSuspended(userId: string, isSuspended: boolean): Promise<UserDocument> {

@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express';
 import type {
   ModeratePropertyInput,
-  ReviewHostApplicationInput,
   SuspendUserInput,
   UpdateHomepageInput,
   UpdatePlatformSettingsInput,
@@ -33,18 +32,10 @@ export const suspendUser = asyncHandler(async (req: Request, res: Response) => {
   ok(res, toUserDto(user));
 });
 
-export const listHostApplications = asyncHandler(async (req: Request, res: Response) => {
-  const page = Number(req.query.page ?? 1);
-  const limit = Number(req.query.limit ?? 20);
-  const status = (req.query.status as string | undefined) ?? 'pending';
-  const { items, total } = await userService.listHostApplications(status, page, limit);
-  paginated(res, items.map((u) => toUserDto(u)), page, limit, total);
-});
-
-// `reason` is validated but, like suspendUser's, not persisted - no moderation audit log in v1.
-export const reviewHostApplication = asyncHandler(async (req: Request, res: Response) => {
-  const { approve } = req.body as ReviewHostApplicationInput;
-  const user = await userService.reviewHostApplication(req.params.id as string, approve);
+// Admin-only way to turn a user into a host - there is no guest-facing application
+// flow (see AdminUsersPage.tsx). Idempotent: granting an existing host is a no-op.
+export const grantHost = asyncHandler(async (req: Request, res: Response) => {
+  const user = await userService.grantHostRole(req.params.id as string);
   ok(res, toUserDto(user));
 });
 

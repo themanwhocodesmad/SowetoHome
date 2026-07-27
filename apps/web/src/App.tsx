@@ -7,7 +7,6 @@ import { ServicesPage } from './pages/ServicesPage.js';
 import { ContactPage } from './pages/ContactPage.js';
 import { PropertyDetailPage } from './pages/PropertyDetailPage.js';
 import { LoginPage } from './pages/LoginPage.js';
-import { BecomeHostPage } from './pages/BecomeHostPage.js';
 import { RequireAuth, RequireRole } from './auth/RequireRole.js';
 import { MyBookingsPage } from './pages/guest/MyBookingsPage.js';
 import { BookingDetailPage } from './pages/guest/BookingDetailPage.js';
@@ -19,7 +18,6 @@ import { HostPayoutsPage } from './pages/host/HostPayoutsPage.js';
 import { AdminListingsPage } from './pages/admin/AdminListingsPage.js';
 import { AdminCreateListingPage } from './pages/admin/AdminCreateListingPage.js';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage.js';
-import { AdminHostApplicationsPage } from './pages/admin/AdminHostApplicationsPage.js';
 import { AdminPayoutsPage } from './pages/admin/AdminPayoutsPage.js';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage.js';
 import { AdminHomepagePage } from './pages/admin/AdminHomepagePage.js';
@@ -39,14 +37,6 @@ export default function App() {
           <Route path="/properties/:id" element={<PropertyDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
 
-          <Route
-            path="/become-host"
-            element={
-              <RequireAuth>
-                <BecomeHostPage />
-              </RequireAuth>
-            }
-          />
           <Route
             path="/bookings"
             element={
@@ -134,14 +124,6 @@ export default function App() {
             element={
               <RequireRole role="admin">
                 <AdminUsersPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/admin/applications"
-            element={
-              <RequireRole role="admin">
-                <AdminHostApplicationsPage />
               </RequireRole>
             }
           />

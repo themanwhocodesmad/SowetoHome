@@ -1458,31 +1458,6 @@ tbody tr:last-child td {
   margin-bottom: 0;
 }
 
-/* ---------- Become a host ---------- */
-.become-host {
-  max-width: 560px;
-  margin: 2.5rem auto;
-  padding: 0 1.5rem;
-}
-
-.become-host__form {
-  margin-top: 1.2rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.9rem;
-  align-items: flex-start;
-}
-
-.become-host__form label {
-  width: 100%;
-}
-
-/* ---------- Admin host applications ---------- */
-.applications__message {
-  max-width: 320px;
-  white-space: pre-wrap;
-}
-
 .table-actions {
   display: flex;
   gap: 8px;

@@ -25,7 +25,6 @@ export function Navbar() {
             <Link to="/host/payouts">Payouts</Link>
           </>
         )}
-        {user && !user.roles.includes('host') && <Link to="/become-host">Become a host</Link>}
         {user?.roles.includes('admin') && (
           <>
             <Link to="/admin/listings">Listings</Link>

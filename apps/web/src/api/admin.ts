@@ -5,7 +5,6 @@ import type {
   PaginatedResult,
   PlatformSettingsDto,
   PropertyDto,
-  ReviewHostApplicationInput,
   SiteImagesDto,
   SuspendUserInput,
   UpdateHomepageInput,
@@ -25,16 +24,8 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify(input),
     }),
-
-  listHostApplications: (page = 1, limit = 20, status = 'pending') =>
-    apiFetch<PaginatedResult<UserDto>>(
-      `/api/admin/host-applications?page=${page}&limit=${limit}&status=${status}`,
-    ),
-  reviewHostApplication: (id: string, input: ReviewHostApplicationInput) =>
-    apiFetch<UserDto>(`/api/admin/host-applications/${id}/review`, {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
+  grantHost: (id: string) =>
+    apiFetch<UserDto>(`/api/admin/users/${id}/grant-host`, { method: 'POST' }),
 
   listProperties: (page = 1, limit = 20, status?: string) =>
     apiFetch<PaginatedResult<PropertyDto>>(

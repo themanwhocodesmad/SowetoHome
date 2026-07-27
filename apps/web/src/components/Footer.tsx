@@ -58,9 +58,6 @@ export function Footer() {
               <Link to="/contact">Contact Us</Link>
             </li>
             <li>
-              <Link to="/become-host">Become a Host</Link>
-            </li>
-            <li>
               <Link to="/login">Sign In</Link>
             </li>
           </ul>
