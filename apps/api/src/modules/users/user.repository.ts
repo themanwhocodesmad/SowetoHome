@@ -28,11 +28,12 @@ export const userRepository = {
     return { items, total };
   },
 
-  async listPaginated(page: number, limit: number) {
+  async listPaginated(page: number, limit: number, role?: string) {
+    const filter = role ? { roles: role } : {};
     const skip = (page - 1) * limit;
     const [items, total] = await Promise.all([
-      UserModel.find().sort({ createdAt: -1 }).skip(skip).limit(limit),
-      UserModel.countDocuments(),
+      UserModel.find(filter).sort({ createdAt: -1 }).skip(skip).limit(limit),
+      UserModel.countDocuments(filter),
     ]);
     return { items, total };
   },

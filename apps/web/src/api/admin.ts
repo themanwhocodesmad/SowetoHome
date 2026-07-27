@@ -16,8 +16,10 @@ import type {
 import { apiFetch } from './client.js';
 
 export const adminApi = {
-  listUsers: (page = 1, limit = 20) =>
-    apiFetch<PaginatedResult<UserDto>>(`/api/admin/users?page=${page}&limit=${limit}`),
+  listUsers: (page = 1, limit = 20, role?: string) =>
+    apiFetch<PaginatedResult<UserDto>>(
+      `/api/admin/users?page=${page}&limit=${limit}${role ? `&role=${role}` : ''}`,
+    ),
   suspendUser: (id: string, input: SuspendUserInput) =>
     apiFetch<UserDto>(`/api/admin/users/${id}/suspend`, {
       method: 'POST',

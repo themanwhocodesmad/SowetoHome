@@ -116,7 +116,7 @@ export const userService = {
     return userRepository.save(user);
   },
 
-  async listPaginated(page: number, limit: number) {
-    return userRepository.listPaginated(page, limit);
+  async listPaginated(page: number, limit: number, role?: string) {
+    return userRepository.listPaginated(page, limit, role);
   },
 };

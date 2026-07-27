@@ -20,7 +20,8 @@ import { toPublicSiteImagePath } from './siteImage.upload.js';
 export const listUsers = asyncHandler(async (req: Request, res: Response) => {
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);
-  const { items, total } = await userService.listPaginated(page, limit);
+  const role = req.query.role as string | undefined;
+  const { items, total } = await userService.listPaginated(page, limit, role);
   paginated(res, items.map((u) => toUserDto(u)), page, limit, total);
 });
 
