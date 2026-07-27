@@ -210,7 +210,7 @@ export function AdminHomepagePage() {
           <section className="panel" style={{ marginBottom: '1.5rem' }}>
             <h3>Trust stats</h3>
             {content.trustStats.map((stat, index) => (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '0.75rem' }}>
+              <div key={index} className="trust-stat-row">
                 <label>
                   Value
                   <input value={stat.value} onChange={(e) => updateStat(index, 'value', e.target.value)} />

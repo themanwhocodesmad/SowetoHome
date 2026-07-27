@@ -32,11 +32,25 @@
   box-sizing: border-box;
 }
 
+html {
+  /* Safety net: no single element should be able to force horizontal scroll on
+     the whole page - real fixes (tables, forms) still get their own overflow
+     handling above, this just stops a stray one from breaking the layout. */
+  overflow-x: hidden;
+}
+
 body {
   margin: 0;
+  max-width: 100vw;
   background: var(--color-bg);
   color: var(--color-text);
   font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+img,
+svg {
+  max-width: 100%;
 }
 
 a {
@@ -89,14 +103,27 @@ h1 {
   position: sticky;
   top: 0;
   z-index: 50;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   padding: 0.9rem 2.5rem;
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border);
-  flex-wrap: wrap;
+}
+
+.navbar__bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   gap: 0.75rem;
+}
+
+.navbar__toggle {
+  display: none;
+  background: none;
+  border: none;
+  padding: 6px;
+  margin: 0;
+  color: var(--color-heading);
+  cursor: pointer;
+  flex-shrink: 0;
 }
 
 .navbar__brand {
@@ -891,6 +918,12 @@ table {
   font-size: 14px;
 }
 
+/* Give dashboard tables a floor width so columns scroll horizontally instead of
+   crushing illegibly on narrow screens (the wrapping .panel--flush provides the scroll). */
+.panel--flush table {
+  min-width: 640px;
+}
+
 thead th {
   text-align: left;
   color: var(--color-muted);
@@ -1116,6 +1149,11 @@ tbody tr:last-child td {
 
 .panel--flush {
   padding: 0;
+  /* Tables inside dashboard panels must scroll within their own box on narrow
+     screens - without this, a wide table forces the whole page wider than the
+     viewport (and past the sticky navbar/sidebar). */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .section-head {
@@ -1530,5 +1568,157 @@ tbody tr:last-child td {
   }
   .newsletter-form {
     flex-direction: column;
+  }
+}
+
+/* ---------- Login page / Google sign-in ---------- */
+.login-page {
+  max-width: 400px;
+  margin: 3rem auto;
+  padding: 0 1.25rem;
+  text-align: center;
+}
+
+.google-signin {
+  display: flex;
+  justify-content: center;
+}
+
+.google-signin > div {
+  max-width: 100%;
+}
+
+/* ---------- Admin homepage: trust stat editor row ---------- */
+.trust-stat-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 0.75rem;
+}
+
+/* =========================================================================
+   Mobile navigation (hamburger menu)
+   Placed last so it wins the cascade over the earlier 900px breakpoint's
+   `.navbar` padding rule for any width where both apply.
+   ========================================================================= */
+@media (max-width: 860px) {
+  .navbar {
+    padding: 0.7rem 1.1rem;
+  }
+
+  .navbar__toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .navbar__links {
+    display: none;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    margin-top: 0.75rem;
+    max-height: calc(100vh - 64px);
+    overflow-y: auto;
+  }
+
+  .navbar__links--open {
+    display: flex;
+  }
+
+  .navbar__links a {
+    width: 100%;
+    justify-content: flex-start;
+    border-radius: var(--radius-sm);
+  }
+
+  .navbar__links button,
+  .navbar__links .button {
+    width: 100%;
+    order: 1;
+    margin-top: 6px;
+    justify-content: center;
+  }
+}
+
+/* =========================================================================
+   General small-screen polish (phones, ~480px and under)
+   ========================================================================= */
+@media (max-width: 480px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .marketing-page section,
+  .hero,
+  .hero__stats,
+  .discovery,
+  .value-prop,
+  .content-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .hero {
+    padding-top: 2rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .hero__stats {
+    gap: 20px;
+  }
+
+  .search-pill {
+    flex-direction: column;
+    border-radius: var(--radius-md);
+    padding: 10px;
+  }
+
+  .search-pill label {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+    width: 100%;
+  }
+
+  .search-pill label:last-of-type {
+    border-bottom: none;
+  }
+
+  .search-pill button {
+    width: 100%;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    margin: 6px 0 0;
+  }
+
+  .amenity-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .listing-form__row--2,
+  .listing-form__row--3,
+  .listing-form__row--4 {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-stat-row {
+    grid-template-columns: 1fr;
+  }
+
+  .dash-topbar {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .site-image-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .site-image-row__preview {
+    width: 100%;
+  }
+
+  .booking-form {
+    max-width: none;
   }
 }

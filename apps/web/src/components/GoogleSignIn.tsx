@@ -61,12 +61,16 @@ export function GoogleSignIn({ onSuccess }: { onSuccess?: () => void }) {
           auto_select: false,
           cancel_on_tap_outside: true,
         });
+        // GIS renders a fixed-pixel-width iframe (no way to pass a CSS-relative width),
+        // so size it to whatever the container actually has, capped at a sensible max -
+        // otherwise a hardcoded 280 overflows on the narrowest phone screens.
+        const width = Math.min(280, Math.max(220, Math.round(buttonRef.current.clientWidth)));
         window.google.accounts.id.renderButton(buttonRef.current, {
           theme: 'outline',
           size: 'large',
           text: 'signin_with',
           shape: 'rectangular',
-          width: 280,
+          width,
         });
       })
       .catch(() => {
