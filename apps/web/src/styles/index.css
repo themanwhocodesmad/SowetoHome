@@ -1057,26 +1057,70 @@ button:disabled {
 }
 
 /* Standardized card grid: grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 */
-.value-prop__steps {
+.value-prop__steps-track {
   display: grid;
   grid-template-columns: 1fr;
   gap: 1.5rem;
 }
 
 @media (min-width: 768px) {
-  .value-prop__steps {
+  .value-prop__steps-track {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (min-width: 1024px) {
-  .value-prop__steps {
+  .value-prop__steps-track {
     gap: 2rem;
   }
 }
 
 .value-prop__step {
   position: relative;
+}
+
+/* The duplicated set exists only to give the mobile auto-scroll carousel a
+   seamless loop - keep it out of the desktop/tablet grid entirely. */
+.value-prop__step[aria-hidden='true'] {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .value-prop__steps {
+    overflow: hidden;
+  }
+
+  .value-prop__steps-track {
+    display: flex;
+    width: max-content;
+    gap: 1.25rem;
+    animation: valuePropCarousel 16s linear infinite;
+  }
+
+  .value-prop__steps:hover .value-prop__steps-track {
+    animation-play-state: paused;
+  }
+
+  /* Duplicate set re-shown here (hidden by default above) so the track has two
+     back-to-back copies of the same content - translating exactly one copy's
+     width makes the loop restart invisibly instead of jump-cutting. */
+  .value-prop__step[aria-hidden='true'] {
+    display: block;
+  }
+
+  .value-prop__step {
+    flex: 0 0 auto;
+    width: min(80vw, 300px);
+  }
+}
+
+@keyframes valuePropCarousel {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .value-prop__step-number {
@@ -1865,9 +1909,6 @@ tbody tr:last-child td {
     bottom: 16px;
   }
   .value-prop__grid {
-    grid-template-columns: 1fr;
-  }
-  .value-prop__steps {
     grid-template-columns: 1fr;
   }
   .contact-grid {

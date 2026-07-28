@@ -257,13 +257,24 @@ export function HomePage() {
           </div>
 
           <div className="value-prop__steps">
-            {(content?.valueSteps ?? DEFAULT_HOMEPAGE_CONTENT.valueSteps).map((step) => (
-              <div className="value-prop__step" key={step.number}>
-                <div className="value-prop__step-number">{step.number}</div>
-                <h3 className="value-prop__step-title">{step.title}</h3>
-                <p className="value-prop__step-copy">{step.copy}</p>
-              </div>
-            ))}
+            <div className="value-prop__steps-track">
+              {(content?.valueSteps ?? DEFAULT_HOMEPAGE_CONTENT.valueSteps).map((step) => (
+                <div className="value-prop__step" key={step.number}>
+                  <div className="value-prop__step-number">{step.number}</div>
+                  <h3 className="value-prop__step-title">{step.title}</h3>
+                  <p className="value-prop__step-copy">{step.copy}</p>
+                </div>
+              ))}
+              {/* Duplicate set, hidden from assistive tech - only shown on mobile to
+                  give the auto-scrolling carousel a seamless loop back to the start. */}
+              {(content?.valueSteps ?? DEFAULT_HOMEPAGE_CONTENT.valueSteps).map((step) => (
+                <div className="value-prop__step" key={`${step.number}-dup`} aria-hidden="true">
+                  <div className="value-prop__step-number">{step.number}</div>
+                  <h3 className="value-prop__step-title">{step.title}</h3>
+                  <p className="value-prop__step-copy">{step.copy}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
