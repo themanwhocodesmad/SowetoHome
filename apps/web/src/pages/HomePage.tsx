@@ -1,10 +1,12 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { PROVINCES } from '@soweto-stays/shared';
+import { Link, useSearchParams } from 'react-router-dom';
+import { DEFAULT_HOMEPAGE_CONTENT, DEFAULT_SECTION_SPACING_PRESET, PROVINCES } from '@soweto-stays/shared';
 import { propertiesApi } from '../api/properties.js';
 import { siteContentApi } from '../api/siteContent.js';
 import { apiBaseUrl } from '../api/client.js';
 import { PropertyCard } from '../components/PropertyCard.js';
+import { SearchBar } from '../components/SearchBar.js';
 
 const PRICE_BANDS = [
   { label: 'All Prices', minPrice: undefined as number | undefined, maxPrice: undefined as number | undefined },
@@ -33,10 +35,17 @@ function hasActiveSearch(filters: DiscoveryFilters, city: string, checkIn: strin
 }
 
 export function HomePage() {
-  const [city, setCity] = useState('');
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState('');
+  // The primary stay search (Where/Check-in/Check-out/Guests) lives in the URL, not
+  // local state - it's edited from the SearchBar component (rendered in the Navbar on
+  // desktop, in this hero on mobile - see index.css), which navigates here with the
+  // search encoded as query params. That keeps both instances in sync for free and
+  // makes a search shareable/bookmarkable.
+  const [searchParams] = useSearchParams();
+  const city = searchParams.get('city') ?? '';
+  const checkIn = searchParams.get('checkIn') ?? '';
+  const checkOut = searchParams.get('checkOut') ?? '';
+  const guests = searchParams.get('guests') ?? '';
+
   const [discovery, setDiscovery] = useState<DiscoveryFilters>({
     keyword: '',
     priceBandIndex: 0,
@@ -54,8 +63,8 @@ export function HomePage() {
     const band = PRICE_BANDS[next.priceBandIndex];
     return {
       city: next.keyword || city || undefined,
-      checkIn: checkIn ? new Date(checkIn).toISOString() : undefined,
-      checkOut: checkOut ? new Date(checkOut).toISOString() : undefined,
+      checkIn: checkIn || undefined,
+      checkOut: checkOut || undefined,
       guests: guests ? Number(guests) : undefined,
       minPrice: band?.minPrice,
       maxPrice: band?.maxPrice,
@@ -65,6 +74,13 @@ export function HomePage() {
     };
   };
 
+  // Re-applies whenever the URL search changes (a SearchBar submission, back/forward
+  // nav, or a shared link landing here with query params already set).
+  useEffect(() => {
+    setAppliedFilters(buildFilters());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [city, checkIn, checkOut, guests]);
+
   const searchActive = hasActiveSearch(discovery, city, checkIn, checkOut, guests);
 
   const { data, isLoading, error } = useQuery({
@@ -72,8 +88,6 @@ export function HomePage() {
     queryFn: () => propertiesApi.search(appliedFilters),
     enabled: searchActive || !homepageQuery.data?.featuredProperties.length,
   });
-
-  const handleSearch = () => setAppliedFilters(buildFilters());
 
   const updateDiscovery = (patch: Partial<DiscoveryFilters>) => {
     const next = { ...discovery, ...patch };
@@ -89,45 +103,25 @@ export function HomePage() {
 
   const heroImage = siteImages?.homeHero ?? listingItems[0]?.images[0];
   const valuePropImage = siteImages?.valuePropImage;
+  // Only "standard" exists today (see index.css's spacing system), but reading it from
+  // the CMS setting rather than hardcoding means a future preset just needs its own CSS
+  // rules under this class name - no other wiring changes.
+  const spacingPreset = homepageQuery.data?.sectionSpacingPreset ?? DEFAULT_SECTION_SPACING_PRESET;
 
   return (
-    <div className="marketing-page">
+    <div className={`marketing-page spacing-${spacingPreset}`}>
       <section className="hero">
         <div className="hero__content">
-          <span className="hero__eyebrow">{content?.heroEyebrow ?? 'Premium Vacation & Boutique Stays'}</span>
+          <span className="hero__eyebrow">{content?.heroEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.heroEyebrow}</span>
           <h1 className="hero__title">
-            {content?.heroTitle ?? 'Elevating the standard of '}
-            <span className="hero__title-accent">{content?.heroTitleAccent ?? 'modern stays'}</span>
+            {content?.heroTitle ?? DEFAULT_HOMEPAGE_CONTENT.heroTitle}
+            <span className="hero__title-accent">
+              {content?.heroTitleAccent ?? DEFAULT_HOMEPAGE_CONTENT.heroTitleAccent}
+            </span>
           </h1>
-          <p className="hero__subtitle">
-            {content?.heroSubtitle ??
-              'Discover signature estates and boutique properties, curated and managed end-to-end.'}
-          </p>
+          <p className="hero__subtitle">{content?.heroSubtitle ?? DEFAULT_HOMEPAGE_CONTENT.heroSubtitle}</p>
 
-          <div className="search-pill">
-            <label>
-              <span>Where</span>
-              <input value={city} onChange={(e) => setCity(e.target.value)} placeholder="Soweto" />
-            </label>
-            <label>
-              <span>Check in</span>
-              <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
-            </label>
-            <label>
-              <span>Check out</span>
-              <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
-            </label>
-            <label>
-              <span>Guests</span>
-              <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} />
-            </label>
-            <button type="button" onClick={handleSearch} aria-label="Search">
-              <svg viewBox="0 0 24 24" width="15" height="15" stroke="white" strokeWidth="2" fill="none">
-                <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-          </div>
+          <SearchBar className="hero__search-mobile" />
 
           <div className="hero__ctas">
             <a href="#discovery" className="button button--lg">
@@ -137,6 +131,15 @@ export function HomePage() {
               Schedule Consultation
             </a>
           </div>
+
+          <div className="hero__stats">
+            {(content?.trustStats ?? DEFAULT_HOMEPAGE_CONTENT.trustStats).map((stat) => (
+              <div className="hero__stat" key={stat.label}>
+                <strong>{stat.value}</strong>
+                <span>{stat.label}</span>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="hero__media">
@@ -144,74 +147,85 @@ export function HomePage() {
             {heroImage && <img src={`${apiBaseUrl()}${heroImage}`} alt="Featured signature estate" />}
           </div>
           <div className="hero__badge">
-            <span>Est.</span>
-            <strong>2026</strong>
+            <span>Verified</span>
+            <strong>Hosts</strong>
           </div>
         </div>
       </section>
 
-      <div className="hero__stats">
-        {(content?.trustStats ?? []).map((stat) => (
-          <div className="hero__stat" key={stat.label}>
-            <strong>{stat.value}</strong>
-            <span>{stat.label}</span>
-          </div>
-        ))}
-      </div>
-
-      <section className="discovery" id="discovery">
-        <div className="discovery-header">
-          <div>
-            <h2>{content?.discoveryTitle ?? 'Featured Signature Estates'}</h2>
-            <p>{content?.discoverySubtitle ?? 'Hand-picked stays available for booking right now.'}</p>
-          </div>
-          <div className="filter-bar">
-            <input
-              type="text"
-              value={discovery.keyword}
-              onChange={(e) => updateDiscovery({ keyword: e.target.value })}
-              placeholder="Search by city or suburb"
-            />
-            <select
-              value={discovery.priceBandIndex}
-              onChange={(e) => updateDiscovery({ priceBandIndex: Number(e.target.value) })}
-            >
-              {PRICE_BANDS.map((band, index) => (
-                <option key={band.label} value={index}>
-                  {band.label}
-                </option>
-              ))}
-            </select>
-            <select value={discovery.province} onChange={(e) => updateDiscovery({ province: e.target.value })}>
-              <option value="">All Regions</option>
-              {PROVINCES.map((province) => (
-                <option key={province} value={province}>
-                  {province}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        {searchActive && isLoading && <p>Loading properties...</p>}
-        {searchActive && error && <p className="error">Could not load properties.</p>}
-        {homepageQuery.isLoading && !searchActive && featuredProperties.length === 0 && (
-          <p>Loading featured stays...</p>
-        )}
-
-        {listingTotal > 0 && (
-          <p className="results-bar">
-            {listingTotal} stay{listingTotal === 1 ? '' : 's'}
-            {!searchActive && featuredProperties.length > 0 ? ' (featured)' : ''}
+      <section className="discovery-section" id="discovery">
+        <div className="discovery">
+          <p className="discovery-header__eyebrow">
+            — {content?.discoveryEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.discoveryEyebrow}
           </p>
-        )}
+          <div className="discovery-header">
+            <h2>{content?.discoveryTitle ?? DEFAULT_HOMEPAGE_CONTENT.discoveryTitle}</h2>
+            <Link to="/" className="discovery-header__all">
+              View All Listings
+              <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M5 12h14M13 6l6 6-6 6" />
+              </svg>
+            </Link>
+          </div>
+          <p className="discovery-header__subtitle">
+            {content?.discoverySubtitle ?? DEFAULT_HOMEPAGE_CONTENT.discoverySubtitle}
+          </p>
 
-        <div className="property-grid">
-          {listingItems.map((property) => (
-            <PropertyCard key={property.id} property={property} />
-          ))}
+          <div className="filter-bar">
+            <div className="filter-bar__search">
+              <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2">
+                <circle cx="11" cy="11" r="7" />
+                <line x1="21" y1="21" x2="16.65" y2="16.65" />
+              </svg>
+              <input
+                type="text"
+                value={discovery.keyword}
+                onChange={(e) => updateDiscovery({ keyword: e.target.value })}
+                placeholder="Search by name or location"
+              />
+            </div>
+            <div className="filter-bar__dropdowns">
+              <select
+                value={discovery.priceBandIndex}
+                onChange={(e) => updateDiscovery({ priceBandIndex: Number(e.target.value) })}
+              >
+                {PRICE_BANDS.map((band, index) => (
+                  <option key={band.label} value={index}>
+                    {band.label}
+                  </option>
+                ))}
+              </select>
+              <select value={discovery.province} onChange={(e) => updateDiscovery({ province: e.target.value })}>
+                <option value="">All Regions</option>
+                {PROVINCES.map((province) => (
+                  <option key={province} value={province}>
+                    {province}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {searchActive && isLoading && <p>Loading properties...</p>}
+          {searchActive && error && <p className="error">Could not load properties.</p>}
+          {homepageQuery.isLoading && !searchActive && featuredProperties.length === 0 && (
+            <p>Loading featured stays...</p>
+          )}
+
+          {listingTotal > 0 && (
+            <p className="results-bar">
+              {listingTotal} stay{listingTotal === 1 ? '' : 's'}
+              {!searchActive && featuredProperties.length > 0 ? ' (featured)' : ''}
+            </p>
+          )}
+
+          <div className="property-grid">
+            {listingItems.map((property) => (
+              <PropertyCard key={property.id} property={property} />
+            ))}
+          </div>
+          {listingItems.length === 0 && !isLoading && <p>No properties match your search yet.</p>}
         </div>
-        {listingItems.length === 0 && !isLoading && <p>No properties match your search yet.</p>}
       </section>
 
       <section className="value-prop">
@@ -219,28 +233,31 @@ export function HomePage() {
           <div className="value-prop__grid">
             <div>
               <span className="value-prop__eyebrow">
-                {content?.valuePropEyebrow ?? 'Strategic Asset Stewardship'}
+                {content?.valuePropEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.valuePropEyebrow}
               </span>
               <h2 className="value-prop__title">
-                {content?.valuePropTitle ??
-                  'A hands-on approach to every guest stay and every property we manage'}
+                {content?.valuePropTitle ?? DEFAULT_HOMEPAGE_CONTENT.valuePropTitle}
+                <br />
+                <span className="value-prop__title-accent">
+                  {content?.valuePropTitleAccent ?? DEFAULT_HOMEPAGE_CONTENT.valuePropTitleAccent}
+                </span>
               </h2>
+            </div>
+            <div>
+              <p className="value-prop__copy">{content?.valuePropCopy1 ?? DEFAULT_HOMEPAGE_CONTENT.valuePropCopy1}</p>
+              <p className="value-prop__copy">{content?.valuePropCopy2 ?? DEFAULT_HOMEPAGE_CONTENT.valuePropCopy2}</p>
               {valuePropImage && (
                 <img
                   src={`${apiBaseUrl()}${valuePropImage}`}
                   alt="Property stewardship"
-                  style={{ marginTop: '1rem', borderRadius: '12px', maxWidth: '100%' }}
+                  className="value-prop__image"
                 />
               )}
-            </div>
-            <div>
-              <p className="value-prop__copy">{content?.valuePropCopy1}</p>
-              <p className="value-prop__copy">{content?.valuePropCopy2}</p>
             </div>
           </div>
 
           <div className="value-prop__steps">
-            {(content?.valueSteps ?? []).map((step) => (
+            {(content?.valueSteps ?? DEFAULT_HOMEPAGE_CONTENT.valueSteps).map((step) => (
               <div className="value-prop__step" key={step.number}>
                 <div className="value-prop__step-number">{step.number}</div>
                 <h3 className="value-prop__step-title">{step.title}</h3>

@@ -5,10 +5,11 @@ export function AboutPage() {
         <span className="content-section__eyebrow">Our Vision</span>
         <h1>Redefining what a managed stay should feel like</h1>
         <p>
-          BookMyStay was founded on a simple idea: premium travel and boutique stays deserve the
-          same level of care as premium real estate. We reverse-engineered the operational
-          discipline of high-end asset management and applied it to vacation rentals, so every
-          guest experience and every property under our care benefits from the same rigor.
+          BookMyStaySA was founded on a simple idea: South African travel and boutique stays
+          deserve the same level of care as premium real estate. We reverse-engineered the
+          operational discipline of high-end asset management and applied it to staycations from
+          Cape Town to Kruger and the Garden Route, so every guest experience and every property
+          under our care benefits from the same rigor.
         </p>
         <p>
           Today we work with independent owners and corporate clients alike, curating a portfolio

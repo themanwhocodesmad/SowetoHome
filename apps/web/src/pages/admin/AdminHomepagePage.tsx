@@ -192,6 +192,13 @@ export function AdminHomepagePage() {
               />
             </label>
             <label>
+              Discovery section eyebrow
+              <input
+                value={content.discoveryEyebrow}
+                onChange={(e) => setContent((c) => ({ ...c, discoveryEyebrow: e.target.value }))}
+              />
+            </label>
+            <label>
               Discovery section title
               <input
                 value={content.discoveryTitle}
@@ -237,6 +244,13 @@ export function AdminHomepagePage() {
               <input
                 value={content.valuePropTitle}
                 onChange={(e) => setContent((c) => ({ ...c, valuePropTitle: e.target.value }))}
+              />
+            </label>
+            <label>
+              Title (bold accent)
+              <input
+                value={content.valuePropTitleAccent}
+                onChange={(e) => setContent((c) => ({ ...c, valuePropTitleAccent: e.target.value }))}
               />
             </label>
             <label>

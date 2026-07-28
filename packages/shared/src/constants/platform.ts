@@ -20,3 +20,11 @@ export const MAX_FEATURED_LISTINGS = 12;
 export type SiteImageKey = (typeof SITE_IMAGE_SLOTS)[number]['key'];
 
 export const SITE_IMAGE_KEYS = SITE_IMAGE_SLOTS.map((slot) => slot.key) as SiteImageKey[];
+
+// Named bundles of section vertical-padding/typography rules (see index.css's
+// "Standardized section container + spacing system"). Only "standard" exists today -
+// the enum leaves room to add e.g. "compact"/"spacious" bundles later without another
+// schema migration, but no CSS for those exists yet.
+export const SECTION_SPACING_PRESETS = ['standard'] as const;
+export type SectionSpacingPreset = (typeof SECTION_SPACING_PRESETS)[number];
+export const DEFAULT_SECTION_SPACING_PRESET: SectionSpacingPreset = 'standard';

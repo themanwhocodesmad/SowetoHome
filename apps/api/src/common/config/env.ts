@@ -46,7 +46,7 @@ const envSchema = z.object({
   ),
   SMTP_USER: z.string().optional(),
   SMTP_PASS: z.string().optional(),
-  EMAIL_FROM: z.string().default('BookMyStay <no-reply@sowetostays.local>'),
+  EMAIL_FROM: z.string().default('Book My Stay <no-reply@sowetostays.local>'),
 
   ADMIN_FEE_PERCENT: z.coerce.number().min(0).max(100).optional(),
   UPLOAD_DIR: z.string().default('uploads'),

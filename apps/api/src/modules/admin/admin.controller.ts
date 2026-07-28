@@ -67,6 +67,7 @@ export const getSettings = asyncHandler(async (_req: Request, res: Response) => 
   ok(res, {
     adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
+    sectionSpacingPreset: settings.sectionSpacingPreset,
   });
 });
 
@@ -76,6 +77,7 @@ export const updateSettings = asyncHandler(async (req: Request, res: Response) =
   ok(res, {
     adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
+    sectionSpacingPreset: settings.sectionSpacingPreset,
   });
 });
 

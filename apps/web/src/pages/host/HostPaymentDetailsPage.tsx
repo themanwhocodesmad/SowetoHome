@@ -43,7 +43,7 @@ export function HostPaymentDetailsPage() {
         <h2>Bank account for payouts</h2>
       </div>
       <p className="property-card__sub">
-        After a guest pays, BookMyStay collects the full amount. Your share is sent to this account
+        After a guest pays, BookMyStaySA collects the full amount. Your share is sent to this account
         via manual EFT once an admin processes the payout.
       </p>
 

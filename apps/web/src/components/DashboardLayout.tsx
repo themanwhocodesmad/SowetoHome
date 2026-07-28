@@ -33,7 +33,7 @@ export function DashboardLayout({ title, navItems, children }: DashboardLayoutPr
           <svg viewBox="0 0 32 32">
             <path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z" />
           </svg>
-          Book<span>My</span>Stay
+          Book<span>My</span>StaySA
         </Link>
 
         <ul className="sidebar-nav">
@@ -47,7 +47,7 @@ export function DashboardLayout({ title, navItems, children }: DashboardLayoutPr
         </ul>
 
         <div className="sidebar-foot">
-          <Link to="/">← Back to BookMyStay</Link>
+          <Link to="/">← Back to BookMyStaySA</Link>
         </div>
       </aside>
 

@@ -21,5 +21,6 @@ export const getHomepage = asyncHandler(async (_req: Request, res: Response) => 
     siteImages: settings.siteImages ?? {},
     content: resolveHomepageContent(settings.homepageContent),
     featuredProperties: featuredProperties.map((p) => toPropertyDto(p)),
+    sectionSpacingPreset: settings.sectionSpacingPreset,
   });
 });

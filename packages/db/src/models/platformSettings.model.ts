@@ -2,7 +2,10 @@ import { Schema, model, type HydratedDocument } from 'mongoose';
 import {
   CANCELLATION_FREE_WINDOW_HOURS,
   DEFAULT_ADMIN_FEE_PERCENT,
+  DEFAULT_SECTION_SPACING_PRESET,
+  SECTION_SPACING_PRESETS,
   type HomepageContentDto,
+  type SectionSpacingPreset,
 } from '@soweto-stays/shared';
 
 export interface IPlatformSettings {
@@ -12,6 +15,7 @@ export interface IPlatformSettings {
   siteImages: Record<string, string>;
   homepageContent?: HomepageContentDto;
   featuredPropertyIds: string[];
+  sectionSpacingPreset: SectionSpacingPreset;
   updatedAt: Date;
 }
 
@@ -33,6 +37,11 @@ const platformSettingsSchema = new Schema<IPlatformSettings>(
     siteImages: { type: Schema.Types.Mixed, default: {} },
     homepageContent: { type: Schema.Types.Mixed, required: false },
     featuredPropertyIds: { type: [String], default: [] },
+    sectionSpacingPreset: {
+      type: String,
+      enum: SECTION_SPACING_PRESETS,
+      default: DEFAULT_SECTION_SPACING_PRESET,
+    },
   },
   { timestamps: { createdAt: false, updatedAt: true } },
 );

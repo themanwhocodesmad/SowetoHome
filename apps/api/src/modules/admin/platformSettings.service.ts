@@ -45,6 +45,9 @@ export const platformSettingsService = {
     if (input.cancellationFreeWindowHours !== undefined) {
       settings.cancellationFreeWindowHours = input.cancellationFreeWindowHours;
     }
+    if (input.sectionSpacingPreset !== undefined) {
+      settings.sectionSpacingPreset = input.sectionSpacingPreset;
+    }
     return settings.save();
   },
 

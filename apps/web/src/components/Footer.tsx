@@ -28,11 +28,11 @@ export function Footer() {
       <div className="site-footer__grid">
         <div>
           <Link to="/" className="site-footer__brand">
-            Book<span>My</span>Stay
+            Book<span>My</span>StaySA
           </Link>
           <p>
-            Premium vacation and boutique stay bookings, backed by full-service property
-            stewardship for owners and guests alike.
+            South Africa's premier staycation bookings - from Cape Town to Kruger and the Garden
+            Route - backed by full-service property stewardship for owners and guests alike.
           </p>
         </div>
 
@@ -84,7 +84,7 @@ export function Footer() {
         </div>
       </div>
 
-      <div className="site-footer__bottom">© {new Date().getFullYear()} BookMyStay. All rights reserved.</div>
+      <div className="site-footer__bottom">© {new Date().getFullYear()} BookMyStaySA. All rights reserved.</div>
     </footer>
   );
 }

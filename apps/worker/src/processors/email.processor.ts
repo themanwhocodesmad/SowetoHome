@@ -39,9 +39,9 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       if (!context.userId) return;
       const user = await UserModel.findById(context.userId);
       if (!user) return;
-      const email = renderTemplate('Welcome to BookMyStay', [
+      const email = renderTemplate('Welcome to Book My Stay', [
         `Hi ${user.name},`,
-        'Welcome to BookMyStay. You can search stays right away, and list your own place as a host whenever you are ready.',
+        'Welcome to Book My Stay. You can search and book verified stays across South Africa right away.',
       ]);
       await sendMail(user.email, email.subject, email.html, email.text);
       return;
@@ -125,8 +125,8 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       if (!context.newsletterSubscriberId) return;
       const subscriber = await NewsletterSubscriberModel.findById(context.newsletterSubscriberId);
       if (!subscriber) return;
-      const email = renderTemplate('You are subscribed to BookMyStay', [
-        'Thanks for subscribing to BookMyStay updates.',
+      const email = renderTemplate('You are subscribed to Book My Stay', [
+        'Thanks for subscribing to Book My Stay updates.',
         'We will keep you informed about new signature estates and stay offers.',
       ]);
       await sendMail(subscriber.email, email.subject, email.html, email.text);

@@ -6,7 +6,7 @@ export function LoginPage() {
 
   return (
     <div className="login-page">
-      <h1>Sign in to BookMyStay</h1>
+      <h1>Sign in to BookMyStaySA</h1>
       <GoogleSignIn onSuccess={() => navigate('/', { replace: true })} />
     </div>
   );
