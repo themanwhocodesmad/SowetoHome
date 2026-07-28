@@ -1904,6 +1904,35 @@ tbody tr:last-child td {
     grid-template-columns: minmax(0, 1fr);
     padding: 2.5rem 1.5rem 2rem;
   }
+  /* display: contents unwraps .hero__content's box so its children become
+     direct grid items of .hero, sitting alongside .hero__media - only then
+     can `order` interleave the two branches (image between the subtitle and
+     the search/CTAs/stats) instead of the whole content block always coming
+     before or after the whole media block as one unit. */
+  .hero__content {
+    display: contents;
+  }
+  .hero__eyebrow {
+    order: 1;
+  }
+  .hero__title {
+    order: 2;
+  }
+  .hero__subtitle {
+    order: 3;
+  }
+  .hero__media {
+    order: 4;
+  }
+  .hero__search-mobile {
+    order: 5;
+  }
+  .hero__ctas {
+    order: 6;
+  }
+  .hero__stats {
+    order: 7;
+  }
   .hero__badge {
     left: 16px;
     bottom: 16px;
