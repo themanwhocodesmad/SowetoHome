@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { MulterError } from 'multer';
+import { Error as MongooseError } from 'mongoose';
 import { ZodError } from 'zod';
 import { logger } from '../logger.js';
 import { AppError } from './AppError.js';
@@ -22,6 +23,20 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
         message: 'Validation failed',
         code: 'VALIDATION_ERROR',
         details: err.flatten(),
+      },
+    });
+    return;
+  }
+
+  if (err instanceof MongooseError.ValidationError) {
+    res.status(400).json({
+      success: false,
+      error: {
+        message: 'Some required fields are missing or invalid',
+        code: 'VALIDATION_ERROR',
+        details: Object.fromEntries(
+          Object.entries(err.errors).map(([field, e]) => [field, e.message]),
+        ),
       },
     });
     return;

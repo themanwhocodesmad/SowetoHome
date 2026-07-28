@@ -15,11 +15,13 @@ export const propertyRouter = Router();
 // catch-all /:id route, or Express would try to match them as a property id.
 propertyRouter.get('/mine', authenticate, requireRole('host'), propertyController.listMine);
 
+// No Zod validation here (unlike the host self-serve route below) - an admin
+// filling this in on a host's behalf shouldn't be blocked by field-length/format
+// rules; the Mongoose schema's required/min constraints are still the backstop.
 propertyRouter.post(
   '/on-behalf/:hostId',
   authenticate,
   requireRole('admin'),
-  validate(createPropertySchema),
   propertyController.createOnBehalf,
 );
 
