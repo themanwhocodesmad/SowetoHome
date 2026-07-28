@@ -1989,8 +1989,25 @@ tbody tr:last-child td {
     padding-bottom: 1.5rem;
   }
 
+  /* Keep all 3 stats in one row on mobile (matching desktop) instead of letting
+     the 3rd one wrap to its own line - shrink the numbers/labels enough that
+     three columns actually fit at the narrowest phone widths. */
   .hero__stats {
-    gap: 20px;
+    flex-wrap: nowrap;
+    gap: 12px;
+  }
+
+  .hero__stat {
+    min-width: 0;
+  }
+
+  .hero__stat strong {
+    font-size: 1.3rem;
+  }
+
+  .hero__stat span {
+    font-size: 0.62rem;
+    white-space: nowrap;
   }
 
   /* Two selects side by side don't fit at ~320px - let them wrap/shrink instead
