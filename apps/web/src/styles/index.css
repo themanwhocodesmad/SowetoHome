@@ -1156,8 +1156,11 @@ button:disabled {
 }
 
 /* ---------- Forms ---------- */
-form label,
-.listing-form label {
+/* Applies to every <label> site-wide, not just ones inside an actual <form> tag -
+   several pages (payment details, admin settings, etc.) use bare label+input pairs
+   outside a <form> element, and previously fell back to the browser's inline
+   default, causing the label text to overlap the input on those pages. */
+label {
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
