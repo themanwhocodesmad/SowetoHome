@@ -1902,7 +1902,12 @@ tbody tr:last-child td {
        shrink further), which was forcing the whole hero column wider than the
        viewport instead of letting the pill's own overflow-x:auto contain it. */
     grid-template-columns: minmax(0, 1fr);
-    padding: 2.5rem 1.5rem 2rem;
+    /* Was 48px from the desktop 2-column layout - once .hero__content becomes
+       `display: contents` below, that gap applies BETWEEN EVERY stacked item
+       (eyebrow, title, subtitle, image, search, CTAs, stats), not just between
+       the two former columns, so it must shrink a lot for mobile. */
+    gap: 14px;
+    padding: 2rem 1.5rem 1.5rem;
   }
   /* display: contents unwraps .hero__content's box so its children become
      direct grid items of .hero, sitting alongside .hero__media - only then
@@ -1914,21 +1919,26 @@ tbody tr:last-child td {
   }
   .hero__eyebrow {
     order: 1;
+    margin-bottom: 0;
   }
   .hero__title {
     order: 2;
+    margin-bottom: 0;
   }
   .hero__subtitle {
     order: 3;
+    margin-bottom: 0;
   }
   .hero__media {
     order: 4;
   }
   .hero__search-mobile {
     order: 5;
+    margin-bottom: 0;
   }
   .hero__ctas {
     order: 6;
+    margin-bottom: 0;
   }
   .hero__stats {
     order: 7;
