@@ -42,7 +42,9 @@
   --spacing-scale: 0.6;
 }
 .spacing-standard {
-  --spacing-scale: 1;
+  /* Slightly below 1 - a modest across-the-board tightening of every section's
+     vertical padding/gaps without hand-tuning each breakpoint's rem value. */
+  --spacing-scale: 0.85;
 }
 .spacing-comfortable {
   --spacing-scale: 1.3;
