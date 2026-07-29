@@ -80,6 +80,7 @@ export const updateContactContentSchema = z.object({
   consultationCopy: z.string().min(1).max(600),
   email: z.string().min(1).max(200),
   phone: z.string().min(1).max(60),
+  showPhone: z.boolean(),
 });
 export type UpdateContactContentInput = z.infer<typeof updateContactContentSchema>;
 

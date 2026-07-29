@@ -1,4 +1,4 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { ThemeEffect } from './components/ThemeEffect.js';
@@ -27,10 +27,16 @@ import { HostPaymentDetailsPage } from './pages/host/HostPaymentDetailsPage.js';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export default function App() {
+  const location = useLocation();
+  // Dashboard routes (admin/host) render their own DashboardLayout sidebar/topbar shell -
+  // the public marketing Navbar (with its search bar) and Footer don't belong there too.
+  const isDashboardRoute =
+    location.pathname.startsWith('/admin') || location.pathname.startsWith('/host');
+
   return (
     <>
       <ThemeEffect />
-      <Navbar />
+      {!isDashboardRoute && <Navbar />}
       <main className="page">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -172,7 +178,7 @@ export default function App() {
           />
         </Routes>
       </main>
-      <Footer />
+      {!isDashboardRoute && <Footer />}
     </>
   );
 }

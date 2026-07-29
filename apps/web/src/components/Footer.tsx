@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { newsletterApi } from '../api/newsletter.js';
 import { useSectionSpacingClass } from '../hooks/useSiteTheme.js';
+import { useAuth } from '../auth/AuthContext.js';
 
 type NewsletterStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -10,6 +11,8 @@ export function Footer() {
   const [status, setStatus] = useState<NewsletterStatus>('idle');
   const [message, setMessage] = useState('');
   const spacing = useSectionSpacingClass('footer');
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const handleSubscribe = async (e: FormEvent) => {
     e.preventDefault();
@@ -59,9 +62,28 @@ export function Footer() {
             <li>
               <Link to="/contact">Contact Us</Link>
             </li>
-            <li>
-              <Link to="/login">Sign In</Link>
-            </li>
+            {user ? (
+              <>
+                <li>
+                  <Link to="/bookings">My Bookings</Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="site-footer__logout"
+                    onClick={() => {
+                      void logout().then(() => navigate('/'));
+                    }}
+                  >
+                    Log out
+                  </button>
+                </li>
+              </>
+            ) : (
+              <li>
+                <Link to="/login">Sign In</Link>
+              </li>
+            )}
           </ul>
         </div>
 

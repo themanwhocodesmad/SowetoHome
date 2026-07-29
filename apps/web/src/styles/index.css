@@ -396,7 +396,7 @@ button:disabled {
      (e.g. the search pill's native date inputs) instead of forcing the column -
      and the whole grid - wider than its container. */
   grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  gap: 48px;
+  gap: calc(48px * var(--spacing-scale, 1));
   align-items: center;
   /* Increased from the original pt-10 pb-20 md:pt-16 md:pb-28 lg:pb-32 for more
      breathing room between sections. */
@@ -1076,7 +1076,7 @@ button:disabled {
 .value-prop__steps-track {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.5rem;
+  gap: calc(1.5rem * var(--spacing-scale, 1));
 }
 
 @media (min-width: 768px) {
@@ -1087,7 +1087,7 @@ button:disabled {
 
 @media (min-width: 1024px) {
   .value-prop__steps-track {
-    gap: 2rem;
+    gap: calc(2rem * var(--spacing-scale, 1));
   }
 }
 
@@ -1188,7 +1188,7 @@ button:disabled {
 .card-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 24px;
+  gap: calc(24px * var(--spacing-scale, 1));
   margin-top: 2rem;
 }
 
@@ -1199,7 +1199,7 @@ button:disabled {
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 40px;
+  gap: calc(40px * var(--spacing-scale, 1));
   align-items: start;
   margin-top: 2rem;
 }
@@ -1576,6 +1576,12 @@ tbody tr:last-child td {
   display: flex;
   flex-direction: column;
   gap: 24px;
+  /* Stays in view while .dash-content scrolls - own overflow-y so the sidebar itself
+     scrolls independently on the rare screen too short to fit the full nav list. */
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
 }
 
 .sidebar .navbar__brand {
@@ -1709,7 +1715,7 @@ tbody tr:last-child td {
 .site-footer__grid {
   display: grid;
   grid-template-columns: 1.3fr 1fr 1fr 1.3fr;
-  gap: 32px;
+  gap: calc(32px * var(--spacing-scale, 1));
 }
 
 .site-footer__brand {
@@ -1754,15 +1760,26 @@ tbody tr:last-child td {
   gap: 9px;
 }
 
-.site-footer a {
+.site-footer a,
+.site-footer__logout {
   color: #e2e8f0;
   text-decoration: none;
   font-size: 0.9rem;
   transition: color 0.2s ease;
 }
 
-.site-footer a:hover {
+.site-footer a:hover,
+.site-footer__logout:hover {
   color: white;
+}
+
+.site-footer__logout {
+  background: none;
+  border: none;
+  padding: 0;
+  font-family: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 .newsletter-form {
@@ -1993,7 +2010,10 @@ tbody tr:last-child td {
     flex-direction: row;
     align-items: center;
     overflow-x: auto;
+    overflow-y: visible;
     gap: 12px;
+    position: static;
+    height: auto;
   }
   .sidebar-nav {
     display: flex;

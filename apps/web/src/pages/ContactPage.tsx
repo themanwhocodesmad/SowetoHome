@@ -71,10 +71,12 @@ export function ContactPage() {
               <strong>Email</strong>
               {content.email}
             </div>
-            <div>
-              <strong>Phone</strong>
-              {content.phone}
-            </div>
+            {content.showPhone && (
+              <div>
+                <strong>Phone</strong>
+                {content.phone}
+              </div>
+            )}
           </div>
         </div>
       </section>

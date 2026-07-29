@@ -270,6 +270,14 @@ function ContactEditor() {
         Phone
         <input value={content.phone} onChange={(e) => setContent((c) => ({ ...c, phone: e.target.value }))} />
       </label>
+      <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexDirection: 'row' }}>
+        <input
+          type="checkbox"
+          checked={content.showPhone}
+          onChange={(e) => setContent((c) => ({ ...c, showPhone: e.target.checked }))}
+        />
+        Show phone number on the Contact page
+      </label>
       <button type="button" disabled={isSaving} onClick={() => void handleSave()}>
         {isSaving ? 'Saving...' : 'Save Contact page'}
       </button>

@@ -47,4 +47,5 @@ export const DEFAULT_CONTACT_CONTENT: ContactContentDto = {
     'Prefer to talk it through first? Request a consultation and we will find a time that works for corporate bookings or multi-property enquiries.',
   email: 'hello@bookmystay.co.za',
   phone: '+27 11 000 0000',
+  showPhone: true,
 };

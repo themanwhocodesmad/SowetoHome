@@ -91,6 +91,7 @@ export interface ContactContentDto {
   consultationCopy: string;
   email: string;
   phone: string;
+  showPhone: boolean;
 }
 
 // ---------- Site-wide theme (typography + per-section spacing), fetched once at app root ----------
