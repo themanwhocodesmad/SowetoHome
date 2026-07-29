@@ -27,6 +27,28 @@
   --font-heading: 'Playfair Display', Georgia, 'Times New Roman', serif;
   --font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   font-family: var(--font-body);
+  /* Default multiplier for the section spacing presets below - "standard" is a no-op. */
+  --spacing-scale: 1;
+}
+
+/* Section spacing presets ---------------------------------------------------------
+   Applied as a class directly on an individual section element (e.g. `.hero.spacing-
+   compact`), NOT globally, so each section (hero, footer, about page, etc.) can pick
+   its own preset independently. Every section's existing (already responsive, already
+   tuned per-breakpoint) padding values are wrapped in `calc(X * var(--spacing-scale,
+   1))` rather than duplicated per preset - this scales relative to what's already there
+   instead of requiring a full parallel set of breakpoint rules per preset. */
+.spacing-compact {
+  --spacing-scale: 0.6;
+}
+.spacing-standard {
+  --spacing-scale: 1;
+}
+.spacing-comfortable {
+  --spacing-scale: 1.3;
+}
+.spacing-spacious {
+  --spacing-scale: 1.6;
 }
 
 * {
@@ -88,12 +110,6 @@ h1 {
 .page:has(.marketing-page) {
   max-width: none;
   padding: 0;
-}
-
-.marketing-page section {
-  max-width: 1080px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
 }
 
 /* ---------- Header ---------- */
@@ -384,20 +400,20 @@ button:disabled {
   align-items: center;
   /* Increased from the original pt-10 pb-20 md:pt-16 md:pb-28 lg:pb-32 for more
      breathing room between sections. */
-  padding-top: 3rem;
-  padding-bottom: 6.5rem;
+  padding-top: calc(3rem * var(--spacing-scale, 1));
+  padding-bottom: calc(6.5rem * var(--spacing-scale, 1));
 }
 
 @media (min-width: 768px) {
   .hero {
-    padding-top: 5rem;
-    padding-bottom: 9rem;
+    padding-top: calc(5rem * var(--spacing-scale, 1));
+    padding-bottom: calc(9rem * var(--spacing-scale, 1));
   }
 }
 
 @media (min-width: 1024px) {
   .hero {
-    padding-bottom: 10.5rem;
+    padding-bottom: calc(10.5rem * var(--spacing-scale, 1));
   }
 }
 
@@ -619,23 +635,23 @@ button:disabled {
   /* overflow-hidden so card drop-shadows never visually bleed across the
      light-gray/white section boundary below. */
   overflow: hidden;
-  padding-top: 5.5rem;
+  padding-top: calc(5.5rem * var(--spacing-scale, 1));
   /* pb-24 md:pb-36 lg:pb-40 - extra room before Strategic Asset Stewardship's own
      top padding, so the cards don't crowd the eyebrow below. */
-  padding-bottom: 6rem;
+  padding-bottom: calc(6rem * var(--spacing-scale, 1));
 }
 
 @media (min-width: 768px) {
   .discovery-section {
-    padding-top: 8rem;
-    padding-bottom: 9rem;
+    padding-top: calc(8rem * var(--spacing-scale, 1));
+    padding-bottom: calc(9rem * var(--spacing-scale, 1));
   }
 }
 
 @media (min-width: 1024px) {
   .discovery-section {
-    padding-top: 9.5rem;
-    padding-bottom: 10rem;
+    padding-top: calc(9.5rem * var(--spacing-scale, 1));
+    padding-bottom: calc(10rem * var(--spacing-scale, 1));
   }
 }
 
@@ -971,21 +987,21 @@ button:disabled {
   overflow: hidden;
   /* pt-20 md:pt-32 lg:pt-36 - paired with .discovery-section's increased bottom
      padding above so the eyebrow gets real breathing room under the estate cards. */
-  padding-top: 5rem;
-  padding-bottom: 5.5rem;
+  padding-top: calc(5rem * var(--spacing-scale, 1));
+  padding-bottom: calc(5.5rem * var(--spacing-scale, 1));
 }
 
 @media (min-width: 768px) {
   .value-prop {
-    padding-top: 8rem;
-    padding-bottom: 8rem;
+    padding-top: calc(8rem * var(--spacing-scale, 1));
+    padding-bottom: calc(8rem * var(--spacing-scale, 1));
   }
 }
 
 @media (min-width: 1024px) {
   .value-prop {
-    padding-top: 9rem;
-    padding-bottom: 9.5rem;
+    padding-top: calc(9rem * var(--spacing-scale, 1));
+    padding-bottom: calc(9.5rem * var(--spacing-scale, 1));
   }
 }
 
@@ -1147,7 +1163,10 @@ button:disabled {
 
 /* ---------- Simple marketing sections (About / Services / Contact) ---------- */
 .content-section {
-  padding: 3.5rem 1.5rem;
+  padding-top: calc(3.5rem * var(--spacing-scale, 1));
+  padding-bottom: calc(3.5rem * var(--spacing-scale, 1));
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
   max-width: 880px;
   margin: 0 auto;
 }
@@ -1676,14 +1695,14 @@ tbody tr:last-child td {
   background: #0e3a60;
   color: #cfd8dc;
   /* Increased from the original pt-16 pb-10 md:pt-20 md:pb-12 for more breathing room. */
-  padding-top: 5.5rem;
-  padding-bottom: 3rem;
+  padding-top: calc(5.5rem * var(--spacing-scale, 1));
+  padding-bottom: calc(3rem * var(--spacing-scale, 1));
 }
 
 @media (min-width: 768px) {
   .site-footer {
-    padding-top: 7rem;
-    padding-bottom: 3.5rem;
+    padding-top: calc(7rem * var(--spacing-scale, 1));
+    padding-bottom: calc(3.5rem * var(--spacing-scale, 1));
   }
 }
 
@@ -1907,7 +1926,10 @@ tbody tr:last-child td {
        (eyebrow, title, subtitle, image, search, CTAs, stats), not just between
        the two former columns, so it must shrink a lot for mobile. */
     gap: 14px;
-    padding: 2rem 1.5rem 1.5rem;
+    padding-top: calc(2rem * var(--spacing-scale, 1));
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: calc(1.5rem * var(--spacing-scale, 1));
   }
   /* display: contents unwraps .hero__content's box so its children become
      direct grid items of .hero, sitting alongside .hero__media - only then
@@ -1949,6 +1971,13 @@ tbody tr:last-child td {
   }
   .value-prop__grid {
     grid-template-columns: 1fr;
+  }
+  /* Base rule makes this a row-flex to vertically-center the copy against the title
+     column on desktop's 2-column grid - once the grid above stacks to 1 column here,
+     row-flex left the two paragraphs sitting side by side instead of stacked. */
+  .value-prop__grid > div:last-child {
+    flex-direction: column;
+    align-items: stretch;
   }
   .contact-grid {
     grid-template-columns: 1fr;
@@ -2062,8 +2091,8 @@ tbody tr:last-child td {
   }
 
   .hero {
-    padding-top: 2.75rem;
-    padding-bottom: 3rem;
+    padding-top: calc(2.75rem * var(--spacing-scale, 1));
+    padding-bottom: calc(3rem * var(--spacing-scale, 1));
   }
 
   /* Keep all 3 stats in one row on mobile (matching desktop) instead of letting

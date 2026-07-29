@@ -1,6 +1,21 @@
 import { z } from 'zod';
 import { PROPERTY_STATUSES } from '../constants/enums.js';
-import { MAX_FEATURED_LISTINGS, SECTION_SPACING_PRESETS } from '../constants/platform.js';
+import {
+  BASE_SIZE_SCALES,
+  BODY_FONT_OPTIONS,
+  HEADING_FONT_OPTIONS,
+  MAX_FEATURED_LISTINGS,
+  SECTION_KEYS,
+  SECTION_SPACING_PRESETS,
+  type BodyFontKey,
+  type HeadingFontKey,
+} from '../constants/platform.js';
+
+const HEADING_FONT_KEYS = HEADING_FONT_OPTIONS.map((o) => o.key) as [
+  HeadingFontKey,
+  ...HeadingFontKey[],
+];
+const BODY_FONT_KEYS = BODY_FONT_OPTIONS.map((o) => o.key) as [BodyFontKey, ...BodyFontKey[]];
 
 export const moderatePropertySchema = z.object({
   status: z.enum(PROPERTY_STATUSES),
@@ -17,9 +32,56 @@ export type SuspendUserInput = z.infer<typeof suspendUserSchema>;
 export const updatePlatformSettingsSchema = z.object({
   adminFeePercent: z.number().min(0).max(100).optional(),
   cancellationFreeWindowHours: z.number().int().nonnegative().optional(),
-  sectionSpacingPreset: z.enum(SECTION_SPACING_PRESETS).optional(),
 });
 export type UpdatePlatformSettingsInput = z.infer<typeof updatePlatformSettingsSchema>;
+
+// Partial map so an admin can update a single section's preset without resending all of them.
+export const updateSectionSpacingSchema = z.object(
+  Object.fromEntries(SECTION_KEYS.map((key) => [key, z.enum(SECTION_SPACING_PRESETS).optional()])),
+);
+export type UpdateSectionSpacingInput = z.infer<typeof updateSectionSpacingSchema>;
+
+export const updateTypographySchema = z.object({
+  headingFont: z.enum(HEADING_FONT_KEYS).optional(),
+  bodyFont: z.enum(BODY_FONT_KEYS).optional(),
+  baseSizeScale: z.enum(BASE_SIZE_SCALES).optional(),
+});
+export type UpdateTypographyInput = z.infer<typeof updateTypographySchema>;
+
+const serviceItemSchema = z.object({
+  title: z.string().min(1).max(80),
+  copy: z.string().min(1).max(600),
+});
+
+export const updateAboutContentSchema = z.object({
+  visionEyebrow: z.string().min(1).max(120),
+  visionTitle: z.string().min(1).max(200),
+  visionCopy1: z.string().min(1).max(2000),
+  visionCopy2: z.string().min(1).max(2000),
+  corporateEyebrow: z.string().min(1).max(120),
+  corporateTitle: z.string().min(1).max(200),
+  corporateCopy: z.string().min(1).max(2000),
+});
+export type UpdateAboutContentInput = z.infer<typeof updateAboutContentSchema>;
+
+export const updateServicesContentSchema = z.object({
+  eyebrow: z.string().min(1).max(120),
+  title: z.string().min(1).max(200),
+  subtitle: z.string().min(1).max(600),
+  services: z.array(serviceItemSchema).min(1).max(12),
+});
+export type UpdateServicesContentInput = z.infer<typeof updateServicesContentSchema>;
+
+export const updateContactContentSchema = z.object({
+  eyebrow: z.string().min(1).max(120),
+  title: z.string().min(1).max(200),
+  subtitle: z.string().min(1).max(600),
+  consultationTitle: z.string().min(1).max(120),
+  consultationCopy: z.string().min(1).max(600),
+  email: z.string().min(1).max(200),
+  phone: z.string().min(1).max(60),
+});
+export type UpdateContactContentInput = z.infer<typeof updateContactContentSchema>;
 
 const homepageStatSchema = z.object({
   value: z.string().min(1).max(40),

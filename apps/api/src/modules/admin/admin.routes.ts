@@ -2,8 +2,13 @@ import { Router } from 'express';
 import {
   moderatePropertySchema,
   suspendUserSchema,
+  updateAboutContentSchema,
+  updateContactContentSchema,
   updateHomepageSchema,
   updatePlatformSettingsSchema,
+  updateSectionSpacingSchema,
+  updateServicesContentSchema,
+  updateTypographySchema,
 } from '@soweto-stays/shared';
 import { authenticate, requireRole } from '../../common/middleware/auth.js';
 import { validate } from '../../common/middleware/validate.js';
@@ -32,6 +37,35 @@ adminRouter.patch(
   '/settings',
   validate(updatePlatformSettingsSchema),
   adminController.updateSettings,
+);
+adminRouter.patch(
+  '/settings/section-spacing',
+  validate(updateSectionSpacingSchema),
+  adminController.updateSectionSpacing,
+);
+adminRouter.patch(
+  '/settings/typography',
+  validate(updateTypographySchema),
+  adminController.updateTypography,
+);
+
+adminRouter.get('/pages/about', adminController.getAboutContent);
+adminRouter.patch(
+  '/pages/about',
+  validate(updateAboutContentSchema),
+  adminController.updateAboutContent,
+);
+adminRouter.get('/pages/services', adminController.getServicesContent);
+adminRouter.patch(
+  '/pages/services',
+  validate(updateServicesContentSchema),
+  adminController.updateServicesContent,
+);
+adminRouter.get('/pages/contact', adminController.getContactContent);
+adminRouter.patch(
+  '/pages/contact',
+  validate(updateContactContentSchema),
+  adminController.updateContactContent,
 );
 
 adminRouter.get('/analytics', adminController.getAnalytics);

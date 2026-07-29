@@ -2,10 +2,12 @@ import { Schema, model, type HydratedDocument } from 'mongoose';
 import {
   CANCELLATION_FREE_WINDOW_HOURS,
   DEFAULT_ADMIN_FEE_PERCENT,
-  DEFAULT_SECTION_SPACING_PRESET,
-  SECTION_SPACING_PRESETS,
+  type AboutContentDto,
+  type ContactContentDto,
+  type SectionSpacingMap,
+  type ServicesContentDto,
   type HomepageContentDto,
-  type SectionSpacingPreset,
+  type TypographySettings,
 } from '@soweto-stays/shared';
 
 export interface IPlatformSettings {
@@ -15,7 +17,11 @@ export interface IPlatformSettings {
   siteImages: Record<string, string>;
   homepageContent?: HomepageContentDto;
   featuredPropertyIds: string[];
-  sectionSpacingPreset: SectionSpacingPreset;
+  sectionSpacing?: Partial<SectionSpacingMap>;
+  typography?: Partial<TypographySettings>;
+  aboutContent?: AboutContentDto;
+  servicesContent?: ServicesContentDto;
+  contactContent?: ContactContentDto;
   updatedAt: Date;
 }
 
@@ -37,11 +43,14 @@ const platformSettingsSchema = new Schema<IPlatformSettings>(
     siteImages: { type: Schema.Types.Mixed, default: {} },
     homepageContent: { type: Schema.Types.Mixed, required: false },
     featuredPropertyIds: { type: [String], default: [] },
-    sectionSpacingPreset: {
-      type: String,
-      enum: SECTION_SPACING_PRESETS,
-      default: DEFAULT_SECTION_SPACING_PRESET,
-    },
+    // Mixed (resolved against DEFAULT_* constants in application code, same pattern as
+    // homepageContent above) rather than strict per-field Mongoose schemas - keeps adding
+    // a new editable field a shared-package-only change, no model migration required.
+    sectionSpacing: { type: Schema.Types.Mixed, default: {} },
+    typography: { type: Schema.Types.Mixed, default: {} },
+    aboutContent: { type: Schema.Types.Mixed, required: false },
+    servicesContent: { type: Schema.Types.Mixed, required: false },
+    contactContent: { type: Schema.Types.Mixed, required: false },
   },
   { timestamps: { createdAt: false, updatedAt: true } },
 );

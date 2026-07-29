@@ -11,5 +11,6 @@ export const ADMIN_NAV_ITEMS = [
   { to: '/admin/payouts', label: 'Payouts' },
   { to: '/admin/analytics', label: 'Analytics' },
   { to: '/admin/homepage', label: 'Homepage' },
+  { to: '/admin/pages', label: 'Pages' },
   { to: '/admin/settings', label: 'Settings' },
 ];

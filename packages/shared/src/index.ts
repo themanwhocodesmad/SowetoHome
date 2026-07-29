@@ -2,6 +2,7 @@ export * from './constants/roles.js';
 export * from './constants/enums.js';
 export * from './constants/platform.js';
 export * from './constants/homepage.js';
+export * from './constants/pages.js';
 export * from './queues.js';
 export * from './redis.js';
 

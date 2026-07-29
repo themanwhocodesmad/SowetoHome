@@ -1,5 +1,5 @@
 import type { PropertyDto } from './property.js';
-import type { SectionSpacingPreset } from '../constants/platform.js';
+import type { SectionSpacingMap, TypographySettings } from '../constants/platform.js';
 
 export interface AdminAnalyticsDto {
   totalBookings: number;
@@ -13,7 +13,8 @@ export interface AdminAnalyticsDto {
 export interface PlatformSettingsDto {
   adminFeePercent: number;
   cancellationFreeWindowHours: number;
-  sectionSpacingPreset: SectionSpacingPreset;
+  sectionSpacing: SectionSpacingMap;
+  typography: TypographySettings;
 }
 
 export type SiteImagesDto = Record<string, string>;
@@ -56,5 +57,45 @@ export interface PublicHomepageDto {
   siteImages: SiteImagesDto;
   content: HomepageContentDto;
   featuredProperties: PropertyDto[];
-  sectionSpacingPreset: SectionSpacingPreset;
+}
+
+// ---------- About / Services / Contact page content (admin-editable, like the homepage) ----------
+
+export interface AboutContentDto {
+  visionEyebrow: string;
+  visionTitle: string;
+  visionCopy1: string;
+  visionCopy2: string;
+  corporateEyebrow: string;
+  corporateTitle: string;
+  corporateCopy: string;
+}
+
+export interface ServiceItemDto {
+  title: string;
+  copy: string;
+}
+
+export interface ServicesContentDto {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  services: ServiceItemDto[];
+}
+
+export interface ContactContentDto {
+  eyebrow: string;
+  title: string;
+  subtitle: string;
+  consultationTitle: string;
+  consultationCopy: string;
+  email: string;
+  phone: string;
+}
+
+// ---------- Site-wide theme (typography + per-section spacing), fetched once at app root ----------
+
+export interface SiteThemeDto {
+  typography: TypographySettings;
+  sectionSpacing: SectionSpacingMap;
 }

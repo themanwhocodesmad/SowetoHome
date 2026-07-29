@@ -1,6 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
+import { ThemeEffect } from './components/ThemeEffect.js';
 import { HomePage } from './pages/HomePage.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { ServicesPage } from './pages/ServicesPage.js';
@@ -21,12 +22,14 @@ import { AdminUsersPage } from './pages/admin/AdminUsersPage.js';
 import { AdminPayoutsPage } from './pages/admin/AdminPayoutsPage.js';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage.js';
 import { AdminHomepagePage } from './pages/admin/AdminHomepagePage.js';
+import { AdminPagesPage } from './pages/admin/AdminPagesPage.js';
 import { HostPaymentDetailsPage } from './pages/host/HostPaymentDetailsPage.js';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export default function App() {
   return (
     <>
+      <ThemeEffect />
       <Navbar />
       <main className="page">
         <Routes>
@@ -148,6 +151,14 @@ export default function App() {
             element={
               <RequireRole role="admin">
                 <AdminHomepagePage />
+              </RequireRole>
+            }
+          />
+          <Route
+            path="/admin/pages"
+            element={
+              <RequireRole role="admin">
+                <AdminPagesPage />
               </RequireRole>
             }
           />

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { newsletterApi } from '../api/newsletter.js';
+import { useSectionSpacingClass } from '../hooks/useSiteTheme.js';
 
 type NewsletterStatus = 'idle' | 'loading' | 'success' | 'error';
 
@@ -8,6 +9,7 @@ export function Footer() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState<NewsletterStatus>('idle');
   const [message, setMessage] = useState('');
+  const spacing = useSectionSpacingClass('footer');
 
   const handleSubscribe = async (e: FormEvent) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export function Footer() {
   };
 
   return (
-    <footer className="site-footer">
+    <footer className={`site-footer ${spacing}`}>
       <div className="site-footer__grid">
         <div>
           <Link to="/" className="site-footer__brand">

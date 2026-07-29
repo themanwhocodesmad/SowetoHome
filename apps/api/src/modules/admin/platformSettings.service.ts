@@ -1,9 +1,26 @@
 import type {
+  AboutContentDto,
+  ContactContentDto,
   HomepageContentDto,
+  SectionSpacingMap,
+  ServicesContentDto,
+  TypographySettings,
+  UpdateAboutContentInput,
+  UpdateContactContentInput,
   UpdateHomepageInput,
   UpdatePlatformSettingsInput,
+  UpdateSectionSpacingInput,
+  UpdateServicesContentInput,
+  UpdateTypographyInput,
 } from '@soweto-stays/shared';
-import { DEFAULT_HOMEPAGE_CONTENT } from '@soweto-stays/shared';
+import {
+  DEFAULT_ABOUT_CONTENT,
+  DEFAULT_CONTACT_CONTENT,
+  DEFAULT_HOMEPAGE_CONTENT,
+  DEFAULT_SECTION_SPACING,
+  DEFAULT_SERVICES_CONTENT,
+  DEFAULT_TYPOGRAPHY,
+} from '@soweto-stays/shared';
 import {
   PLATFORM_SETTINGS_ID,
   PlatformSettingsModel,
@@ -26,6 +43,34 @@ export function resolveHomepageContent(
   return stored ?? DEFAULT_HOMEPAGE_CONTENT;
 }
 
+export function resolveAboutContent(stored: AboutContentDto | undefined | null): AboutContentDto {
+  return stored ?? DEFAULT_ABOUT_CONTENT;
+}
+
+export function resolveServicesContent(
+  stored: ServicesContentDto | undefined | null,
+): ServicesContentDto {
+  return stored ?? DEFAULT_SERVICES_CONTENT;
+}
+
+export function resolveContactContent(
+  stored: ContactContentDto | undefined | null,
+): ContactContentDto {
+  return stored ?? DEFAULT_CONTACT_CONTENT;
+}
+
+export function resolveSectionSpacing(
+  stored: Partial<SectionSpacingMap> | undefined | null,
+): SectionSpacingMap {
+  return { ...DEFAULT_SECTION_SPACING, ...stored };
+}
+
+export function resolveTypography(
+  stored: Partial<TypographySettings> | undefined | null,
+): TypographySettings {
+  return { ...DEFAULT_TYPOGRAPHY, ...stored };
+}
+
 export const platformSettingsService = {
   getOrCreate,
 
@@ -45,9 +90,41 @@ export const platformSettingsService = {
     if (input.cancellationFreeWindowHours !== undefined) {
       settings.cancellationFreeWindowHours = input.cancellationFreeWindowHours;
     }
-    if (input.sectionSpacingPreset !== undefined) {
-      settings.sectionSpacingPreset = input.sectionSpacingPreset;
-    }
+    return settings.save();
+  },
+
+  async updateSectionSpacing(input: UpdateSectionSpacingInput): Promise<PlatformSettingsDocument> {
+    const settings = await getOrCreate();
+    settings.sectionSpacing = { ...settings.sectionSpacing, ...input };
+    settings.markModified('sectionSpacing');
+    return settings.save();
+  },
+
+  async updateTypography(input: UpdateTypographyInput): Promise<PlatformSettingsDocument> {
+    const settings = await getOrCreate();
+    settings.typography = { ...settings.typography, ...input };
+    settings.markModified('typography');
+    return settings.save();
+  },
+
+  async updateAboutContent(input: UpdateAboutContentInput): Promise<PlatformSettingsDocument> {
+    const settings = await getOrCreate();
+    settings.aboutContent = input;
+    settings.markModified('aboutContent');
+    return settings.save();
+  },
+
+  async updateServicesContent(input: UpdateServicesContentInput): Promise<PlatformSettingsDocument> {
+    const settings = await getOrCreate();
+    settings.servicesContent = input;
+    settings.markModified('servicesContent');
+    return settings.save();
+  },
+
+  async updateContactContent(input: UpdateContactContentInput): Promise<PlatformSettingsDocument> {
+    const settings = await getOrCreate();
+    settings.contactContent = input;
+    settings.markModified('contactContent');
     return settings.save();
   },
 
@@ -76,6 +153,31 @@ export const platformSettingsService = {
   async getHomepageContent(): Promise<HomepageContentDto> {
     const settings = await getOrCreate();
     return resolveHomepageContent(settings.homepageContent);
+  },
+
+  async getSectionSpacing(): Promise<SectionSpacingMap> {
+    const settings = await getOrCreate();
+    return resolveSectionSpacing(settings.sectionSpacing);
+  },
+
+  async getTypography(): Promise<TypographySettings> {
+    const settings = await getOrCreate();
+    return resolveTypography(settings.typography);
+  },
+
+  async getAboutContent(): Promise<AboutContentDto> {
+    const settings = await getOrCreate();
+    return resolveAboutContent(settings.aboutContent);
+  },
+
+  async getServicesContent(): Promise<ServicesContentDto> {
+    const settings = await getOrCreate();
+    return resolveServicesContent(settings.servicesContent);
+  },
+
+  async getContactContent(): Promise<ContactContentDto> {
+    const settings = await getOrCreate();
+    return resolveContactContent(settings.contactContent);
   },
 
   async getFeaturedPropertyIds(): Promise<string[]> {

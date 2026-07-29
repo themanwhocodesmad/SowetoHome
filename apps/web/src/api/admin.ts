@@ -1,14 +1,24 @@
 import type {
+  AboutContentDto,
   AdminAnalyticsDto,
   AdminHomepageDto,
+  ContactContentDto,
   ModeratePropertyInput,
   PaginatedResult,
   PlatformSettingsDto,
   PropertyDto,
+  SectionSpacingMap,
+  ServicesContentDto,
   SiteImagesDto,
   SuspendUserInput,
+  TypographySettings,
+  UpdateAboutContentInput,
+  UpdateContactContentInput,
   UpdateHomepageInput,
   UpdatePlatformSettingsInput,
+  UpdateSectionSpacingInput,
+  UpdateServicesContentInput,
+  UpdateTypographyInput,
   UserDto,
   BookingDto,
 } from '@soweto-stays/shared';
@@ -45,6 +55,35 @@ export const adminApi = {
   getSettings: () => apiFetch<PlatformSettingsDto>('/api/admin/settings'),
   updateSettings: (input: UpdatePlatformSettingsInput) =>
     apiFetch<PlatformSettingsDto>('/api/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+  updateSectionSpacing: (input: UpdateSectionSpacingInput) =>
+    apiFetch<SectionSpacingMap>('/api/admin/settings/section-spacing', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+  updateTypography: (input: UpdateTypographyInput) =>
+    apiFetch<TypographySettings>('/api/admin/settings/typography', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+
+  getAboutContent: () => apiFetch<AboutContentDto>('/api/admin/pages/about'),
+  updateAboutContent: (input: UpdateAboutContentInput) =>
+    apiFetch<AboutContentDto>('/api/admin/pages/about', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+  getServicesContent: () => apiFetch<ServicesContentDto>('/api/admin/pages/services'),
+  updateServicesContent: (input: UpdateServicesContentInput) =>
+    apiFetch<ServicesContentDto>('/api/admin/pages/services', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+  getContactContent: () => apiFetch<ContactContentDto>('/api/admin/pages/contact'),
+  updateContactContent: (input: UpdateContactContentInput) =>
+    apiFetch<ContactContentDto>('/api/admin/pages/contact', {
       method: 'PATCH',
       body: JSON.stringify(input),
     }),

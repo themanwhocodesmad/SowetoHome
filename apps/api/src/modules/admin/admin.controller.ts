@@ -2,8 +2,13 @@ import type { Request, Response } from 'express';
 import type {
   ModeratePropertyInput,
   SuspendUserInput,
+  UpdateAboutContentInput,
+  UpdateContactContentInput,
   UpdateHomepageInput,
   UpdatePlatformSettingsInput,
+  UpdateSectionSpacingInput,
+  UpdateServicesContentInput,
+  UpdateTypographyInput,
 } from '@soweto-stays/shared';
 import { SITE_IMAGE_KEYS } from '@soweto-stays/shared';
 import { asyncHandler } from '../../common/middleware/asyncHandler.js';
@@ -12,7 +17,15 @@ import { ok, paginated } from '../../common/http/respond.js';
 import { userService, toUserDto } from '../users/user.service.js';
 import { propertyService, toPropertyDto } from '../properties/property.service.js';
 import { bookingService, toBookingDto } from '../bookings/booking.service.js';
-import { platformSettingsService, resolveHomepageContent } from './platformSettings.service.js';
+import {
+  platformSettingsService,
+  resolveAboutContent,
+  resolveContactContent,
+  resolveHomepageContent,
+  resolveServicesContent,
+  resolveSectionSpacing,
+  resolveTypography,
+} from './platformSettings.service.js';
 import { adminService } from './admin.service.js';
 import { toPublicSiteImagePath } from './siteImage.upload.js';
 
@@ -67,7 +80,8 @@ export const getSettings = asyncHandler(async (_req: Request, res: Response) => 
   ok(res, {
     adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
-    sectionSpacingPreset: settings.sectionSpacingPreset,
+    sectionSpacing: resolveSectionSpacing(settings.sectionSpacing),
+    typography: resolveTypography(settings.typography),
   });
 });
 
@@ -77,8 +91,54 @@ export const updateSettings = asyncHandler(async (req: Request, res: Response) =
   ok(res, {
     adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
-    sectionSpacingPreset: settings.sectionSpacingPreset,
+    sectionSpacing: resolveSectionSpacing(settings.sectionSpacing),
+    typography: resolveTypography(settings.typography),
   });
+});
+
+export const updateSectionSpacing = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdateSectionSpacingInput;
+  const settings = await platformSettingsService.updateSectionSpacing(input);
+  ok(res, resolveSectionSpacing(settings.sectionSpacing));
+});
+
+export const updateTypography = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdateTypographyInput;
+  const settings = await platformSettingsService.updateTypography(input);
+  ok(res, resolveTypography(settings.typography));
+});
+
+export const getAboutContent = asyncHandler(async (_req: Request, res: Response) => {
+  const settings = await platformSettingsService.getOrCreate();
+  ok(res, resolveAboutContent(settings.aboutContent));
+});
+
+export const updateAboutContent = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdateAboutContentInput;
+  const settings = await platformSettingsService.updateAboutContent(input);
+  ok(res, resolveAboutContent(settings.aboutContent));
+});
+
+export const getServicesContent = asyncHandler(async (_req: Request, res: Response) => {
+  const settings = await platformSettingsService.getOrCreate();
+  ok(res, resolveServicesContent(settings.servicesContent));
+});
+
+export const updateServicesContent = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdateServicesContentInput;
+  const settings = await platformSettingsService.updateServicesContent(input);
+  ok(res, resolveServicesContent(settings.servicesContent));
+});
+
+export const getContactContent = asyncHandler(async (_req: Request, res: Response) => {
+  const settings = await platformSettingsService.getOrCreate();
+  ok(res, resolveContactContent(settings.contactContent));
+});
+
+export const updateContactContent = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdateContactContentInput;
+  const settings = await platformSettingsService.updateContactContent(input);
+  ok(res, resolveContactContent(settings.contactContent));
 });
 
 export const getAnalytics = asyncHandler(async (_req: Request, res: Response) => {

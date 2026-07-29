@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link, useSearchParams } from 'react-router-dom';
-import { DEFAULT_HOMEPAGE_CONTENT, DEFAULT_SECTION_SPACING_PRESET, PROVINCES } from '@soweto-stays/shared';
+import { DEFAULT_HOMEPAGE_CONTENT, PROVINCES } from '@soweto-stays/shared';
 import { propertiesApi } from '../api/properties.js';
 import { siteContentApi } from '../api/siteContent.js';
 import { apiBaseUrl } from '../api/client.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 import { SearchBar } from '../components/SearchBar.js';
+import { useSectionSpacingClass } from '../hooks/useSiteTheme.js';
 
 const PRICE_BANDS = [
   { label: 'All Prices', minPrice: undefined as number | undefined, maxPrice: undefined as number | undefined },
@@ -103,14 +104,13 @@ export function HomePage() {
 
   const heroImage = siteImages?.homeHero ?? listingItems[0]?.images[0];
   const valuePropImage = siteImages?.valuePropImage;
-  // Only "standard" exists today (see index.css's spacing system), but reading it from
-  // the CMS setting rather than hardcoding means a future preset just needs its own CSS
-  // rules under this class name - no other wiring changes.
-  const spacingPreset = homepageQuery.data?.sectionSpacingPreset ?? DEFAULT_SECTION_SPACING_PRESET;
+  const heroSpacing = useSectionSpacingClass('homeHero');
+  const discoverySpacing = useSectionSpacingClass('homeDiscovery');
+  const valuePropSpacing = useSectionSpacingClass('homeValueProp');
 
   return (
-    <div className={`marketing-page spacing-${spacingPreset}`}>
-      <section className="hero">
+    <div className="marketing-page">
+      <section className={`hero ${heroSpacing}`}>
         <div className="hero__content">
           <span className="hero__eyebrow">{content?.heroEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.heroEyebrow}</span>
           <h1 className="hero__title">
@@ -153,7 +153,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="discovery-section" id="discovery">
+      <section className={`discovery-section ${discoverySpacing}`} id="discovery">
         <div className="discovery">
           <p className="discovery-header__eyebrow">
             — {content?.discoveryEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.discoveryEyebrow}
@@ -228,7 +228,7 @@ export function HomePage() {
         </div>
       </section>
 
-      <section className="value-prop">
+      <section className={`value-prop ${valuePropSpacing}`}>
         <div className="value-prop__inner">
           <div className="value-prop__grid">
             <div>

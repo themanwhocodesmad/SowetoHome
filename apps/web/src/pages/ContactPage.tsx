@@ -1,10 +1,21 @@
 import { useState, type FormEvent } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { DEFAULT_CONTACT_CONTENT } from '@soweto-stays/shared';
+import { siteContentApi } from '../api/siteContent.js';
+import { useSectionSpacingClass } from '../hooks/useSiteTheme.js';
 
 export function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [submitted, setSubmitted] = useState(false);
+
+  const { data } = useQuery({
+    queryKey: ['site-content', 'contact'],
+    queryFn: siteContentApi.getContact,
+  });
+  const content = data ?? DEFAULT_CONTACT_CONTENT;
+  const spacing = useSectionSpacingClass('contact');
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -16,13 +27,10 @@ export function ContactPage() {
 
   return (
     <div className="marketing-page">
-      <section className="content-section">
-        <span className="content-section__eyebrow">Get In Touch</span>
-        <h1>Talk to our stay advisory team</h1>
-        <p>
-          Have a question about a booking, a property, or a corporate consultation? Send us a
-          message and a member of our team will follow up to schedule a call.
-        </p>
+      <section className={`content-section ${spacing}`}>
+        <span className="content-section__eyebrow">{content.eyebrow}</span>
+        <h1>{content.title}</h1>
+        <p>{content.subtitle}</p>
 
         <div className="contact-grid">
           <form onSubmit={handleSubmit}>
@@ -56,17 +64,16 @@ export function ContactPage() {
 
           <div className="contact-details">
             <div>
-              <strong>Consultation Scheduling</strong>
-              Prefer to talk it through first? Request a consultation and we will find a time that
-              works for corporate bookings or multi-property enquiries.
+              <strong>{content.consultationTitle}</strong>
+              {content.consultationCopy}
             </div>
             <div>
               <strong>Email</strong>
-              hello@bookmystay.co.za
+              {content.email}
             </div>
             <div>
               <strong>Phone</strong>
-              +27 11 000 0000
+              {content.phone}
             </div>
           </div>
         </div>
