@@ -1011,21 +1011,13 @@ button:disabled {
   max-width: 100%;
 }
 
-.value-prop__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 3rem;
-  margin-bottom: 4rem;
-}
-
-@media (min-width: 1024px) {
-  .value-prop__grid {
-    grid-template-columns: 1fr 1fr;
-  }
+.value-prop__heading {
+  margin-bottom: 2.5rem;
+  max-width: 640px;
 }
 
 .value-prop__image {
-  margin-top: 1rem;
+  margin-top: 2rem;
   border-radius: var(--radius-md);
   max-width: 100%;
   display: block;
@@ -1041,14 +1033,12 @@ button:disabled {
   margin-bottom: 0.75rem;
 }
 
-/* Sized down from the standard H2 scale on purpose - this title sits beside a
-   full paragraph, so it reads better smaller than Hero/Discovery's H2s. */
 .value-prop__title {
   font-family: var(--font-heading);
   font-weight: 600;
   letter-spacing: -0.025em;
-  font-size: clamp(1.25rem, 2vw, 1.625rem);
-  line-height: 1.25;
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+  line-height: 1.2;
   margin-bottom: 0;
 }
 
@@ -1058,9 +1048,19 @@ button:disabled {
   font-weight: 400;
 }
 
-.value-prop__grid > div:last-child {
-  display: flex;
-  align-items: center;
+/* Two paragraphs shown as parallel cards (side by side on desktop, stacked on
+   mobile) rather than plain running text under the title. */
+.value-prop__copy-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+@media (min-width: 768px) {
+  .value-prop__copy-grid {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 .value-prop__copy {
@@ -1070,8 +1070,12 @@ button:disabled {
   font-size: 0.9rem;
 }
 
-.value-prop__copy + .value-prop__copy {
-  margin-top: 14px;
+.value-prop__copy--card {
+  background: #ffffff;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  padding: 1.5rem;
 }
 
 /* Standardized card grid: grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 */
@@ -1987,16 +1991,6 @@ tbody tr:last-child td {
   .hero__badge {
     left: 16px;
     bottom: 16px;
-  }
-  .value-prop__grid {
-    grid-template-columns: 1fr;
-  }
-  /* Base rule makes this a row-flex to vertically-center the copy against the title
-     column on desktop's 2-column grid - once the grid above stacks to 1 column here,
-     row-flex left the two paragraphs sitting side by side instead of stacked. */
-  .value-prop__grid > div:last-child {
-    flex-direction: column;
-    align-items: stretch;
   }
   .contact-grid {
     grid-template-columns: 1fr;

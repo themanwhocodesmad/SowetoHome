@@ -230,31 +230,35 @@ export function HomePage() {
 
       <section className={`value-prop ${valuePropSpacing}`}>
         <div className="value-prop__inner">
-          <div className="value-prop__grid">
-            <div>
-              <span className="value-prop__eyebrow">
-                {content?.valuePropEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.valuePropEyebrow}
+          <div className="value-prop__heading">
+            <span className="value-prop__eyebrow">
+              {content?.valuePropEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.valuePropEyebrow}
+            </span>
+            <h2 className="value-prop__title">
+              {content?.valuePropTitle ?? DEFAULT_HOMEPAGE_CONTENT.valuePropTitle}
+              <br />
+              <span className="value-prop__title-accent">
+                {content?.valuePropTitleAccent ?? DEFAULT_HOMEPAGE_CONTENT.valuePropTitleAccent}
               </span>
-              <h2 className="value-prop__title">
-                {content?.valuePropTitle ?? DEFAULT_HOMEPAGE_CONTENT.valuePropTitle}
-                <br />
-                <span className="value-prop__title-accent">
-                  {content?.valuePropTitleAccent ?? DEFAULT_HOMEPAGE_CONTENT.valuePropTitleAccent}
-                </span>
-              </h2>
-            </div>
-            <div>
-              <p className="value-prop__copy">{content?.valuePropCopy1 ?? DEFAULT_HOMEPAGE_CONTENT.valuePropCopy1}</p>
-              <p className="value-prop__copy">{content?.valuePropCopy2 ?? DEFAULT_HOMEPAGE_CONTENT.valuePropCopy2}</p>
-              {valuePropImage && (
-                <img
-                  src={`${apiBaseUrl()}${valuePropImage}`}
-                  alt="Property stewardship"
-                  className="value-prop__image"
-                />
-              )}
-            </div>
+            </h2>
           </div>
+
+          <div className="value-prop__copy-grid">
+            <p className="value-prop__copy value-prop__copy--card">
+              {content?.valuePropCopy1 ?? DEFAULT_HOMEPAGE_CONTENT.valuePropCopy1}
+            </p>
+            <p className="value-prop__copy value-prop__copy--card">
+              {content?.valuePropCopy2 ?? DEFAULT_HOMEPAGE_CONTENT.valuePropCopy2}
+            </p>
+          </div>
+
+          {valuePropImage && (
+            <img
+              src={`${apiBaseUrl()}${valuePropImage}`}
+              alt="Property stewardship"
+              className="value-prop__image"
+            />
+          )}
 
           <div className="value-prop__steps">
             <div className="value-prop__steps-track">
