@@ -22,7 +22,10 @@ export function PropertyCard({ property }: { property: PropertyDto }) {
         ) : (
           <div className="property-card__placeholder">No photo yet</div>
         )}
-        {isGuestFavorite && <span className="property-card__badge">Guest favorite</span>}
+        <div className="property-card__badges">
+          {isGuestFavorite && <span className="property-card__badge">Guest favorite</span>}
+          {property.isAvailable && <span className="property-card__badge property-card__badge--available">Available</span>}
+        </div>
         <button
           type="button"
           className={`property-card__save${isSaved ? ' property-card__save--active' : ''}`}

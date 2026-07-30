@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { DEFAULT_HOMEPAGE_CONTENT } from '@soweto-stays/shared';
+import { propertiesApi } from '../api/properties.js';
 import { siteContentApi } from '../api/siteContent.js';
 import { apiBaseUrl } from '../api/client.js';
 import { PropertyCard } from '../components/PropertyCard.js';
@@ -13,11 +14,21 @@ export function HomePage() {
     queryFn: siteContentApi.getHomepage,
   });
 
+  const curatedProperties = homepageQuery.data?.featuredProperties ?? [];
+
+  // Falls back to a plain search when no admin has curated a "featured properties"
+  // list yet, so the homepage isn't just an empty gap until someone does that setup.
+  const fallbackQuery = useQuery({
+    queryKey: ['properties', 'homepage-fallback'],
+    queryFn: () => propertiesApi.search({ page: 1, limit: 6 }),
+    enabled: homepageQuery.isSuccess && curatedProperties.length === 0,
+  });
+
   const content = homepageQuery.data?.content;
   const siteImages = homepageQuery.data?.siteImages;
-  const featuredProperties = homepageQuery.data?.featuredProperties ?? [];
+  const displayedProperties = curatedProperties.length > 0 ? curatedProperties : fallbackQuery.data?.items ?? [];
 
-  const heroImage = siteImages?.homeHero ?? featuredProperties[0]?.images[0];
+  const heroImage = siteImages?.homeHero ?? displayedProperties[0]?.images[0];
   const valuePropImage = siteImages?.valuePropImage;
   const heroSpacing = useSectionSpacingClass('homeHero');
   const discoverySpacing = useSectionSpacingClass('homeDiscovery');
@@ -68,7 +79,7 @@ export function HomePage() {
         </div>
       </section>
 
-      {featuredProperties.length > 0 && (
+      {displayedProperties.length > 0 && (
         <section className={`discovery-section ${discoverySpacing}`} id="discovery">
           <div className="discovery">
             <p className="discovery-header__eyebrow">
@@ -87,8 +98,8 @@ export function HomePage() {
               {content?.discoverySubtitle ?? DEFAULT_HOMEPAGE_CONTENT.discoverySubtitle}
             </p>
 
-            <div className="property-grid">
-              {featuredProperties.map((property) => (
+            <div className="property-grid property-grid--static">
+              {displayedProperties.map((property) => (
                 <PropertyCard key={property.id} property={property} />
               ))}
             </div>
