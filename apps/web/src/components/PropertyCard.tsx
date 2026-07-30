@@ -1,7 +1,8 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import type { PropertyDto } from '@soweto-stays/shared';
 import { apiBaseUrl } from '../api/client.js';
+import { useAuth } from '../auth/AuthContext.js';
+import { useSavedPropertyIds, useToggleSavedProperty } from '../hooks/useSavedProperties.js';
 
 // Matches the "Guest favorite" ribbon in Airbnb-style listing UIs - a strong rating
 // backed by enough reviews to mean something, not just a single 5-star fluke.
@@ -10,7 +11,11 @@ const GUEST_FAVORITE_MIN_REVIEWS = 3;
 
 export function PropertyCard({ property }: { property: PropertyDto }) {
   const cover = property.images[0];
-  const [isSaved, setIsSaved] = useState(false);
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const { data: savedIds } = useSavedPropertyIds();
+  const { save, unsave } = useToggleSavedProperty();
+  const isSaved = savedIds?.includes(property.id) ?? false;
   const isGuestFavorite =
     property.ratingCount >= GUEST_FAVORITE_MIN_REVIEWS && property.ratingAvg >= GUEST_FAVORITE_MIN_RATING;
 
@@ -31,10 +36,19 @@ export function PropertyCard({ property }: { property: PropertyDto }) {
           className={`property-card__save${isSaved ? ' property-card__save--active' : ''}`}
           aria-label={isSaved ? 'Remove from saved' : 'Save property'}
           aria-pressed={isSaved}
+          disabled={save.isPending || unsave.isPending}
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            setIsSaved((saved) => !saved);
+            if (!user) {
+              navigate('/login');
+              return;
+            }
+            if (isSaved) {
+              unsave.mutate(property.id);
+            } else {
+              save.mutate(property.id);
+            }
           }}
         >
           <svg viewBox="0 0 24 24" width="16" height="16" fill={isSaved ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="2">

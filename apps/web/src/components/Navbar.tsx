@@ -78,6 +78,32 @@ export function Navbar() {
         <Link to="/services">Services</Link>
         <Link to="/about">About</Link>
         <Link to="/contact">Contact</Link>
+
+        {/* Account actions come right after the primary nav - not after the full list of
+            host/admin tools below - so they're reachable without scrolling past those
+            on a small screen when a user has both roles. */}
+        {user && <Link to="/bookings">My Bookings</Link>}
+        {user && <Link to="/saved">Saved Properties</Link>}
+        {user ? (
+          <button
+            type="button"
+            className="navbar__links__logout"
+            onClick={() => {
+              void logout().then(() => navigate('/'));
+            }}
+          >
+            Log out ({user.name})
+          </button>
+        ) : (
+          <Link to="/login" className="button">
+            Log in
+          </Link>
+        )}
+
+        {(user?.roles.includes('host') || user?.roles.includes('admin')) && (
+          <div className="navbar__links__divider" role="separator" />
+        )}
+
         {user?.roles.includes('host') && (
           <>
             <Link to="/host/listings">My Listings</Link>
@@ -93,21 +119,6 @@ export function Navbar() {
             <Link to="/admin/analytics">Analytics</Link>
             <Link to="/admin/settings">Settings</Link>
           </>
-        )}
-        {user && <Link to="/bookings">My Bookings</Link>}
-        {user ? (
-          <button
-            type="button"
-            onClick={() => {
-              void logout().then(() => navigate('/'));
-            }}
-          >
-            Log out ({user.name})
-          </button>
-        ) : (
-          <Link to="/login" className="button">
-            Log in
-          </Link>
         )}
       </nav>
     </header>

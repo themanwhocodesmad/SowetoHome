@@ -7,3 +7,4 @@ export * from './models/payout.model.js';
 export * from './models/review.model.js';
 export * from './models/platformSettings.model.js';
 export * from './models/newsletterSubscriber.model.js';
+export * from './models/savedProperty.model.js';

@@ -12,6 +12,7 @@ import { LoginPage } from './pages/LoginPage.js';
 import { ResetPasswordPage } from './pages/ResetPasswordPage.js';
 import { RequireAuth, RequireRole } from './auth/RequireRole.js';
 import { MyBookingsPage } from './pages/guest/MyBookingsPage.js';
+import { SavedPropertiesPage } from './pages/guest/SavedPropertiesPage.js';
 import { BookingDetailPage } from './pages/guest/BookingDetailPage.js';
 import { HostListingsPage } from './pages/host/HostListingsPage.js';
 import { CreateListingPage } from './pages/host/CreateListingPage.js';
@@ -63,6 +64,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <BookingDetailPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/saved"
+            element={
+              <RequireAuth>
+                <SavedPropertiesPage />
               </RequireAuth>
             }
           />
