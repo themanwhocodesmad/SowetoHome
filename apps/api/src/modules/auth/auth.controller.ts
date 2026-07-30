@@ -1,5 +1,11 @@
 import type { Request, Response } from 'express';
-import type { GoogleSignInInput } from '@soweto-stays/shared';
+import type {
+  ForgotPasswordInput,
+  GoogleSignInInput,
+  LoginInput,
+  RegisterInput,
+  ResetPasswordInput,
+} from '@soweto-stays/shared';
 import { isProduction } from '../../common/config/env.js';
 import { asyncHandler } from '../../common/middleware/asyncHandler.js';
 import { AppError } from '../../common/errors/AppError.js';
@@ -36,6 +42,38 @@ export const googleSignIn = asyncHandler(async (req: Request, res: Response) => 
   const profile = await verifyGoogleCredential(credential);
   const user = await userService.findOrCreateFromGoogleProfile(profile);
   if (user.isSuspended) throw AppError.forbidden('This account has been suspended');
+
+  const accessToken = issueTokens(res, user);
+  ok(res, { accessToken, user: toUserDto(user) });
+});
+
+export const register = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as RegisterInput;
+  const user = await userService.registerWithPassword(input);
+
+  const accessToken = issueTokens(res, user);
+  ok(res, { accessToken, user: toUserDto(user) });
+});
+
+export const login = asyncHandler(async (req: Request, res: Response) => {
+  const { email, password } = req.body as LoginInput;
+  const user = await userService.loginWithPassword(email, password);
+  if (user.isSuspended) throw AppError.forbidden('This account has been suspended');
+
+  const accessToken = issueTokens(res, user);
+  ok(res, { accessToken, user: toUserDto(user) });
+});
+
+export const forgotPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { email } = req.body as ForgotPasswordInput;
+  await userService.requestPasswordReset(email);
+  // Same response whether or not the email matched an account - see requestPasswordReset.
+  ok(res, { requested: true });
+});
+
+export const resetPassword = asyncHandler(async (req: Request, res: Response) => {
+  const { token, password } = req.body as ResetPasswordInput;
+  const user = await userService.resetPassword(token, password);
 
   const accessToken = issueTokens(res, user);
   ok(res, { accessToken, user: toUserDto(user) });

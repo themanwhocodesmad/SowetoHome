@@ -93,13 +93,18 @@ export function BookingDetailPage() {
 
 function GuestReviewForms({ bookingId }: { bookingId: string }) {
   const [propertyRating, setPropertyRating] = useState(5);
+  const [propertyComment, setPropertyComment] = useState('');
+  const [propertySubmitted, setPropertySubmitted] = useState(false);
   const [hostRating, setHostRating] = useState(5);
+  const [hostComment, setHostComment] = useState('');
+  const [hostSubmitted, setHostSubmitted] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
   const submitPropertyReview = async () => {
     try {
-      await reviewsApi.submitProperty({ bookingId, rating: propertyRating });
+      await reviewsApi.submitProperty({ bookingId, rating: propertyRating, comment: propertyComment || undefined });
       setStatus('Thanks for rating the property!');
+      setPropertySubmitted(true);
     } catch (err) {
       setStatus(err instanceof Error ? err.message : 'Could not submit review');
     }
@@ -107,8 +112,9 @@ function GuestReviewForms({ bookingId }: { bookingId: string }) {
 
   const submitHostReview = async () => {
     try {
-      await reviewsApi.submitHost({ bookingId, rating: hostRating });
+      await reviewsApi.submitHost({ bookingId, rating: hostRating, comment: hostComment || undefined });
       setStatus('Thanks for rating your host!');
+      setHostSubmitted(true);
     } catch (err) {
       setStatus(err instanceof Error ? err.message : 'Could not submit review');
     }
@@ -118,45 +124,77 @@ function GuestReviewForms({ bookingId }: { bookingId: string }) {
     <section>
       <h2>Rate your stay</h2>
       {status && <p>{status}</p>}
-      <label>
-        Rate the property (1-5)
-        <input
-          type="number"
-          min={1}
-          max={5}
-          value={propertyRating}
-          onChange={(e) => setPropertyRating(Number(e.target.value))}
-        />
-      </label>
-      <button type="button" onClick={() => void submitPropertyReview()}>
-        Submit property rating
-      </button>
 
-      <label>
-        Rate your host (1-5)
-        <input
-          type="number"
-          min={1}
-          max={5}
-          value={hostRating}
-          onChange={(e) => setHostRating(Number(e.target.value))}
-        />
-      </label>
-      <button type="button" onClick={() => void submitHostReview()}>
-        Submit host rating
-      </button>
+      {!propertySubmitted && (
+        <>
+          <label>
+            Rate the property (1-5)
+            <input
+              type="number"
+              min={1}
+              max={5}
+              value={propertyRating}
+              onChange={(e) => setPropertyRating(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Comment (optional)
+            <textarea
+              rows={3}
+              maxLength={1000}
+              value={propertyComment}
+              onChange={(e) => setPropertyComment(e.target.value)}
+              placeholder="How was the property?"
+            />
+          </label>
+          <button type="button" onClick={() => void submitPropertyReview()}>
+            Submit property rating
+          </button>
+        </>
+      )}
+
+      {!hostSubmitted && (
+        <>
+          <label>
+            Rate your host (1-5)
+            <input
+              type="number"
+              min={1}
+              max={5}
+              value={hostRating}
+              onChange={(e) => setHostRating(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Comment (optional)
+            <textarea
+              rows={3}
+              maxLength={1000}
+              value={hostComment}
+              onChange={(e) => setHostComment(e.target.value)}
+              placeholder="How was your host?"
+            />
+          </label>
+          <button type="button" onClick={() => void submitHostReview()}>
+            Submit host rating
+          </button>
+        </>
+      )}
     </section>
   );
 }
 
 function HostReviewForm({ bookingId }: { bookingId: string }) {
   const [guestRating, setGuestRating] = useState(5);
+  const [guestComment, setGuestComment] = useState('');
+  const [submitted, setSubmitted] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
 
   const submitGuestReview = async () => {
     try {
-      await reviewsApi.submitGuest({ bookingId, rating: guestRating });
+      await reviewsApi.submitGuest({ bookingId, rating: guestRating, comment: guestComment || undefined });
       setStatus('Thanks for rating your guest!');
+      setSubmitted(true);
     } catch (err) {
       setStatus(err instanceof Error ? err.message : 'Could not submit review');
     }
@@ -166,19 +204,33 @@ function HostReviewForm({ bookingId }: { bookingId: string }) {
     <section>
       <h2>Rate your guest</h2>
       {status && <p>{status}</p>}
-      <label>
-        Rate the guest (1-5)
-        <input
-          type="number"
-          min={1}
-          max={5}
-          value={guestRating}
-          onChange={(e) => setGuestRating(Number(e.target.value))}
-        />
-      </label>
-      <button type="button" onClick={() => void submitGuestReview()}>
-        Submit guest rating
-      </button>
+      {!submitted && (
+        <>
+          <label>
+            Rate the guest (1-5)
+            <input
+              type="number"
+              min={1}
+              max={5}
+              value={guestRating}
+              onChange={(e) => setGuestRating(Number(e.target.value))}
+            />
+          </label>
+          <label>
+            Comment (optional)
+            <textarea
+              rows={3}
+              maxLength={1000}
+              value={guestComment}
+              onChange={(e) => setGuestComment(e.target.value)}
+              placeholder="How was hosting this guest?"
+            />
+          </label>
+          <button type="button" onClick={() => void submitGuestReview()}>
+            Submit guest rating
+          </button>
+        </>
+      )}
     </section>
   );
 }

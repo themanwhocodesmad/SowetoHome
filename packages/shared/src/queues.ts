@@ -10,6 +10,7 @@ export type QueueName = (typeof QUEUE_NAMES)[keyof typeof QUEUE_NAMES];
 
 export const EMAIL_TEMPLATES = [
   'welcome',
+  'password-reset',
   'booking-requested',
   'booking-confirmed',
   'checkin-reminder',
@@ -32,6 +33,9 @@ export interface EmailJobPayload {
     userId?: string;
     bookingId?: string;
     newsletterSubscriberId?: string;
+    // Only used by 'password-reset' - the plaintext token can't be re-derived from the
+    // hash stored on the user document, so it has to travel with the job itself.
+    resetUrl?: string;
   };
 }
 

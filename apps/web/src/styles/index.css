@@ -787,6 +787,30 @@ button:disabled {
   }
 }
 
+@media (max-width: 767px) {
+  /* Swipeable row instead of stacked full-width cards - each card snaps into
+     place and the next one peeks in at the edge as a scroll affordance. */
+  .property-grid {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 1rem;
+    margin: 0 -1.25rem;
+    padding: 0 1.25rem 0.5rem;
+    scrollbar-width: none;
+  }
+
+  .property-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .property-grid .property-card {
+    flex: 0 0 auto;
+    width: min(78vw, 300px);
+    scroll-snap-align: start;
+  }
+}
+
 .property-card {
   display: block;
   text-decoration: none;
@@ -844,8 +868,45 @@ button:disabled {
   color: var(--color-heading);
 }
 
+.property-card__save {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+.property-card__save--active {
+  color: #ff385c;
+}
+
 .property-card__body {
   padding: 20px;
+}
+
+.property-card__title-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.property-card__rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--color-heading);
 }
 
 .property-card__title {
@@ -2220,6 +2281,71 @@ tbody tr:last-child td {
 
 .google-signin > div {
   max-width: 100%;
+}
+
+.login-page__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 1.5rem 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.login-page__divider::before,
+.login-page__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.email-auth-form {
+  text-align: left;
+}
+
+.email-auth-form button[type='submit'] {
+  width: 100%;
+  justify-content: center;
+  margin-top: 0.25rem;
+}
+
+.email-auth-form__forgot {
+  display: block;
+  margin: -0.5rem 0 1rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.email-auth-form__forgot:hover {
+  text-decoration: underline;
+  background: none;
+  color: var(--color-primary);
+}
+
+.email-auth-form__switch {
+  display: block;
+  width: 100%;
+  text-align: center;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  padding: 0.75rem 0 0;
+  cursor: pointer;
+}
+
+.email-auth-form__switch:hover {
+  text-decoration: underline;
+  background: none;
 }
 
 /* ---------- Admin homepage: trust stat editor row ---------- */

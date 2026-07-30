@@ -12,4 +12,28 @@ export const authApi = {
       body: JSON.stringify({ credential }),
       skipAuthRetry: true,
     }),
+  register: (input: { name: string; email: string; password: string }) =>
+    apiFetch<{ accessToken: string; user: UserDto }>('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      skipAuthRetry: true,
+    }),
+  login: (input: { email: string; password: string }) =>
+    apiFetch<{ accessToken: string; user: UserDto }>('/api/auth/login', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      skipAuthRetry: true,
+    }),
+  forgotPassword: (email: string) =>
+    apiFetch<{ requested: boolean }>('/api/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+      skipAuthRetry: true,
+    }),
+  resetPassword: (input: { token: string; password: string }) =>
+    apiFetch<{ accessToken: string; user: UserDto }>('/api/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify(input),
+      skipAuthRetry: true,
+    }),
 };

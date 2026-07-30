@@ -3,11 +3,13 @@ import { Navbar } from './components/Navbar.js';
 import { Footer } from './components/Footer.js';
 import { ThemeEffect } from './components/ThemeEffect.js';
 import { HomePage } from './pages/HomePage.js';
+import { PropertiesPage } from './pages/PropertiesPage.js';
 import { AboutPage } from './pages/AboutPage.js';
 import { ServicesPage } from './pages/ServicesPage.js';
 import { ContactPage } from './pages/ContactPage.js';
 import { PropertyDetailPage } from './pages/PropertyDetailPage.js';
 import { LoginPage } from './pages/LoginPage.js';
+import { ResetPasswordPage } from './pages/ResetPasswordPage.js';
 import { RequireAuth, RequireRole } from './auth/RequireRole.js';
 import { MyBookingsPage } from './pages/guest/MyBookingsPage.js';
 import { BookingDetailPage } from './pages/guest/BookingDetailPage.js';
@@ -40,11 +42,13 @@ export default function App() {
       <main className="page">
         <Routes>
           <Route path="/" element={<HomePage />} />
+          <Route path="/properties" element={<PropertiesPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/services" element={<ServicesPage />} />
           <Route path="/contact" element={<ContactPage />} />
           <Route path="/properties/:id" element={<PropertyDetailPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
 
           <Route
             path="/bookings"

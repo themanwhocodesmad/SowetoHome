@@ -9,6 +9,15 @@ export const userRepository = {
     return UserModel.findOne({ googleId });
   },
 
+  findByEmail(email: string): Promise<UserDocument | null> {
+    return UserModel.findOne({ email: email.toLowerCase().trim() });
+  },
+
+  // passwordHash is `select: false` on the schema, so login needs it explicitly.
+  findByEmailWithPassword(email: string): Promise<UserDocument | null> {
+    return UserModel.findOne({ email: email.toLowerCase().trim() }).select('+passwordHash');
+  },
+
   createFromGoogleProfile(input: {
     googleId: string;
     email: string;
@@ -16,6 +25,19 @@ export const userRepository = {
     avatarUrl?: string;
   }): Promise<UserDocument> {
     return UserModel.create({ ...input, roles: ['guest'] });
+  },
+
+  createWithPassword(input: { email: string; name: string; passwordHash: string }): Promise<UserDocument> {
+    return UserModel.create({ ...input, roles: ['guest'] });
+  },
+
+  // passwordResetTokenHash is `select: false` - reset needs it explicitly, and needs the
+  // expiry filtered in the query itself so an expired token never matches a document.
+  findByResetTokenHash(tokenHash: string): Promise<UserDocument | null> {
+    return UserModel.findOne({
+      passwordResetTokenHash: tokenHash,
+      passwordResetExpires: { $gt: new Date() },
+    }).select('+passwordResetTokenHash +passwordResetExpires');
   },
 
   async listPaginated(page: number, limit: number, role?: string) {

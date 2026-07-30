@@ -74,7 +74,7 @@ export function Navbar() {
       </div>
 
       <nav className={`navbar__links${isMenuOpen ? ' navbar__links--open' : ''}`}>
-        <Link to="/">Properties</Link>
+        <Link to="/properties">Properties</Link>
         <Link to="/services">Services</Link>
         <Link to="/about">About</Link>
         <Link to="/contact">Contact</Link>

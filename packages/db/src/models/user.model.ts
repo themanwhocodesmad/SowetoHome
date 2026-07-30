@@ -8,7 +8,10 @@ export interface PayoutDetails {
 }
 
 export interface IUser {
-  googleId: string;
+  googleId?: string;
+  passwordHash?: string;
+  passwordResetTokenHash?: string;
+  passwordResetExpires?: Date;
   email: string;
   name: string;
   avatarUrl?: string;
@@ -39,7 +42,12 @@ const payoutDetailsSchema = new Schema<PayoutDetails>(
 
 const userSchema = new Schema<IUser>(
   {
-    googleId: { type: String, required: true, unique: true },
+    // Optional + sparse: a user can sign up with either Google or an email/password, so
+    // neither field is required, but each must still be unique among the users that have one.
+    googleId: { type: String, unique: true, sparse: true },
+    passwordHash: { type: String, select: false },
+    passwordResetTokenHash: { type: String, select: false },
+    passwordResetExpires: { type: Date, select: false },
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     name: { type: String, required: true, trim: true },
     avatarUrl: { type: String },

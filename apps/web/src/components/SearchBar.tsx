@@ -10,9 +10,9 @@ function toDateInputValue(isoString: string | null): string {
 // Rendered in two places (Navbar on desktop, the homepage hero on mobile) so the
 // primary stay search is always reachable regardless of screen size - see
 // index.css for which one is visible at a given breakpoint. Submitting always
-// navigates to "/" with the search encoded in the URL, which is what HomePage
-// reads to build its property query, so either instance works identically and
-// a search is shareable/bookmarkable.
+// navigates to "/properties" with the search encoded in the URL, which is what
+// PropertiesPage reads to build its property query, so either instance works
+// identically and a search is shareable/bookmarkable.
 export function SearchBar({ className }: { className?: string }) {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -39,7 +39,7 @@ export function SearchBar({ className }: { className?: string }) {
     if (checkIn) params.set('checkIn', new Date(checkIn).toISOString());
     if (checkOut) params.set('checkOut', new Date(checkOut).toISOString());
     if (guests) params.set('guests', guests);
-    navigate(`/?${params.toString()}`);
+    navigate(`/properties?${params.toString()}`);
   };
 
   return (

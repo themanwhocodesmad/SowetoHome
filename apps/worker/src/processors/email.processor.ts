@@ -47,6 +47,20 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       return;
     }
 
+    case 'password-reset': {
+      if (!context.userId || !context.resetUrl) return;
+      const user = await UserModel.findById(context.userId);
+      if (!user) return;
+      const email = renderTemplate('Reset your Book My Stay password', [
+        `Hi ${user.name},`,
+        `We received a request to reset your password. Click the link below to choose a new one - this link expires in 1 hour and can only be used once.`,
+        context.resetUrl,
+        `If you didn't request this, you can safely ignore this email.`,
+      ]);
+      await sendMail(user.email, email.subject, email.html, email.text);
+      return;
+    }
+
     case 'booking-requested': {
       const data = context.bookingId ? await resolveBookingContext(context.bookingId) : null;
       if (!data) return;
