@@ -1,30 +1,53 @@
 import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { bookingsApi } from '../../api/bookings.js';
 import { paymentsApi } from '../../api/payments.js';
 import { reviewsApi } from '../../api/reviews.js';
 import { useAuth } from '../../auth/AuthContext.js';
 
+// Yoco's success/cancel/failure redirect URLs (see payment.service.ts) all land back
+// here with this query param - the booking's real status still comes from the
+// signature-verified webhook, not this redirect, but it decides what banner to show.
+const POLL_WHILE_PENDING_MS = 2000;
+const POLL_TIMEOUT_MS = 20000;
+
 export function BookingDetailPage() {
   const { id } = useParams<{ id: string }>();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [searchParams] = useSearchParams();
+  const paymentOutcome = searchParams.get('payment');
 
   const [isPaying, setIsPaying] = useState(false);
   const [isCancelling, setIsCancelling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [pollStartedAt] = useState(() => Date.now());
 
   const bookingQuery = useQuery({
     queryKey: ['bookings', id],
     queryFn: () => bookingsApi.getById(id as string),
     enabled: Boolean(id),
+    // Yoco redirects the browser back before the webhook necessarily arrives - if we
+    // just landed here from a successful checkout and the booking still looks
+    // unpaid, keep polling briefly rather than leaving the guest staring at a
+    // stale "pending_payment" status that reads as a failure.
+    refetchInterval: (query) => {
+      if (paymentOutcome !== 'success') return false;
+      if (query.state.data?.bookingStatus !== 'pending_payment') return false;
+      if (Date.now() - pollStartedAt > POLL_TIMEOUT_MS) return false;
+      return POLL_WHILE_PENDING_MS;
+    },
   });
 
   if (bookingQuery.isLoading) return <p>Loading booking...</p>;
   if (bookingQuery.error || !bookingQuery.data) return <p className="error">Booking not found.</p>;
 
   const booking = bookingQuery.data;
+  const stillConfirmingPayment =
+    paymentOutcome === 'success' &&
+    booking.bookingStatus === 'pending_payment' &&
+    Date.now() - pollStartedAt <= POLL_TIMEOUT_MS;
   const isGuest = user?.id === booking.guestId;
   const isHost = user?.id === booking.hostId;
   const canCancel = booking.bookingStatus === 'pending_payment' || booking.bookingStatus === 'confirmed';
@@ -61,6 +84,29 @@ export function BookingDetailPage() {
   return (
     <div>
       <h1>Booking details</h1>
+
+      {paymentOutcome === 'success' && stillConfirmingPayment && (
+        <p className="notice">
+          Confirming your payment with Yoco - this usually takes a few seconds. This page will
+          update automatically once it's done.
+        </p>
+      )}
+      {paymentOutcome === 'success' && !stillConfirmingPayment && booking.bookingStatus === 'pending_payment' && (
+        <p className="error">
+          Yoco hasn't confirmed this payment yet. If your card was charged, this should resolve
+          shortly - if it doesn't within a few minutes, please contact us.
+        </p>
+      )}
+      {paymentOutcome === 'cancelled' && booking.bookingStatus === 'pending_payment' && (
+        <p className="notice">Payment was cancelled. You can try again whenever you're ready.</p>
+      )}
+      {paymentOutcome === 'failed' && booking.bookingStatus === 'pending_payment' && (
+        <p className="error">
+          Your payment didn't go through. This is usually a decline from your card issuer - check
+          with your bank or try a different card, then try again below.
+        </p>
+      )}
+
       {actionError && <p className="error">{actionError}</p>}
       <ul>
         <li>Status: {booking.bookingStatus}</li>
