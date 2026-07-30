@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { propertiesApi } from '../api/properties.js';
@@ -17,6 +17,7 @@ export function PropertyDetailPage() {
   const [numGuests, setNumGuests] = useState(1);
   const [isBooking, setIsBooking] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
+  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   const propertyQuery = useQuery({
     queryKey: ['properties', id],
@@ -29,6 +30,19 @@ export function PropertyDetailPage() {
     queryFn: () => reviewsApi.listForProperty(id as string),
     enabled: Boolean(id),
   });
+
+  const imageCount = propertyQuery.data?.images.length ?? 0;
+
+  useEffect(() => {
+    if (lightboxIndex === null) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setLightboxIndex(null);
+      if (e.key === 'ArrowRight') setLightboxIndex((i) => (i === null ? null : (i + 1) % imageCount));
+      if (e.key === 'ArrowLeft') setLightboxIndex((i) => (i === null ? null : (i - 1 + imageCount) % imageCount));
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
+  }, [lightboxIndex, imageCount]);
 
   if (propertyQuery.isLoading) return <p>Loading...</p>;
   if (propertyQuery.error || !propertyQuery.data) return <p className="error">Property not found.</p>;
@@ -64,11 +78,80 @@ export function PropertyDetailPage() {
 
       <div className="property-detail__gallery">
         {property.images.length > 0 ? (
-          property.images.map((img) => <img key={img} src={`${apiBaseUrl()}${img}`} alt={property.title} />)
+          property.images.map((img, index) => (
+            <button
+              key={img}
+              type="button"
+              className="property-detail__gallery-item"
+              onClick={() => setLightboxIndex(index)}
+              aria-label={`View photo ${index + 1} of ${property.images.length} in full screen`}
+            >
+              <img src={`${apiBaseUrl()}${img}`} alt={property.title} />
+            </button>
+          ))
         ) : (
           <div className="property-card__placeholder">No photos uploaded yet.</div>
         )}
       </div>
+
+      {lightboxIndex !== null && (
+        <div className="lightbox" onClick={() => setLightboxIndex(null)}>
+          <button
+            type="button"
+            className="lightbox__close"
+            onClick={() => setLightboxIndex(null)}
+            aria-label="Close full-screen photo view"
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="M5 5l14 14M19 5L5 19" />
+            </svg>
+          </button>
+
+          {property.images.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="lightbox__nav lightbox__nav--prev"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((i) => (i === null ? null : (i - 1 + property.images.length) % property.images.length));
+                }}
+                aria-label="Previous photo"
+              >
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M15 6l-6 6 6 6" />
+                </svg>
+              </button>
+              <button
+                type="button"
+                className="lightbox__nav lightbox__nav--next"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setLightboxIndex((i) => (i === null ? null : (i + 1) % property.images.length));
+                }}
+                aria-label="Next photo"
+              >
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M9 6l6 6-6 6" />
+                </svg>
+              </button>
+            </>
+          )}
+
+          <img
+            src={`${apiBaseUrl()}${property.images[lightboxIndex]}`}
+            alt={`${property.title} - photo ${lightboxIndex + 1} of ${property.images.length}`}
+            className="lightbox__image"
+            onClick={(e) => e.stopPropagation()}
+          />
+
+          {property.images.length > 1 && (
+            <div className="lightbox__counter">
+              {lightboxIndex + 1} / {property.images.length}
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="property-detail__meta">
         <span>

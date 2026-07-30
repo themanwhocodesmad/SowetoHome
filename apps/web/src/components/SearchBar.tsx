@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 function toDateInputValue(isoString: string | null): string {
@@ -22,7 +22,18 @@ export function SearchBar({ className }: { className?: string }) {
   const [checkOut, setCheckOut] = useState(toDateInputValue(searchParams.get('checkOut')));
   const [guests, setGuests] = useState(searchParams.get('guests') ?? '');
 
-  const handleSearch = () => {
+  // Keep this instance's fields in sync when the URL changes from elsewhere
+  // (the other SearchBar instance submitting, browser back/forward, a shared
+  // link) rather than only reading the URL once on mount.
+  useEffect(() => {
+    setCity(searchParams.get('city') ?? '');
+    setCheckIn(toDateInputValue(searchParams.get('checkIn')));
+    setCheckOut(toDateInputValue(searchParams.get('checkOut')));
+    setGuests(searchParams.get('guests') ?? '');
+  }, [searchParams]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
     const params = new URLSearchParams();
     if (city) params.set('city', city);
     if (checkIn) params.set('checkIn', new Date(checkIn).toISOString());
@@ -32,7 +43,7 @@ export function SearchBar({ className }: { className?: string }) {
   };
 
   return (
-    <div className={`search-pill${className ? ` ${className}` : ''}`}>
+    <form className={`search-pill${className ? ` ${className}` : ''}`} onSubmit={handleSearch}>
       <label>
         <span>Where</span>
         <input
@@ -53,12 +64,12 @@ export function SearchBar({ className }: { className?: string }) {
         <span>Guests</span>
         <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} />
       </label>
-      <button type="button" onClick={handleSearch} aria-label="Search">
+      <button type="submit" aria-label="Search">
         <svg viewBox="0 0 24 24" width="15" height="15" stroke="white" strokeWidth="2" fill="none">
           <circle cx="11" cy="11" r="7" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
       </button>
-    </div>
+    </form>
   );
 }

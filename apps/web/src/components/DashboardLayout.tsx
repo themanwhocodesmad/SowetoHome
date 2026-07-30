@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.js';
 
 interface DashboardNavItem {
@@ -23,8 +24,22 @@ function initials(name: string): string {
 }
 
 export function DashboardLayout({ title, navItems, children }: DashboardLayoutProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMenuOpen]);
 
   return (
     <div className="dash-layout">
@@ -55,12 +70,36 @@ export function DashboardLayout({ title, navItems, children }: DashboardLayoutPr
         <div className="dash-topbar">
           <h1>{title}</h1>
           {user && (
-            <div className="owner-chip">
-              <div>
-                {user.name}
-                <span className="sub">{user.roles.join(', ')}</span>
-              </div>
-              <div className="avatar">{initials(user.name)}</div>
+            <div className="owner-chip owner-chip--menu" ref={menuRef}>
+              <button
+                type="button"
+                className="owner-chip__trigger"
+                onClick={() => setIsMenuOpen((open) => !open)}
+                aria-expanded={isMenuOpen}
+                aria-label="Account menu"
+              >
+                <div>
+                  {user.name}
+                  <span className="sub">{user.roles.join(', ')}</span>
+                </div>
+                <div className="avatar">{initials(user.name)}</div>
+              </button>
+
+              {isMenuOpen && (
+                <div className="owner-chip__dropdown">
+                  <Link to="/" onClick={() => setIsMenuOpen(false)}>
+                    Back to BookMyStaySA
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      void logout().then(() => navigate('/'));
+                    }}
+                  >
+                    Log out
+                  </button>
+                </div>
+              )}
             </div>
           )}
         </div>
