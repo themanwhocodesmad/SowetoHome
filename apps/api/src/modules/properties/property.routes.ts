@@ -11,26 +11,16 @@ import { propertyImageUpload } from './upload.js';
 
 export const propertyRouter = Router();
 
-// NOTE: static segments (/mine, /on-behalf/:hostId) must be registered before the
-// catch-all /:id route, or Express would try to match them as a property id.
-propertyRouter.get('/mine', authenticate, requireRole('host'), propertyController.listMine);
-
-// No Zod validation here (unlike the host self-serve route below) - an admin
-// filling this in on a host's behalf shouldn't be blocked by field-length/format
-// rules; the Mongoose schema's required/min constraints are still the backstop.
-propertyRouter.post(
-  '/on-behalf/:hostId',
-  authenticate,
-  requireRole('admin'),
-  propertyController.createOnBehalf,
-);
+// NOTE: the static /mine segment must be registered before the catch-all /:id route,
+// or Express would try to match it as a property id.
+propertyRouter.get('/mine', authenticate, requireRole('admin'), propertyController.listMine);
 
 propertyRouter.get('/', validate(propertySearchQuerySchema, 'query'), propertyController.search);
 
 propertyRouter.post(
   '/',
   authenticate,
-  requireRole('host'),
+  requireRole('admin'),
   validate(createPropertySchema),
   propertyController.createMine,
 );

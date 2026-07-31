@@ -84,7 +84,7 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
 
       const hostEmail = renderTemplate('New booking confirmed', [
         `Hi ${data.host.name},`,
-        `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}. Your payout: ${money(data.booking.hostPayoutAmount)}.`,
+        `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}.`,
       ]);
       await sendMail(data.host.email, hostEmail.subject, hostEmail.html, hostEmail.text);
       return;
@@ -109,17 +109,6 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
         `Your refund of ${money(data.booking.totalPrice)} for ${data.property.title} has been processed by our team.`,
       ]);
       await sendMail(data.guest.email, email.subject, email.html, email.text);
-      return;
-    }
-
-    case 'host-payout-sent': {
-      const data = context.bookingId ? await resolveBookingContext(context.bookingId) : null;
-      if (!data) return;
-      const email = renderTemplate('Payout sent', [
-        `Hi ${data.host.name},`,
-        `We've sent your payout of ${money(data.booking.hostPayoutAmount)} for the booking at ${data.property.title}.`,
-      ]);
-      await sendMail(data.host.email, email.subject, email.html, email.text);
       return;
     }
 

@@ -6,12 +6,9 @@ export interface AdminAnalyticsDto {
   confirmedBookings: number;
   cancelledBookings: number;
   totalRevenue: number;
-  totalAdminFees: number;
-  totalHostPayouts: number;
 }
 
 export interface PlatformSettingsDto {
-  adminFeePercent: number;
   cancellationFreeWindowHours: number;
   sectionSpacing: SectionSpacingMap;
   typography: TypographySettings;

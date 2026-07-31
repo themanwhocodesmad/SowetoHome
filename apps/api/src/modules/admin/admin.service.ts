@@ -21,12 +21,6 @@ export const adminService = {
             },
           },
           totalRevenue: { $sum: { $cond: [{ $eq: ['$paymentStatus', 'paid'] }, '$totalPrice', 0] } },
-          totalAdminFees: {
-            $sum: { $cond: [{ $eq: ['$paymentStatus', 'paid'] }, '$adminFeeAmount', 0] },
-          },
-          totalHostPayouts: {
-            $sum: { $cond: [{ $eq: ['$paymentStatus', 'paid'] }, '$hostPayoutAmount', 0] },
-          },
         },
       },
     ]);
@@ -36,8 +30,6 @@ export const adminService = {
       confirmedBookings: totals?.confirmedBookings ?? 0,
       cancelledBookings: totals?.cancelledBookings ?? 0,
       totalRevenue: totals?.totalRevenue ?? 0,
-      totalAdminFees: totals?.totalAdminFees ?? 0,
-      totalHostPayouts: totals?.totalHostPayouts ?? 0,
     };
   },
 };

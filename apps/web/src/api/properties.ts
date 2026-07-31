@@ -22,11 +22,6 @@ export const propertiesApi = {
   listMine: () => apiFetch<PropertyDto[]>('/api/properties/mine'),
   create: (input: CreatePropertyInput) =>
     apiFetch<PropertyDto>('/api/properties', { method: 'POST', body: JSON.stringify(input) }),
-  createOnBehalf: (hostId: string, input: CreatePropertyInput) =>
-    apiFetch<PropertyDto>(`/api/properties/on-behalf/${hostId}`, {
-      method: 'POST',
-      body: JSON.stringify(input),
-    }),
   update: (id: string, input: UpdatePropertyInput) =>
     apiFetch<PropertyDto>(`/api/properties/${id}`, {
       method: 'PATCH',

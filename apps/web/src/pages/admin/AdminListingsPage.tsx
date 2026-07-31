@@ -27,8 +27,8 @@ export function AdminListingsPage() {
     <DashboardLayout title="Listings" navItems={ADMIN_NAV_ITEMS}>
       <div className="section-head">
         <h2>All listings</h2>
-        <Link to="/admin/listings/new" className="button">
-          + Create listing for a host
+        <Link to="/host/listings/new" className="button">
+          + Create listing
         </Link>
       </div>
 

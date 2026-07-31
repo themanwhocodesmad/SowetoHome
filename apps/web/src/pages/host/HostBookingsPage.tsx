@@ -30,7 +30,6 @@ export function HostBookingsPage() {
                 <th>Check-out</th>
                 <th>Guests</th>
                 <th>Total</th>
-                <th>Payout</th>
                 <th>Status</th>
               </tr>
             </thead>
@@ -43,7 +42,6 @@ export function HostBookingsPage() {
                   <td>{new Date(booking.checkOut).toLocaleDateString()}</td>
                   <td>{booking.numGuests}</td>
                   <td>R{booking.totalPrice.toFixed(2)}</td>
-                  <td>R{booking.hostPayoutAmount.toFixed(2)}</td>
                   <td>
                     <span className={pillClass(booking.bookingStatus)}>
                       {booking.bookingStatus.replace(/_/g, ' ')}

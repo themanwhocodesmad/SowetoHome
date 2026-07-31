@@ -45,13 +45,6 @@ export const suspendUser = asyncHandler(async (req: Request, res: Response) => {
   ok(res, toUserDto(user));
 });
 
-// Admin-only way to turn a user into a host - there is no guest-facing application
-// flow (see AdminUsersPage.tsx). Idempotent: granting an existing host is a no-op.
-export const grantHost = asyncHandler(async (req: Request, res: Response) => {
-  const user = await userService.grantHostRole(req.params.id as string);
-  ok(res, toUserDto(user));
-});
-
 export const listProperties = asyncHandler(async (req: Request, res: Response) => {
   const page = Number(req.query.page ?? 1);
   const limit = Number(req.query.limit ?? 20);
@@ -78,7 +71,6 @@ export const listBookings = asyncHandler(async (req: Request, res: Response) => 
 export const getSettings = asyncHandler(async (_req: Request, res: Response) => {
   const settings = await platformSettingsService.getOrCreate();
   ok(res, {
-    adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
     sectionSpacing: resolveSectionSpacing(settings.sectionSpacing),
     typography: resolveTypography(settings.typography),
@@ -89,7 +81,6 @@ export const updateSettings = asyncHandler(async (req: Request, res: Response) =
   const input = req.body as UpdatePlatformSettingsInput;
   const settings = await platformSettingsService.update(input);
   ok(res, {
-    adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
     sectionSpacing: resolveSectionSpacing(settings.sectionSpacing),
     typography: resolveTypography(settings.typography),

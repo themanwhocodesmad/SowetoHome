@@ -16,13 +16,6 @@ export const createMine = asyncHandler(async (req: Request, res: Response) => {
   created(res, toPropertyDto(property));
 });
 
-export const createOnBehalf = asyncHandler(async (req: Request, res: Response) => {
-  const input = req.body as CreatePropertyInput;
-  const { hostId } = req.params as { hostId: string };
-  const property = await propertyService.createByAdmin(hostId, input);
-  created(res, toPropertyDto(property));
-});
-
 export const update = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as UpdatePropertyInput;
   const property = await propertyService.update(req.params.id as string, req.authUser!, input);

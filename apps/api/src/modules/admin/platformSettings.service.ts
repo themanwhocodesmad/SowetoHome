@@ -74,11 +74,6 @@ export function resolveTypography(
 export const platformSettingsService = {
   getOrCreate,
 
-  async getAdminFeePercent(): Promise<number> {
-    const settings = await getOrCreate();
-    return settings.adminFeePercent;
-  },
-
   async getCancellationFreeWindowHours(): Promise<number> {
     const settings = await getOrCreate();
     return settings.cancellationFreeWindowHours;
@@ -86,7 +81,6 @@ export const platformSettingsService = {
 
   async update(input: UpdatePlatformSettingsInput): Promise<PlatformSettingsDocument> {
     const settings = await getOrCreate();
-    if (input.adminFeePercent !== undefined) settings.adminFeePercent = input.adminFeePercent;
     if (input.cancellationFreeWindowHours !== undefined) {
       settings.cancellationFreeWindowHours = input.cancellationFreeWindowHours;
     }

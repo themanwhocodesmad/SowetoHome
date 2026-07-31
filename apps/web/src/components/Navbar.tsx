@@ -82,22 +82,13 @@ export function Navbar() {
         {user && <Link to="/bookings">My Bookings</Link>}
         {user && <Link to="/saved">Saved Properties</Link>}
 
-        {(user?.roles.includes('host') || user?.roles.includes('admin')) && (
-          <div className="navbar__links__divider" role="separator" />
-        )}
-
-        {user?.roles.includes('host') && (
-          <>
-            <Link to="/host/listings">My Listings</Link>
-            <Link to="/host/bookings">Host Bookings</Link>
-            <Link to="/host/payouts">Payouts</Link>
-          </>
-        )}
         {user?.roles.includes('admin') && (
           <>
+            <div className="navbar__links__divider" role="separator" />
+            <Link to="/host/listings">My Listings</Link>
+            <Link to="/host/bookings">Host Bookings</Link>
             <Link to="/admin/listings">Listings</Link>
             <Link to="/admin/users">Users</Link>
-            <Link to="/admin/payouts">Payouts</Link>
             <Link to="/admin/analytics">Analytics</Link>
             <Link to="/admin/settings">Settings</Link>
           </>

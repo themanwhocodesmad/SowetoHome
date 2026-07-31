@@ -8,7 +8,6 @@ import type {
 } from '@soweto-stays/shared';
 import { env } from '../../common/config/env.js';
 import { AppError } from '../../common/errors/AppError.js';
-import { userService } from '../users/user.service.js';
 import { findBookedPropertyIds } from '../bookings/availability.js';
 import type { PropertyDocument } from '@soweto-stays/db';
 import { propertyRepository } from './property.repository.js';
@@ -62,20 +61,6 @@ export const propertyService = {
       ...input,
       hostId,
       status: 'pending_review',
-    });
-  },
-
-  // Admins never own listings (see claude_plan.md §2/§10) - they act on behalf of an
-  // existing host, who gains the host role automatically if they don't already have it.
-  async createByAdmin(targetHostId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
-    const targetUser = await userService.getById(targetHostId);
-    if (!targetUser.roles.includes('host')) {
-      await userService.grantHostRole(targetHostId);
-    }
-    return propertyRepository.create({
-      ...input,
-      hostId: targetUser._id,
-      status: 'published',
     });
   },
 

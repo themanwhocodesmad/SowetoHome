@@ -14,7 +14,6 @@ import { userRouter } from './modules/users/user.routes.js';
 import { propertyRouter } from './modules/properties/property.routes.js';
 import { bookingRouter } from './modules/bookings/booking.routes.js';
 import { paymentRouter } from './modules/payments/payment.routes.js';
-import { payoutRouter } from './modules/payouts/payout.routes.js';
 import { reviewRouter } from './modules/reviews/review.routes.js';
 import { adminRouter } from './modules/admin/admin.routes.js';
 import { newsletterRouter } from './modules/newsletter/newsletter.routes.js';
@@ -75,7 +74,6 @@ export function createApp(): Express {
   app.use('/api/properties', propertyRouter);
   app.use('/api/bookings', bookingRouter);
   app.use('/api/payments', paymentRouter);
-  app.use('/api/payouts', payoutRouter);
   app.use('/api/reviews', reviewRouter);
   app.use('/api/admin', adminRouter);
   app.use('/api/newsletter', newsletterRouter);

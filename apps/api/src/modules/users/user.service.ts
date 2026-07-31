@@ -45,13 +45,6 @@ export function toUserDto(user: UserDocument): UserDto {
     hostRatingCount: user.hostRatingCount,
     guestRatingAvg: user.guestRatingAvg,
     guestRatingCount: user.guestRatingCount,
-    payoutDetails: user.payoutDetails
-      ? {
-          bankName: user.payoutDetails.bankName,
-          accountNumber: user.payoutDetails.accountNumber,
-          accountHolder: user.payoutDetails.accountHolder,
-        }
-      : undefined,
     createdAt: user.createdAt.toISOString(),
   };
 }
@@ -131,25 +124,7 @@ export const userService = {
     const user = await this.getById(userId);
     if (input.name !== undefined) user.name = input.name;
     if (input.phone !== undefined) user.phone = input.phone;
-    if (input.payoutDetails !== undefined) {
-      if (!user.roles.includes('host')) {
-        throw AppError.forbidden('Only hosts can save payout bank details');
-      }
-      user.payoutDetails = input.payoutDetails;
-    }
     return userRepository.save(user);
-  },
-
-  // Only an admin can turn a user into a host - there is no self-service application
-  // flow. Used directly from the admin Users page, and implicitly when an admin creates
-  // a listing on behalf of a user who isn't a host yet.
-  async grantHostRole(userId: string): Promise<UserDocument> {
-    const user = await this.getById(userId);
-    if (!user.roles.includes('host')) {
-      user.roles = [...user.roles, 'host'];
-      await userRepository.save(user);
-    }
-    return user;
   },
 
   async setSuspended(userId: string, isSuspended: boolean): Promise<UserDocument> {

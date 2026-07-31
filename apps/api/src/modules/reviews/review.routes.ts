@@ -21,7 +21,7 @@ reviewRouter.post(
 reviewRouter.post(
   '/guest',
   authenticate,
-  requireRole('host'),
+  requireRole('admin'),
   validate(submitReviewSchema),
   reviewController.submitGuestReview,
 );

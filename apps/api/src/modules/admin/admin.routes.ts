@@ -17,7 +17,6 @@ adminRouter.use(authenticate, requireRole('admin'));
 
 adminRouter.get('/users', adminController.listUsers);
 adminRouter.post('/users/:id/suspend', validate(suspendUserSchema), adminController.suspendUser);
-adminRouter.post('/users/:id/grant-host', adminController.grantHost);
 
 adminRouter.get('/properties', adminController.listProperties);
 adminRouter.post(

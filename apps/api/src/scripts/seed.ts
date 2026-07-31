@@ -264,7 +264,7 @@ async function seedHost() {
       googleId: 'seed-demo-host',
       email: 'demo.host@sowetostays.local',
       name: 'Thandiwe Nkosi',
-      roles: ['host', 'guest'],
+      roles: ['admin', 'guest'],
       isSuspended: false,
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },

@@ -1,7 +1,6 @@
 import { Schema, model, type HydratedDocument } from 'mongoose';
 import {
   CANCELLATION_FREE_WINDOW_HOURS,
-  DEFAULT_ADMIN_FEE_PERCENT,
   type AboutContentDto,
   type ContactContentDto,
   type SectionSpacingMap,
@@ -12,7 +11,6 @@ import {
 
 export interface IPlatformSettings {
   _id: string;
-  adminFeePercent: number;
   cancellationFreeWindowHours: number;
   siteImages: Record<string, string>;
   homepageContent?: HomepageContentDto;
@@ -34,7 +32,6 @@ export const PLATFORM_SETTINGS_ID = 'singleton';
 const platformSettingsSchema = new Schema<IPlatformSettings>(
   {
     _id: { type: String, default: PLATFORM_SETTINGS_ID },
-    adminFeePercent: { type: Number, default: DEFAULT_ADMIN_FEE_PERCENT, min: 0, max: 100 },
     cancellationFreeWindowHours: {
       type: Number,
       default: CANCELLATION_FREE_WINDOW_HOURS,

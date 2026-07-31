@@ -9,7 +9,6 @@ import { AppError } from '../../common/errors/AppError.js';
 import { logger } from '../../common/logger.js';
 import { enqueueEmail, scheduleBookingReminder, scheduleRatingPrompt } from '../../common/queue/notify.js';
 import { bookingService } from '../bookings/booking.service.js';
-import { payoutService } from '../payouts/payout.service.js';
 import { verifyYocoWebhookSignature } from './yoco.signature.js';
 
 const HOUR_MS = 60 * 60 * 1000;
@@ -122,7 +121,6 @@ export const paymentService = {
   async onBookingConfirmed(booking: BookingDocument): Promise<void> {
     const bookingId = booking._id.toString();
     await enqueueEmail('booking-confirmed', { bookingId });
-    await payoutService.createForConfirmedBooking(booking);
 
     const reminderAt = new Date(
       booking.checkIn.getTime() - REMINDER_BEFORE_CHECKIN_HOURS * HOUR_MS,

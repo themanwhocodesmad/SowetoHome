@@ -18,15 +18,11 @@ import { HostListingsPage } from './pages/host/HostListingsPage.js';
 import { CreateListingPage } from './pages/host/CreateListingPage.js';
 import { EditListingPage } from './pages/host/EditListingPage.js';
 import { HostBookingsPage } from './pages/host/HostBookingsPage.js';
-import { HostPayoutsPage } from './pages/host/HostPayoutsPage.js';
 import { AdminListingsPage } from './pages/admin/AdminListingsPage.js';
-import { AdminCreateListingPage } from './pages/admin/AdminCreateListingPage.js';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage.js';
-import { AdminPayoutsPage } from './pages/admin/AdminPayoutsPage.js';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage.js';
 import { AdminHomepagePage } from './pages/admin/AdminHomepagePage.js';
 import { AdminPagesPage } from './pages/admin/AdminPagesPage.js';
-import { HostPaymentDetailsPage } from './pages/host/HostPaymentDetailsPage.js';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export default function App() {
@@ -79,7 +75,7 @@ export default function App() {
           <Route
             path="/host/listings"
             element={
-              <RequireRole role="host">
+              <RequireRole role="admin">
                 <HostListingsPage />
               </RequireRole>
             }
@@ -87,7 +83,7 @@ export default function App() {
           <Route
             path="/host/listings/new"
             element={
-              <RequireRole role="host">
+              <RequireRole role="admin">
                 <CreateListingPage />
               </RequireRole>
             }
@@ -95,7 +91,7 @@ export default function App() {
           <Route
             path="/host/listings/:id/edit"
             element={
-              <RequireRole role="host">
+              <RequireRole role="admin">
                 <EditListingPage />
               </RequireRole>
             }
@@ -103,24 +99,8 @@ export default function App() {
           <Route
             path="/host/bookings"
             element={
-              <RequireRole role="host">
+              <RequireRole role="admin">
                 <HostBookingsPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/payouts"
-            element={
-              <RequireRole role="host">
-                <HostPayoutsPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/payment-details"
-            element={
-              <RequireRole role="host">
-                <HostPaymentDetailsPage />
               </RequireRole>
             }
           />
@@ -134,26 +114,10 @@ export default function App() {
             }
           />
           <Route
-            path="/admin/listings/new"
-            element={
-              <RequireRole role="admin">
-                <AdminCreateListingPage />
-              </RequireRole>
-            }
-          />
-          <Route
             path="/admin/users"
             element={
               <RequireRole role="admin">
                 <AdminUsersPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/admin/payouts"
-            element={
-              <RequireRole role="admin">
-                <AdminPayoutsPage />
               </RequireRole>
             }
           />

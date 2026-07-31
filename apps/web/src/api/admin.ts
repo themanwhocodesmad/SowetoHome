@@ -34,8 +34,6 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify(input),
     }),
-  grantHost: (id: string) =>
-    apiFetch<UserDto>(`/api/admin/users/${id}/grant-host`, { method: 'POST' }),
 
   listProperties: (page = 1, limit = 20, status?: string) =>
     apiFetch<PaginatedResult<PropertyDto>>(
