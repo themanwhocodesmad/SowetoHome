@@ -10,6 +10,25 @@ import {
   type TypographySettings,
 } from '@soweto-stays/shared';
 
+// Raw (unmasked) credential storage - platformSettings.service.ts is the only place that
+// reads this shape directly; everywhere else (admin API responses) gets the masked
+// PaymentGatewaySettingsDto instead, which never round-trips a real secret to the client.
+export interface IPaymentGatewaySettings {
+  activeProvider: 'yoco' | 'payfast';
+  yoco: {
+    enabled: boolean;
+    secretKey?: string;
+    webhookSecret?: string;
+  };
+  payfast: {
+    enabled: boolean;
+    merchantId?: string;
+    merchantKey?: string;
+    passphrase?: string;
+    mode: 'sandbox' | 'live';
+  };
+}
+
 export interface IPlatformSettings {
   _id: string;
   adminFeePercent: number;
@@ -22,6 +41,7 @@ export interface IPlatformSettings {
   aboutContent?: AboutContentDto;
   servicesContent?: ServicesContentDto;
   contactContent?: ContactContentDto;
+  paymentGateways?: IPaymentGatewaySettings;
   updatedAt: Date;
 }
 
@@ -51,6 +71,7 @@ const platformSettingsSchema = new Schema<IPlatformSettings>(
     aboutContent: { type: Schema.Types.Mixed, required: false },
     servicesContent: { type: Schema.Types.Mixed, required: false },
     contactContent: { type: Schema.Types.Mixed, required: false },
+    paymentGateways: { type: Schema.Types.Mixed, required: false },
   },
   { timestamps: { createdAt: false, updatedAt: true } },
 );

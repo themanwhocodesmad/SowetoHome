@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   moderatePropertySchema,
   suspendUserSchema,
+  updatePaymentGatewaySettingsSchema,
   updatePlatformSettingsSchema,
   updateSectionSpacingSchema,
   updateTypographySchema,
@@ -17,7 +18,6 @@ adminRouter.use(authenticate, requireRole('admin'));
 
 adminRouter.get('/users', adminController.listUsers);
 adminRouter.post('/users/:id/suspend', validate(suspendUserSchema), adminController.suspendUser);
-adminRouter.post('/users/:id/grant-host', adminController.grantHost);
 
 adminRouter.get('/properties', adminController.listProperties);
 adminRouter.post(
@@ -43,6 +43,13 @@ adminRouter.patch(
   '/settings/typography',
   validate(updateTypographySchema),
   adminController.updateTypography,
+);
+
+adminRouter.get('/payment-settings', adminController.getPaymentGatewaySettings);
+adminRouter.patch(
+  '/payment-settings',
+  validate(updatePaymentGatewaySettingsSchema),
+  adminController.updatePaymentGatewaySettings,
 );
 
 // No Zod validation on these three (or on /homepage below) - admins editing page copy

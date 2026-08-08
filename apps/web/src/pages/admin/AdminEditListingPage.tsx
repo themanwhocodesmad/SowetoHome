@@ -6,10 +6,10 @@ import { propertiesApi } from '../../api/properties.js';
 import { apiBaseUrl } from '../../api/client.js';
 import { ListingForm } from '../../components/ListingForm.js';
 import { DashboardLayout } from '../../components/DashboardLayout.js';
-import { HOST_NAV_ITEMS } from '../../components/dashboardNav.js';
+import { ADMIN_NAV_ITEMS } from '../../components/dashboardNav.js';
 import { pillClass } from '../../components/pillVariant.js';
 
-export function EditListingPage() {
+export function AdminEditListingPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -25,14 +25,14 @@ export function EditListingPage() {
 
   if (propertyQuery.isLoading) {
     return (
-      <DashboardLayout title="Edit listing" navItems={HOST_NAV_ITEMS}>
+      <DashboardLayout title="Edit listing" navItems={ADMIN_NAV_ITEMS}>
         <p>Loading...</p>
       </DashboardLayout>
     );
   }
   if (propertyQuery.error || !propertyQuery.data) {
     return (
-      <DashboardLayout title="Edit listing" navItems={HOST_NAV_ITEMS}>
+      <DashboardLayout title="Edit listing" navItems={ADMIN_NAV_ITEMS}>
         <p className="error">Listing not found.</p>
       </DashboardLayout>
     );
@@ -42,7 +42,7 @@ export function EditListingPage() {
 
   const handleSubmit = async (values: CreatePropertyInput) => {
     await propertiesApi.update(property.id, values);
-    navigate('/host/listings');
+    navigate('/admin/listings');
   };
 
   const handleUpload = async (files: FileList | null) => {
@@ -75,7 +75,7 @@ export function EditListingPage() {
   const canAddMore = property.images.length < 8;
 
   return (
-    <DashboardLayout title="Edit listing" navItems={HOST_NAV_ITEMS}>
+    <DashboardLayout title="Edit listing" navItems={ADMIN_NAV_ITEMS}>
       <div className="section-head">
         <h2>{property.title}</h2>
         <span className={pillClass(property.status)}>{property.status}</span>

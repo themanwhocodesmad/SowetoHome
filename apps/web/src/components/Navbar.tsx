@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.js';
+import { apiBaseUrl } from '../api/client.js';
+import { useSiteImages } from '../hooks/useSiteImages.js';
 import { SearchBar } from './SearchBar.js';
 
 function initials(name: string): string {
@@ -17,6 +19,8 @@ export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { data: siteImages } = useSiteImages();
+  const logoPath = siteImages?.siteLogo;
 
   // Collapse the menu automatically whenever the route changes (link click,
   // back/forward nav, programmatic navigate) rather than requiring an explicit close.
@@ -27,18 +31,26 @@ export function Navbar() {
   return (
     <header className="navbar">
       <div className="navbar__bar">
-        <Link to="/" className="navbar__brand">
-          <svg viewBox="0 0 32 32">
-            <path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z" />
-          </svg>
-          Book<span>My</span>StaySA
-        </Link>
-
+        {/* Leftmost element, ahead of the brand mark - the dropdown/account triggers live
+            at the opposite (right) end of the bar, so this anchors the left end. */}
         <Link to="/" className="navbar__icon-btn navbar__home-btn" aria-label="Home">
           <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 11.5 12 4l9 7.5" />
             <path d="M5.5 10v9a1 1 0 0 0 1 1H9a1 1 0 0 0 1-1v-4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4a1 1 0 0 0 1 1h2.5a1 1 0 0 0 1-1v-9" />
           </svg>
+        </Link>
+
+        <Link to="/" className="navbar__brand">
+          {logoPath ? (
+            <img className="navbar__brand-logo" src={`${apiBaseUrl()}${logoPath}`} alt="BookMyStaySA" />
+          ) : (
+            <>
+              <svg viewBox="0 0 32 32">
+                <path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z" />
+              </svg>
+              Book<span>My</span>StaySA
+            </>
+          )}
         </Link>
 
         {/* Hidden on narrow screens - the same search lives in the hero there instead. */}
@@ -82,22 +94,11 @@ export function Navbar() {
         {user && <Link to="/bookings">My Bookings</Link>}
         {user && <Link to="/saved">Saved Properties</Link>}
 
-        {(user?.roles.includes('host') || user?.roles.includes('admin')) && (
-          <div className="navbar__links__divider" role="separator" />
-        )}
-
-        {user?.roles.includes('host') && (
-          <>
-            <Link to="/host/listings">My Listings</Link>
-            <Link to="/host/bookings">Host Bookings</Link>
-            <Link to="/host/payouts">Payouts</Link>
-          </>
-        )}
         {user?.roles.includes('admin') && (
           <>
+            <div className="navbar__links__divider" role="separator" />
             <Link to="/admin/listings">Listings</Link>
             <Link to="/admin/users">Users</Link>
-            <Link to="/admin/payouts">Payouts</Link>
             <Link to="/admin/analytics">Analytics</Link>
             <Link to="/admin/settings">Settings</Link>
           </>

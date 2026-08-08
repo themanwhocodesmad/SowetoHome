@@ -26,10 +26,6 @@ export const propertyRepository = {
     return property.save();
   },
 
-  async listByHost(hostId: string): Promise<PropertyDocument[]> {
-    return PropertyModel.find({ hostId }).sort({ createdAt: -1 });
-  },
-
   async listForAdmin(page: number, limit: number, filter: PropertyFilter) {
     const query: Record<string, unknown> = {};
     if (filter.status) query.status = filter.status;

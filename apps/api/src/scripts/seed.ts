@@ -256,6 +256,8 @@ async function materialiseImage(photo: PhotoDef, destDir: string): Promise<strin
   }
 }
 
+// The platform (admin) is the sole host of every listing - this demo user is an admin
+// account, not a separate 'host' role (which no longer exists).
 async function seedHost() {
   return UserModel.findOneAndUpdate(
     { _id: DEMO_HOST_ID },
@@ -264,7 +266,7 @@ async function seedHost() {
       googleId: 'seed-demo-host',
       email: 'demo.host@sowetostays.local',
       name: 'Thandiwe Nkosi',
-      roles: ['host', 'guest'],
+      roles: ['admin', 'guest'],
       isSuspended: false,
     },
     { upsert: true, new: true, setDefaultsOnInsert: true },

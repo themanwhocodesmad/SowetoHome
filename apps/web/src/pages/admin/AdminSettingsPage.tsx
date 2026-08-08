@@ -16,6 +16,7 @@ import {
 import { adminApi } from '../../api/admin.js';
 import { DashboardLayout } from '../../components/DashboardLayout.js';
 import { ADMIN_NAV_ITEMS } from '../../components/dashboardNav.js';
+import { PaymentGatewaySettingsPanel } from '../../components/PaymentGatewaySettingsPanel.js';
 
 export function AdminSettingsPage() {
   const queryClient = useQueryClient();
@@ -114,6 +115,8 @@ export function AdminSettingsPage() {
               Save settings
             </button>
           </div>
+
+          <PaymentGatewaySettingsPanel />
 
           <div className="panel" style={{ maxWidth: 420, marginBottom: '1.5rem' }}>
             <h3>Typography</h3>

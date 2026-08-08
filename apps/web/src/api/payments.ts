@@ -1,7 +1,7 @@
-import type { YocoCheckoutResponse } from '@soweto-stays/shared';
+import type { CheckoutResponse } from '@soweto-stays/shared';
 import { apiFetch } from './client.js';
 
 export const paymentsApi = {
   getCheckoutForm: (bookingId: string) =>
-    apiFetch<YocoCheckoutResponse>(`/api/payments/checkout/${bookingId}`, { method: 'POST' }),
+    apiFetch<CheckoutResponse>(`/api/payments/checkout/${bookingId}`, { method: 'POST' }),
 };

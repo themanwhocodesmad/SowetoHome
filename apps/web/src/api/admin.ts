@@ -5,6 +5,7 @@ import type {
   ContactContentDto,
   ModeratePropertyInput,
   PaginatedResult,
+  PaymentGatewaySettingsDto,
   PlatformSettingsDto,
   PropertyDto,
   SectionSpacingMap,
@@ -15,6 +16,7 @@ import type {
   UpdateAboutContentInput,
   UpdateContactContentInput,
   UpdateHomepageInput,
+  UpdatePaymentGatewaySettingsInput,
   UpdatePlatformSettingsInput,
   UpdateSectionSpacingInput,
   UpdateServicesContentInput,
@@ -34,8 +36,6 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify(input),
     }),
-  grantHost: (id: string) =>
-    apiFetch<UserDto>(`/api/admin/users/${id}/grant-host`, { method: 'POST' }),
 
   listProperties: (page = 1, limit = 20, status?: string) =>
     apiFetch<PaginatedResult<PropertyDto>>(
@@ -65,6 +65,13 @@ export const adminApi = {
     }),
   updateTypography: (input: UpdateTypographyInput) =>
     apiFetch<TypographySettings>('/api/admin/settings/typography', {
+      method: 'PATCH',
+      body: JSON.stringify(input),
+    }),
+
+  getPaymentSettings: () => apiFetch<PaymentGatewaySettingsDto>('/api/admin/payment-settings'),
+  updatePaymentSettings: (input: UpdatePaymentGatewaySettingsInput) =>
+    apiFetch<PaymentGatewaySettingsDto>('/api/admin/payment-settings', {
       method: 'PATCH',
       body: JSON.stringify(input),
     }),

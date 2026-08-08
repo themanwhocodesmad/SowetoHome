@@ -41,7 +41,7 @@ export function AdminAnalyticsPage() {
             <strong>R{data.totalAdminFees.toFixed(2)}</strong>
           </div>
           <div className="stat-tile">
-            <span>Total host payouts</span>
+            <span>Net revenue (after admin fee)</span>
             <strong>R{data.totalHostPayouts.toFixed(2)}</strong>
           </div>
         </div>

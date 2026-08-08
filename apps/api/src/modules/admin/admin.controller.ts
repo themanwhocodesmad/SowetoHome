@@ -5,6 +5,7 @@ import type {
   UpdateAboutContentInput,
   UpdateContactContentInput,
   UpdateHomepageInput,
+  UpdatePaymentGatewaySettingsInput,
   UpdatePlatformSettingsInput,
   UpdateSectionSpacingInput,
   UpdateServicesContentInput,
@@ -42,13 +43,6 @@ export const listUsers = asyncHandler(async (req: Request, res: Response) => {
 export const suspendUser = asyncHandler(async (req: Request, res: Response) => {
   const { isSuspended } = req.body as SuspendUserInput;
   const user = await userService.setSuspended(req.params.id as string, isSuspended);
-  ok(res, toUserDto(user));
-});
-
-// Admin-only way to turn a user into a host - there is no guest-facing application
-// flow (see AdminUsersPage.tsx). Idempotent: granting an existing host is a no-op.
-export const grantHost = asyncHandler(async (req: Request, res: Response) => {
-  const user = await userService.grantHostRole(req.params.id as string);
   ok(res, toUserDto(user));
 });
 
@@ -106,6 +100,17 @@ export const updateTypography = asyncHandler(async (req: Request, res: Response)
   const input = req.body as UpdateTypographyInput;
   const settings = await platformSettingsService.updateTypography(input);
   ok(res, resolveTypography(settings.typography));
+});
+
+export const getPaymentGatewaySettings = asyncHandler(async (_req: Request, res: Response) => {
+  const settings = await platformSettingsService.getPaymentGatewaySettings();
+  ok(res, settings);
+});
+
+export const updatePaymentGatewaySettings = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as UpdatePaymentGatewaySettingsInput;
+  const settings = await platformSettingsService.updatePaymentGatewaySettings(input);
+  ok(res, settings);
 });
 
 export const getAboutContent = asyncHandler(async (_req: Request, res: Response) => {

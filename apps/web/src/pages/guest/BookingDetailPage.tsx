@@ -61,7 +61,24 @@ export function BookingDetailPage() {
     setIsPaying(true);
     try {
       const checkout = await paymentsApi.getCheckoutForm(booking.id);
-      window.location.href = checkout.redirectUrl;
+      if (checkout.provider === 'payfast') {
+        // PayFast has no redirect-URL API like Yoco's - the browser has to POST a real
+        // HTML form (with the signed fields) straight to PayFast's own process URL.
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = checkout.actionUrl;
+        Object.entries(checkout.fields).forEach(([name, value]) => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = name;
+          input.value = value;
+          form.appendChild(input);
+        });
+        document.body.appendChild(form);
+        form.submit();
+      } else {
+        window.location.href = checkout.redirectUrl;
+      }
     } catch (err) {
       setActionError(err instanceof Error ? err.message : 'Could not start payment');
       setIsPaying(false);
@@ -87,14 +104,14 @@ export function BookingDetailPage() {
 
       {paymentOutcome === 'success' && stillConfirmingPayment && (
         <p className="notice">
-          Confirming your payment with Yoco - this usually takes a few seconds. This page will
-          update automatically once it's done.
+          Confirming your payment - this usually takes a few seconds. This page will update
+          automatically once it's done.
         </p>
       )}
       {paymentOutcome === 'success' && !stillConfirmingPayment && booking.bookingStatus === 'pending_payment' && (
         <p className="error">
-          Yoco hasn't confirmed this payment yet. If your card was charged, this should resolve
-          shortly - if it doesn't within a few minutes, please contact us.
+          The payment gateway hasn't confirmed this payment yet. If your card was charged, this
+          should resolve shortly - if it doesn't within a few minutes, please contact us.
         </p>
       )}
       {paymentOutcome === 'cancelled' && booking.bookingStatus === 'pending_payment' && (
@@ -121,7 +138,7 @@ export function BookingDetailPage() {
 
       {isGuest && booking.bookingStatus === 'pending_payment' && (
         <button type="button" disabled={isPaying} onClick={() => void handlePay()}>
-          {isPaying ? 'Redirecting to Yoco...' : 'Pay now'}
+          {isPaying ? 'Redirecting to payment...' : 'Pay now'}
         </button>
       )}
 

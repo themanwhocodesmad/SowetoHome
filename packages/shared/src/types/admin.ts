@@ -10,6 +10,36 @@ export interface AdminAnalyticsDto {
   totalHostPayouts: number;
 }
 
+// ---------- Payment gateway settings (Yoco + PayFast), admin-configurable from the dashboard ----------
+
+export type PaymentProvider = 'yoco' | 'payfast';
+
+export interface YocoGatewaySettingsDto {
+  enabled: boolean;
+  // Secrets are never round-tripped to the client - only whether one is currently set,
+  // plus a last-4 hint so an admin can recognize which key is saved without re-exposing it.
+  hasSecretKey: boolean;
+  secretKeyHint?: string;
+  hasWebhookSecret: boolean;
+  // Derived from the secret key's sk_test_/sk_live_ prefix, not stored separately.
+  mode?: 'test' | 'live';
+}
+
+export interface PayFastGatewaySettingsDto {
+  enabled: boolean;
+  merchantId?: string;
+  hasMerchantKey: boolean;
+  merchantKeyHint?: string;
+  hasPassphrase: boolean;
+  mode: 'sandbox' | 'live';
+}
+
+export interface PaymentGatewaySettingsDto {
+  activeProvider: PaymentProvider;
+  yoco: YocoGatewaySettingsDto;
+  payfast: PayFastGatewaySettingsDto;
+}
+
 export interface PlatformSettingsDto {
   adminFeePercent: number;
   cancellationFreeWindowHours: number;

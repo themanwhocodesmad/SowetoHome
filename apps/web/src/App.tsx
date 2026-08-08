@@ -14,27 +14,21 @@ import { RequireAuth, RequireRole } from './auth/RequireRole.js';
 import { MyBookingsPage } from './pages/guest/MyBookingsPage.js';
 import { SavedPropertiesPage } from './pages/guest/SavedPropertiesPage.js';
 import { BookingDetailPage } from './pages/guest/BookingDetailPage.js';
-import { HostListingsPage } from './pages/host/HostListingsPage.js';
-import { CreateListingPage } from './pages/host/CreateListingPage.js';
-import { EditListingPage } from './pages/host/EditListingPage.js';
-import { HostBookingsPage } from './pages/host/HostBookingsPage.js';
-import { HostPayoutsPage } from './pages/host/HostPayoutsPage.js';
 import { AdminListingsPage } from './pages/admin/AdminListingsPage.js';
 import { AdminCreateListingPage } from './pages/admin/AdminCreateListingPage.js';
+import { AdminEditListingPage } from './pages/admin/AdminEditListingPage.js';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage.js';
-import { AdminPayoutsPage } from './pages/admin/AdminPayoutsPage.js';
 import { AdminAnalyticsPage } from './pages/admin/AdminAnalyticsPage.js';
 import { AdminHomepagePage } from './pages/admin/AdminHomepagePage.js';
 import { AdminPagesPage } from './pages/admin/AdminPagesPage.js';
-import { HostPaymentDetailsPage } from './pages/host/HostPaymentDetailsPage.js';
 import { AdminSettingsPage } from './pages/admin/AdminSettingsPage.js';
 
 export default function App() {
   const location = useLocation();
-  // Dashboard routes (admin/host) render their own DashboardLayout sidebar/topbar shell -
-  // the public marketing Navbar (with its search bar) and Footer don't belong there too.
-  const isDashboardRoute =
-    location.pathname.startsWith('/admin') || location.pathname.startsWith('/host');
+  // Dashboard routes render their own DashboardLayout sidebar/topbar shell - the public
+  // marketing Navbar (with its search bar) and Footer don't belong there too. Only /admin
+  // exists now - there is no separate host dashboard (the platform/admin is the sole host).
+  const isDashboardRoute = location.pathname.startsWith('/admin');
 
   return (
     <>
@@ -77,55 +71,6 @@ export default function App() {
           />
 
           <Route
-            path="/host/listings"
-            element={
-              <RequireRole role="host">
-                <HostListingsPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/listings/new"
-            element={
-              <RequireRole role="host">
-                <CreateListingPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/listings/:id/edit"
-            element={
-              <RequireRole role="host">
-                <EditListingPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/bookings"
-            element={
-              <RequireRole role="host">
-                <HostBookingsPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/payouts"
-            element={
-              <RequireRole role="host">
-                <HostPayoutsPage />
-              </RequireRole>
-            }
-          />
-          <Route
-            path="/host/payment-details"
-            element={
-              <RequireRole role="host">
-                <HostPaymentDetailsPage />
-              </RequireRole>
-            }
-          />
-
-          <Route
             path="/admin/listings"
             element={
               <RequireRole role="admin">
@@ -142,18 +87,18 @@ export default function App() {
             }
           />
           <Route
-            path="/admin/users"
+            path="/admin/listings/:id/edit"
             element={
               <RequireRole role="admin">
-                <AdminUsersPage />
+                <AdminEditListingPage />
               </RequireRole>
             }
           />
           <Route
-            path="/admin/payouts"
+            path="/admin/users"
             element={
               <RequireRole role="admin">
-                <AdminPayoutsPage />
+                <AdminUsersPage />
               </RequireRole>
             }
           />

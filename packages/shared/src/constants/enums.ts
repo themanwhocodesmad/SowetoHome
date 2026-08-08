@@ -21,9 +21,6 @@ export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 // exclude a property from date-filtered search results. Cancelled/refunded bookings free the dates.
 export const ACTIVE_BOOKING_STATUSES: BookingStatus[] = ['pending_payment', 'confirmed', 'completed'];
 
-export const PAYOUT_STATUSES = ['pending', 'paid', 'failed'] as const;
-export type PayoutStatus = (typeof PAYOUT_STATUSES)[number];
-
 export const PROVINCES = [
   'Eastern Cape',
   'Free State',

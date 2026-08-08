@@ -8,7 +8,6 @@ import type {
 } from '@soweto-stays/shared';
 import { env } from '../../common/config/env.js';
 import { AppError } from '../../common/errors/AppError.js';
-import { userService } from '../users/user.service.js';
 import { findBookedPropertyIds } from '../bookings/availability.js';
 import type { PropertyDocument } from '@soweto-stays/db';
 import { propertyRepository } from './property.repository.js';
@@ -57,24 +56,12 @@ function assertCanManage(property: PropertyDocument, requester: AuthUser) {
 }
 
 export const propertyService = {
-  async createByHost(hostId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
+  // The admin is the sole host of every listing (no separate host accounts) - a listing
+  // created here is trusted and goes straight to 'published' rather than 'pending_review'.
+  async create(adminId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
     return propertyRepository.create({
       ...input,
-      hostId,
-      status: 'pending_review',
-    });
-  },
-
-  // Admins never own listings (see claude_plan.md §2/§10) - they act on behalf of an
-  // existing host, who gains the host role automatically if they don't already have it.
-  async createByAdmin(targetHostId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
-    const targetUser = await userService.getById(targetHostId);
-    if (!targetUser.roles.includes('host')) {
-      await userService.grantHostRole(targetHostId);
-    }
-    return propertyRepository.create({
-      ...input,
-      hostId: targetUser._id,
+      hostId: adminId,
       status: 'published',
     });
   },
@@ -160,10 +147,6 @@ export const propertyService = {
     });
 
     return saved;
-  },
-
-  async listMine(hostId: string): Promise<PropertyDocument[]> {
-    return propertyRepository.listByHost(hostId);
   },
 
   async listForAdmin(page: number, limit: number, status?: string, hostId?: string) {

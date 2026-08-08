@@ -84,7 +84,7 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
 
       const hostEmail = renderTemplate('New booking confirmed', [
         `Hi ${data.host.name},`,
-        `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}. Your payout: ${money(data.booking.hostPayoutAmount)}.`,
+        `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}. Net amount for this booking: ${money(data.booking.hostPayoutAmount)}.`,
       ]);
       await sendMail(data.host.email, hostEmail.subject, hostEmail.html, hostEmail.text);
       return;
@@ -112,17 +112,6 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       return;
     }
 
-    case 'host-payout-sent': {
-      const data = context.bookingId ? await resolveBookingContext(context.bookingId) : null;
-      if (!data) return;
-      const email = renderTemplate('Payout sent', [
-        `Hi ${data.host.name},`,
-        `We've sent your payout of ${money(data.booking.hostPayoutAmount)} for the booking at ${data.property.title}.`,
-      ]);
-      await sendMail(data.host.email, email.subject, email.html, email.text);
-      return;
-    }
-
     case 'checkin-reminder':
     case 'checkout-rating-prompt':
       // These are sent by the dedicated BOOKING_REMINDER / RATING_PROMPT queues instead
@@ -130,9 +119,8 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       logger.warn({ template }, 'Template belongs to a dedicated queue, not EMAIL');
       return;
 
-    case 'admin-new-host':
     case 'admin-listing-pending':
-      // Reserved for a future admin-moderation slice - nothing enqueues these yet.
+      // Reserved for a future admin-moderation slice - nothing enqueues this yet.
       return;
 
     case 'newsletter-confirmation': {

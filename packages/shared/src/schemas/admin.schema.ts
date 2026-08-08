@@ -29,6 +29,30 @@ export const suspendUserSchema = z.object({
 });
 export type SuspendUserInput = z.infer<typeof suspendUserSchema>;
 
+// Every credential field is optional and, when sent as an empty string, clears the
+// currently-saved value (see platformSettings.service.ts) - so an admin can update just
+// one field (e.g. flip `enabled`) without needing to resend/re-know the existing secret.
+export const updatePaymentGatewaySettingsSchema = z.object({
+  activeProvider: z.enum(['yoco', 'payfast']).optional(),
+  yoco: z
+    .object({
+      enabled: z.boolean().optional(),
+      secretKey: z.string().max(200).optional(),
+      webhookSecret: z.string().max(200).optional(),
+    })
+    .optional(),
+  payfast: z
+    .object({
+      enabled: z.boolean().optional(),
+      merchantId: z.string().max(100).optional(),
+      merchantKey: z.string().max(200).optional(),
+      passphrase: z.string().max(200).optional(),
+      mode: z.enum(['sandbox', 'live']).optional(),
+    })
+    .optional(),
+});
+export type UpdatePaymentGatewaySettingsInput = z.infer<typeof updatePaymentGatewaySettingsSchema>;
+
 export const updatePlatformSettingsSchema = z.object({
   adminFeePercent: z.number().min(0).max(100).optional(),
   cancellationFreeWindowHours: z.number().int().nonnegative().optional(),

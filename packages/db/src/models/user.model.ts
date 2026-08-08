@@ -1,12 +1,6 @@
 import { Schema, model, type HydratedDocument } from 'mongoose';
 import { ROLES, type Role } from '@soweto-stays/shared';
 
-export interface PayoutDetails {
-  bankName: string;
-  accountNumber: string;
-  accountHolder: string;
-}
-
 export interface IUser {
   googleId?: string;
   passwordHash?: string;
@@ -17,7 +11,6 @@ export interface IUser {
   avatarUrl?: string;
   roles: Role[];
   phone?: string;
-  payoutDetails?: PayoutDetails;
   isSuspended: boolean;
   // Denormalized aggregates - a user can be rated in two distinct capacities (see
   // claude_plan.md §7.5: guests rate hosts, hosts rate guests), so these are kept separate.
@@ -30,15 +23,6 @@ export interface IUser {
 }
 
 export type UserDocument = HydratedDocument<IUser>;
-
-const payoutDetailsSchema = new Schema<PayoutDetails>(
-  {
-    bankName: { type: String, required: true },
-    accountNumber: { type: String, required: true },
-    accountHolder: { type: String, required: true },
-  },
-  { _id: false },
-);
 
 const userSchema = new Schema<IUser>(
   {
@@ -53,7 +37,6 @@ const userSchema = new Schema<IUser>(
     avatarUrl: { type: String },
     roles: { type: [String], enum: ROLES, default: ['guest'] },
     phone: { type: String },
-    payoutDetails: { type: payoutDetailsSchema, required: false },
     isSuspended: { type: Boolean, default: false },
     hostRatingAvg: { type: Number, default: 0 },
     hostRatingCount: { type: Number, default: 0 },

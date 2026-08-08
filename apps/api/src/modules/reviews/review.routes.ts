@@ -18,10 +18,11 @@ reviewRouter.post(
   validate(submitReviewSchema),
   reviewController.submitHostReview,
 );
+// Only an admin can be "the host" leaving a guest review now (see property.service.ts).
 reviewRouter.post(
   '/guest',
   authenticate,
-  requireRole('host'),
+  requireRole('admin'),
   validate(submitReviewSchema),
   reviewController.submitGuestReview,
 );

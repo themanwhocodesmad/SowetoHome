@@ -28,7 +28,7 @@ export function AdminListingsPage() {
       <div className="section-head">
         <h2>All listings</h2>
         <Link to="/admin/listings/new" className="button">
-          + Create listing for a host
+          + Create listing
         </Link>
       </div>
 
@@ -52,7 +52,6 @@ export function AdminListingsPage() {
           <thead>
             <tr>
               <th>Title</th>
-              <th>Host</th>
               <th>Status</th>
               <th>Actions</th>
             </tr>
@@ -63,11 +62,11 @@ export function AdminListingsPage() {
                 <td>
                   <Link to={`/properties/${property.id}`}>{property.title}</Link>
                 </td>
-                <td>{property.hostId}</td>
                 <td>
                   <span className={pillClass(property.status)}>{property.status}</span>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>
+                  <Link to={`/admin/listings/${property.id}/edit`}>Edit</Link>{' '}
                   {property.status !== 'published' && (
                     <button type="button" onClick={() => void moderate(property.id, 'published')}>
                       Approve

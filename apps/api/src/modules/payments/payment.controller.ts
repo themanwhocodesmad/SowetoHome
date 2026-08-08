@@ -18,3 +18,11 @@ export const notify = asyncHandler(async (req: Request, res: Response) => {
   await paymentService.handleNotify(req.rawBody, req.headers);
   res.status(200).send('OK');
 });
+
+// PayFast posts form-urlencoded, signed over its own fields (see payfast.signature.ts) -
+// express.urlencoded() already parsed the body by the time this runs, so req.body is used
+// directly rather than a stashed raw buffer. Also no user auth - authenticated by signature.
+export const payfastNotify = asyncHandler(async (req: Request, res: Response) => {
+  await paymentService.handlePayFastNotify(req.body as Record<string, string>);
+  res.status(200).send('OK');
+});

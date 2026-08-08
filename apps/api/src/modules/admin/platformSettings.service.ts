@@ -2,12 +2,14 @@ import type {
   AboutContentDto,
   ContactContentDto,
   HomepageContentDto,
+  PaymentGatewaySettingsDto,
   SectionSpacingMap,
   ServicesContentDto,
   TypographySettings,
   UpdateAboutContentInput,
   UpdateContactContentInput,
   UpdateHomepageInput,
+  UpdatePaymentGatewaySettingsInput,
   UpdatePlatformSettingsInput,
   UpdateSectionSpacingInput,
   UpdateServicesContentInput,
@@ -24,6 +26,7 @@ import {
 import {
   PLATFORM_SETTINGS_ID,
   PlatformSettingsModel,
+  type IPaymentGatewaySettings,
   type PlatformSettingsDocument,
 } from '@soweto-stays/db';
 
@@ -63,6 +66,56 @@ export function resolveSectionSpacing(
   stored: Partial<SectionSpacingMap> | undefined | null,
 ): SectionSpacingMap {
   return { ...DEFAULT_SECTION_SPACING, ...stored };
+}
+
+const DEFAULT_PAYMENT_GATEWAY_SETTINGS: IPaymentGatewaySettings = {
+  activeProvider: 'yoco',
+  yoco: { enabled: false },
+  payfast: { enabled: false, mode: 'sandbox' },
+};
+
+export function resolvePaymentGatewaySettings(
+  stored: IPaymentGatewaySettings | undefined | null,
+): IPaymentGatewaySettings {
+  return {
+    activeProvider: stored?.activeProvider ?? DEFAULT_PAYMENT_GATEWAY_SETTINGS.activeProvider,
+    yoco: { ...DEFAULT_PAYMENT_GATEWAY_SETTINGS.yoco, ...stored?.yoco },
+    payfast: { ...DEFAULT_PAYMENT_GATEWAY_SETTINGS.payfast, ...stored?.payfast },
+  };
+}
+
+function last4(value: string | undefined): string | undefined {
+  if (!value || value.length < 4) return undefined;
+  return `••••${value.slice(-4)}`;
+}
+
+// Never returns a real secret - only whether one is set, plus a last-4 hint so an admin
+// can recognize which credential is currently saved without it ever leaving the server.
+export function maskPaymentGatewaySettings(
+  settings: IPaymentGatewaySettings,
+): PaymentGatewaySettingsDto {
+  return {
+    activeProvider: settings.activeProvider,
+    yoco: {
+      enabled: settings.yoco.enabled,
+      hasSecretKey: Boolean(settings.yoco.secretKey),
+      secretKeyHint: last4(settings.yoco.secretKey),
+      hasWebhookSecret: Boolean(settings.yoco.webhookSecret),
+      mode: settings.yoco.secretKey?.startsWith('sk_live_')
+        ? 'live'
+        : settings.yoco.secretKey
+          ? 'test'
+          : undefined,
+    },
+    payfast: {
+      enabled: settings.payfast.enabled,
+      merchantId: settings.payfast.merchantId,
+      hasMerchantKey: Boolean(settings.payfast.merchantKey),
+      merchantKeyHint: last4(settings.payfast.merchantKey),
+      hasPassphrase: Boolean(settings.payfast.passphrase),
+      mode: settings.payfast.mode,
+    },
+  };
 }
 
 export function resolveTypography(
@@ -178,6 +231,62 @@ export const platformSettingsService = {
   async getContactContent(): Promise<ContactContentDto> {
     const settings = await getOrCreate();
     return resolveContactContent(settings.contactContent);
+  },
+
+  // Raw credentials, for payment.service.ts to actually call the gateway APIs with - never
+  // exposed to an HTTP response. See getPaymentGatewaySettings below for the admin-facing,
+  // secret-masked equivalent.
+  async getRawPaymentGatewaySettings(): Promise<IPaymentGatewaySettings> {
+    const settings = await getOrCreate();
+    return resolvePaymentGatewaySettings(settings.paymentGateways);
+  },
+
+  async getPaymentGatewaySettings(): Promise<PaymentGatewaySettingsDto> {
+    const settings = await getOrCreate();
+    return maskPaymentGatewaySettings(resolvePaymentGatewaySettings(settings.paymentGateways));
+  },
+
+  // Every credential field is a deliberate overwrite - sending an empty string clears it
+  // (see updatePaymentGatewaySettingsSchema in shared), so "save with the key field blank"
+  // is how an admin removes a previously-saved secret.
+  async updatePaymentGatewaySettings(
+    input: UpdatePaymentGatewaySettingsInput,
+  ): Promise<PaymentGatewaySettingsDto> {
+    const settings = await getOrCreate();
+    const current = resolvePaymentGatewaySettings(settings.paymentGateways);
+
+    const next: IPaymentGatewaySettings = {
+      activeProvider: input.activeProvider ?? current.activeProvider,
+      yoco: {
+        enabled: input.yoco?.enabled ?? current.yoco.enabled,
+        secretKey: input.yoco?.secretKey !== undefined ? input.yoco.secretKey || undefined : current.yoco.secretKey,
+        webhookSecret:
+          input.yoco?.webhookSecret !== undefined
+            ? input.yoco.webhookSecret || undefined
+            : current.yoco.webhookSecret,
+      },
+      payfast: {
+        enabled: input.payfast?.enabled ?? current.payfast.enabled,
+        merchantId:
+          input.payfast?.merchantId !== undefined
+            ? input.payfast.merchantId || undefined
+            : current.payfast.merchantId,
+        merchantKey:
+          input.payfast?.merchantKey !== undefined
+            ? input.payfast.merchantKey || undefined
+            : current.payfast.merchantKey,
+        passphrase:
+          input.payfast?.passphrase !== undefined
+            ? input.payfast.passphrase || undefined
+            : current.payfast.passphrase,
+        mode: input.payfast?.mode ?? current.payfast.mode,
+      },
+    };
+
+    settings.paymentGateways = next;
+    settings.markModified('paymentGateways');
+    await settings.save();
+    return maskPaymentGatewaySettings(next);
   },
 
   async getFeaturedPropertyIds(): Promise<string[]> {

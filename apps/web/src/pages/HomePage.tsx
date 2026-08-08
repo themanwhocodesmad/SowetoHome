@@ -1,3 +1,4 @@
+import { useEffect, useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { DEFAULT_HOMEPAGE_CONTENT } from '@soweto-stays/shared';
@@ -7,6 +8,12 @@ import { apiBaseUrl } from '../api/client.js';
 import { PropertyCard } from '../components/PropertyCard.js';
 import { SearchBar } from '../components/SearchBar.js';
 import { useSectionSpacingClass } from '../hooks/useSiteTheme.js';
+
+// How many hero background photos are supported. homeHero is slide 1, homeHero2-4
+// (all optional, uploaded via Admin → Homepage/Site Images) fill in the rest of the
+// rotation - any left unset are simply skipped rather than showing a gap.
+const HERO_SLIDESHOW_KEYS = ['homeHero', 'homeHero2', 'homeHero3', 'homeHero4'] as const;
+const HERO_SLIDE_INTERVAL_MS = 6000;
 
 export function HomePage() {
   const homepageQuery = useQuery({
@@ -28,17 +35,55 @@ export function HomePage() {
   const siteImages = homepageQuery.data?.siteImages;
   const displayedProperties = curatedProperties.length > 0 ? curatedProperties : fallbackQuery.data?.items ?? [];
 
-  const heroImage = siteImages?.homeHero ?? displayedProperties[0]?.images[0];
+  const logoImage = siteImages?.siteLogo;
   const valuePropImage = siteImages?.valuePropImage;
   const heroSpacing = useSectionSpacingClass('homeHero');
   const discoverySpacing = useSectionSpacingClass('homeDiscovery');
   const valuePropSpacing = useSectionSpacingClass('homeValueProp');
 
+  // Slideshow background: every uploaded homeHero* slot, in order, falling back to
+  // photos from whatever properties are already being shown so the hero never has to
+  // sit on a single static image (or a bare gradient) before an admin uploads any.
+  const heroSlides = useMemo(() => {
+    const uploaded = HERO_SLIDESHOW_KEYS.map((key) => siteImages?.[key]).filter(
+      (path): path is string => Boolean(path),
+    );
+    if (uploaded.length > 0) return uploaded;
+    return displayedProperties
+      .map((property) => property.images[0])
+      .filter((path): path is string => Boolean(path))
+      .slice(0, 4);
+  }, [siteImages, displayedProperties]);
+
+  const [activeSlide, setActiveSlide] = useState(0);
+
+  useEffect(() => {
+    setActiveSlide(0);
+  }, [heroSlides.length]);
+
+  useEffect(() => {
+    if (heroSlides.length < 2) return;
+    const timer = setInterval(() => {
+      setActiveSlide((i) => (i + 1) % heroSlides.length);
+    }, HERO_SLIDE_INTERVAL_MS);
+    return () => clearInterval(timer);
+  }, [heroSlides.length]);
+
   return (
     <div className="marketing-page">
       <section className={`hero ${heroSpacing}`}>
+        {heroSlides.map((path, index) => (
+          <div
+            key={path}
+            className={`hero__slide${index === activeSlide ? ' is-active' : ''}`}
+            style={{ backgroundImage: `url(${apiBaseUrl()}${path})` }}
+          />
+        ))}
+        <div className="hero__scrim" />
+
         <div className="hero__content">
-          <span className="hero__eyebrow">{content?.heroEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.heroEyebrow}</span>
+          {logoImage && <img className="hero__logo" src={`${apiBaseUrl()}${logoImage}`} alt="BookMyStaySA" />}
+          <span className="hero__tagline">{content?.heroEyebrow ?? DEFAULT_HOMEPAGE_CONTENT.heroEyebrow}</span>
           <h1 className="hero__title">
             {content?.heroTitle ?? DEFAULT_HOMEPAGE_CONTENT.heroTitle}
             <span className="hero__title-accent">
@@ -57,25 +102,32 @@ export function HomePage() {
               Schedule Consultation
             </a>
           </div>
-
-          <div className="hero__stats">
-            {(content?.trustStats ?? DEFAULT_HOMEPAGE_CONTENT.trustStats).map((stat) => (
-              <div className="hero__stat" key={stat.label}>
-                <strong>{stat.value}</strong>
-                <span>{stat.label}</span>
-              </div>
-            ))}
-          </div>
         </div>
 
-        <div className="hero__media">
-          <div className="hero__media-frame">
-            {heroImage && <img src={`${apiBaseUrl()}${heroImage}`} alt="Featured signature estate" />}
+        {heroSlides.length > 1 && (
+          <div className="hero__dots">
+            {heroSlides.map((path, index) => (
+              <button
+                key={path}
+                type="button"
+                className={`hero__dot${index === activeSlide ? ' is-active' : ''}`}
+                aria-label={`Show slide ${index + 1}`}
+                aria-current={index === activeSlide}
+                onClick={() => setActiveSlide(index)}
+              />
+            ))}
           </div>
-          <div className="hero__badge">
-            <span>Verified</span>
-            <strong>Hosts</strong>
-          </div>
+        )}
+      </section>
+
+      <section className={`hero-stats-bar ${heroSpacing}`}>
+        <div className="hero__stats">
+          {(content?.trustStats ?? DEFAULT_HOMEPAGE_CONTENT.trustStats).map((stat) => (
+            <div className="hero__stat" key={stat.label}>
+              <strong>{stat.value}</strong>
+              <span>{stat.label}</span>
+            </div>
+          ))}
         </div>
       </section>
 

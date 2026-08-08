@@ -17,8 +17,6 @@ export const EMAIL_TEMPLATES = [
   'checkout-rating-prompt',
   'cancellation-confirmed',
   'refund-processed',
-  'host-payout-sent',
-  'admin-new-host',
   'admin-listing-pending',
   'newsletter-confirmation',
 ] as const;
