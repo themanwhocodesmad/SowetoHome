@@ -52,6 +52,7 @@ export function SearchBar({ className }: { className?: string }) {
           onChange={(e) => setCity(e.target.value)}
           placeholder="Cape Town, Kruger, Garden Route..."
         />
+        <Chevron />
       </label>
       {/* Grouped so the stacked mobile-card variant (see .hero__search-mobile in
           index.css) can render "Check-in — Check-out" as one row, matching the
@@ -60,6 +61,7 @@ export function SearchBar({ className }: { className?: string }) {
       <div className="search-pill__dates">
         <label>
           <span>Check in</span>
+          <CalendarIcon />
           <input
             type="date"
             value={checkIn}
@@ -68,8 +70,10 @@ export function SearchBar({ className }: { className?: string }) {
             onFocus={openDatePicker}
           />
         </label>
+        <span className="search-pill__dash" aria-hidden="true">–</span>
         <label>
           <span>Check out</span>
+          <CalendarIcon />
           <input
             type="date"
             value={checkOut}
@@ -81,17 +85,47 @@ export function SearchBar({ className }: { className?: string }) {
       </div>
       <label>
         <span>Guests</span>
+        <GuestIcon />
         <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} />
+        <Chevron />
       </label>
       <button type="submit" aria-label="Search">
-        <svg viewBox="0 0 24 24" width="15" height="15" stroke="white" strokeWidth="2" fill="none">
+        <svg className="search-pill__search-icon" viewBox="0 0 24 24" width="15" height="15" stroke="white" strokeWidth="2" fill="none">
           <circle cx="11" cy="11" r="7" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
-        {/* Only shown by the stacked mobile-card variant - the pill/icon-only button
-            stays as-is everywhere else. */}
         <span className="search-pill__cta-label">Find your escape</span>
       </button>
     </form>
+  );
+}
+
+// Purely decorative - the fields underneath are still plain inputs, these just echo the
+// chevron/calendar/person icons from the reference design so the pill reads the same way at
+// a glance. Hidden by default, shown only where index.css opts a variant in (currently just
+// the navbar's desktop instance) so the already-approved stacked mobile card stays as-is.
+function Chevron() {
+  return (
+    <svg className="search-pill__chevron" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function CalendarIcon() {
+  return (
+    <svg className="search-pill__cal-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </svg>
+  );
+}
+
+function GuestIcon() {
+  return (
+    <svg className="search-pill__guest-icon" viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M20 21a8 8 0 0 0-16 0" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
   );
 }

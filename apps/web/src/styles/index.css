@@ -165,20 +165,95 @@ h1 {
 .search-pill.navbar__search {
   display: none;
   flex: 1 1 auto;
-  max-width: 480px;
+  max-width: 800px;
   margin: 0 auto;
   /* Slimmer than the hero's mobile instance of the same component, to match the
-     thinner header bar. */
+     thinner header bar. Darker, more defined border + icons per the reference
+     booking-widget look (chevrons, calendar icons, a filled text CTA). */
   padding: 4px;
+  border-width: 1.5px;
+  border-color: var(--color-heading);
+  gap: 2px;
 }
 
-.navbar__search label {
+/* Every rule below is double-class-scoped (.search-pill.navbar__search ...) rather than
+   just .navbar__search ... - single-class selectors here tied with the generic .search-pill
+   label/input/button/span rules further down the file on specificity, so source order (the
+   generic rules come later) silently won on any overlapping property. Doubling the class
+   guarantees these always win, matching the pattern already established above. */
+.search-pill.navbar__search label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
   padding: 4px 10px;
+  margin-bottom: 0;
 }
 
-.navbar__search button {
-  width: 30px;
-  height: 30px;
+.search-pill.navbar__search .search-pill__chevron,
+.search-pill.navbar__search .search-pill__cal-icon,
+.search-pill.navbar__search .search-pill__guest-icon,
+.search-pill.navbar__search .search-pill__dash {
+  display: block;
+  flex-shrink: 0;
+  color: var(--color-muted);
+}
+
+.search-pill.navbar__search .search-pill__dash {
+  align-self: center;
+  font-size: 14px;
+  padding: 0 2px;
+}
+
+.search-pill.navbar__search .search-pill__dates {
+  align-items: center;
+}
+
+/* Where (free text, needs the room) gets more of the row than Guests (just an icon + a
+   1-2 digit number) - direct children only, so this doesn't touch the two date labels
+   nested inside .search-pill__dates. */
+.search-pill.navbar__search > label:first-of-type {
+  flex: 1.6;
+}
+
+.search-pill.navbar__search > label:last-of-type {
+  flex: 0.6;
+}
+
+/* Drop the small caption text ("Check in", "Guests"...) in this compact header context -
+   the icon + native placeholder (or the field's own value) already say the same thing, and
+   dropping it frees up real width for the "Find your escape" button text. */
+.search-pill.navbar__search label span {
+  display: none;
+}
+
+.search-pill.navbar__search input {
+  min-width: 0;
+}
+
+.search-pill.navbar__search input[type='number'] {
+  width: 22px;
+}
+
+.search-pill.navbar__search .search-pill__search-icon {
+  display: none;
+}
+
+.search-pill.navbar__search .search-pill__cta-label {
+  display: inline;
+}
+
+.search-pill.navbar__search button {
+  width: auto;
+  height: 34px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .navbar__actions {
@@ -657,6 +732,16 @@ button:disabled {
 /* Hidden everywhere except the stacked mobile hero card, which shows it instead of
    (well, alongside) the icon - see the max-width query near the bottom of this file. */
 .search-pill__cta-label {
+  display: none;
+}
+
+/* Decorative chevron/calendar/person icons + the check-in/check-out dash (see
+   SearchBar.tsx) - hidden by default so the already-approved stacked mobile card keeps
+   its plain look; the navbar's desktop instance opts them back in below. */
+.search-pill__chevron,
+.search-pill__cal-icon,
+.search-pill__guest-icon,
+.search-pill__dash {
   display: none;
 }
 
