@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { openDatePicker } from '../utils/openDatePicker.js';
 
 function toDateInputValue(isoString: string | null): string {
   if (!isoString) return '';
@@ -59,11 +60,23 @@ export function SearchBar({ className }: { className?: string }) {
       <div className="search-pill__dates">
         <label>
           <span>Check in</span>
-          <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+          <input
+            type="date"
+            value={checkIn}
+            onChange={(e) => setCheckIn(e.target.value)}
+            onClick={openDatePicker}
+            onFocus={openDatePicker}
+          />
         </label>
         <label>
           <span>Check out</span>
-          <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+          <input
+            type="date"
+            value={checkOut}
+            onChange={(e) => setCheckOut(e.target.value)}
+            onClick={openDatePicker}
+            onFocus={openDatePicker}
+          />
         </label>
       </div>
       <label>

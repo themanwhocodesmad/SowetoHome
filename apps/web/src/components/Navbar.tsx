@@ -1,8 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.js';
-import { apiBaseUrl } from '../api/client.js';
-import { useSiteImages } from '../hooks/useSiteImages.js';
 import { SearchBar } from './SearchBar.js';
 
 function initials(name: string): string {
@@ -19,8 +17,6 @@ export function Navbar() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { data: siteImages } = useSiteImages();
-  const logoPath = siteImages?.siteLogo;
 
   // Collapse the menu automatically whenever the route changes (link click,
   // back/forward nav, programmatic navigate) rather than requiring an explicit close.
@@ -40,17 +36,14 @@ export function Navbar() {
           </svg>
         </Link>
 
+        {/* Always the default mark, regardless of whether an admin has uploaded a site
+            logo - an uploaded logo is a hero-section asset only (see HomePage.tsx),
+            not a header replacement, so the header stays visually constant. */}
         <Link to="/" className="navbar__brand">
-          {logoPath ? (
-            <img className="navbar__brand-logo" src={`${apiBaseUrl()}${logoPath}`} alt="BookMyStaySA" />
-          ) : (
-            <>
-              <svg viewBox="0 0 32 32">
-                <path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z" />
-              </svg>
-              Book<span>My</span>StaySA
-            </>
-          )}
+          <svg viewBox="0 0 32 32">
+            <path fill="currentColor" d="M16 2C10 9 4 15.5 4 21a12 12 0 0 0 24 0c0-5.5-6-12-12-19Z" />
+          </svg>
+          Book<span>My</span>StaySA
         </Link>
 
         {/* Hidden on narrow screens - the same search lives in the hero there instead. */}

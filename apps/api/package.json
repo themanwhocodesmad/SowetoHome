@@ -9,8 +9,10 @@
     "start": "node dist/server.js",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed": "tsx src/scripts/seed.ts",
+    "seed:reviews": "tsx src/scripts/seedFakeReviews.ts",
     "make-admin": "tsx src/scripts/makeAdmin.ts",
     "seed:prod": "node dist/scripts/seed.js",
+    "seed:reviews:prod": "node dist/scripts/seedFakeReviews.js",
     "make-admin:prod": "node dist/scripts/makeAdmin.js",
     "test": "echo \"no tests yet\" && exit 0"
   },

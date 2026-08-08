@@ -6,6 +6,7 @@ import { bookingsApi } from '../api/bookings.js';
 import { reviewsApi } from '../api/reviews.js';
 import { useAuth } from '../auth/AuthContext.js';
 import { apiBaseUrl } from '../api/client.js';
+import { openDatePicker } from '../utils/openDatePicker.js';
 
 export function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -206,11 +207,23 @@ export function PropertyDetailPage() {
               {bookingError && <p className="error">{bookingError}</p>}
               <label>
                 Check-in
-                <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+                <input
+                  type="date"
+                  value={checkIn}
+                  onChange={(e) => setCheckIn(e.target.value)}
+                  onClick={openDatePicker}
+                  onFocus={openDatePicker}
+                />
               </label>
               <label>
                 Check-out
-                <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+                <input
+                  type="date"
+                  value={checkOut}
+                  onChange={(e) => setCheckOut(e.target.value)}
+                  onClick={openDatePicker}
+                  onFocus={openDatePicker}
+                />
               </label>
               <label>
                 Guests

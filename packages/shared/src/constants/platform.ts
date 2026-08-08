@@ -10,7 +10,7 @@ export const RATING_PROMPT_AFTER_CHECKOUT_HOURS = 24;
 // client can swap these demo photos themselves without a code deploy. Add a new slot here
 // to make it editable - no other backend change needed, storage is a flexible key/value map.
 export const SITE_IMAGE_SLOTS = [
-  { key: 'siteLogo', label: 'Site logo (navbar & hero, transparent PNG recommended)' },
+  { key: 'siteLogo', label: 'Site logo (shown on the homepage hero only - the header stays the default mark, transparent PNG recommended)' },
   { key: 'homeHero', label: 'Homepage hero photo' },
   { key: 'homeHero2', label: 'Homepage hero slideshow photo 2 (optional)' },
   { key: 'homeHero3', label: 'Homepage hero slideshow photo 3 (optional)' },
