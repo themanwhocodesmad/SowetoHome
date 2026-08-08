@@ -2,6 +2,51 @@ import { useEffect, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { PaymentProvider, UpdatePaymentGatewaySettingsInput } from '@soweto-stays/shared';
 import { adminApi } from '../api/admin.js';
+import { apiBaseUrl } from '../api/client.js';
+
+// Paste these into the corresponding field in the Yoco / PayFast merchant dashboard so
+// their servers know where to POST payment notifications - see payment.routes.ts.
+const YOCO_WEBHOOK_URL = `${apiBaseUrl()}/api/payments/yoco/notify`;
+const PAYFAST_NOTIFY_URL = `${apiBaseUrl()}/api/payments/payfast/notify`;
+
+function WebhookTestRow({ provider, disabled }: { provider: PaymentProvider; disabled: boolean }) {
+  const [isTesting, setIsTesting] = useState(false);
+  const [result, setResult] = useState<{ ok: boolean; message: string } | null>(null);
+
+  const runTest = async () => {
+    setIsTesting(true);
+    setResult(null);
+    try {
+      const outcome = await adminApi.testPaymentWebhook(provider);
+      setResult(outcome);
+    } catch (err) {
+      setResult({ ok: false, message: err instanceof Error ? err.message : 'Test failed' });
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  return (
+    <div style={{ marginTop: '0.75rem' }}>
+      <button type="button" disabled={disabled || isTesting} onClick={() => void runTest()}>
+        {isTesting ? 'Testing...' : 'Test webhook'}
+      </button>
+      {disabled && (
+        <p className="listing-form__hint" style={{ margin: '4px 0 0' }}>
+          Save credentials above first.
+        </p>
+      )}
+      {result && (
+        <p
+          className={result.ok ? 'listing-form__hint' : 'error'}
+          style={{ margin: '6px 0 0', color: result.ok ? 'var(--color-accent, green)' : undefined }}
+        >
+          {result.ok ? '✓' : '✗'} {result.message}
+        </p>
+      )}
+    </div>
+  );
+}
 
 // Secret fields (Yoco secret key/webhook secret, PayFast merchant key/passphrase) are never
 // sent back from the API - only whether one is set, plus a last-4 hint (see
@@ -128,6 +173,11 @@ export function PaymentGatewaySettingsPanel() {
                 autoComplete="off"
               />
             </label>
+            <label>
+              Webhook URL <span className="listing-form__hint">paste into Yoco → Webhooks</span>
+              <input value={YOCO_WEBHOOK_URL} readOnly onFocus={(e) => e.target.select()} />
+            </label>
+            <WebhookTestRow provider="yoco" disabled={!data.yoco.hasWebhookSecret && !yocoWebhookSecret} />
           </div>
 
           <div className="panel" style={{ marginBottom: '1rem' }}>
@@ -179,6 +229,11 @@ export function PaymentGatewaySettingsPanel() {
                 autoComplete="off"
               />
             </label>
+            <label>
+              Notify (ITN) URL <span className="listing-form__hint">paste into PayFast → Notify URL</span>
+              <input value={PAYFAST_NOTIFY_URL} readOnly onFocus={(e) => e.target.select()} />
+            </label>
+            <WebhookTestRow provider="payfast" disabled={!payfastMerchantId} />
           </div>
 
           <button type="button" disabled={isSaving} onClick={() => void handleSave()}>

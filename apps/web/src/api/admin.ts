@@ -6,6 +6,7 @@ import type {
   ModeratePropertyInput,
   PaginatedResult,
   PaymentGatewaySettingsDto,
+  PaymentProvider,
   PlatformSettingsDto,
   PropertyDto,
   SectionSpacingMap,
@@ -74,6 +75,11 @@ export const adminApi = {
     apiFetch<PaymentGatewaySettingsDto>('/api/admin/payment-settings', {
       method: 'PATCH',
       body: JSON.stringify(input),
+    }),
+  testPaymentWebhook: (provider: PaymentProvider) =>
+    apiFetch<{ ok: boolean; message: string }>('/api/admin/payment-settings/test-webhook', {
+      method: 'POST',
+      body: JSON.stringify({ provider }),
     }),
 
   getAboutContent: () => apiFetch<AboutContentDto>('/api/admin/pages/about'),

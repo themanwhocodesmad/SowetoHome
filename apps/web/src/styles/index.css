@@ -647,6 +647,26 @@ button:disabled {
   border-right: none;
 }
 
+/* Wraps the check-in/check-out pair - see SearchBar.tsx. Behaves like a single flex
+   item in the row so desktop/tablet layouts are unaffected; the stacked mobile-card
+   variant below restyles it into its own row. */
+.search-pill__dates {
+  display: flex;
+  flex: 2 1 auto;
+  min-width: 0;
+}
+
+.search-pill__dates label {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Hidden everywhere except the stacked mobile hero card, which shows it instead of
+   (well, alongside) the icon - see the max-width query near the bottom of this file. */
+.search-pill__cta-label {
+  display: none;
+}
+
 .search-pill label span {
   display: block;
   font-size: 11px;
@@ -2457,27 +2477,82 @@ tbody tr:last-child td {
     width: min(150px, 45vw);
   }
 
-  /* Keep all 3 stats in one row on mobile (matching desktop) instead of letting
-     the 3rd one wrap to its own line - shrink the numbers/labels enough that
-     three columns actually fit at the narrowest phone widths. */
+  /* Reference layout: full-bleed photo, centered logo/title, then straight into the
+     floating search card near the bottom - no separate subtitle paragraph or CTA
+     button row competing with it (the card's own submit button is the sole CTA). */
+  .hero__subtitle,
   .hero__ctas {
-    flex-wrap: nowrap;
-    justify-content: center;
-    gap: 10px;
-    overflow-x: auto;
-    max-width: 100%;
-    scrollbar-width: none;
-  }
-
-  .hero__ctas::-webkit-scrollbar {
     display: none;
   }
 
-  .hero__ctas .button--lg {
-    padding: 8px 10px;
-    font-size: 0.7rem;
-    white-space: nowrap;
-    flex-shrink: 0;
+  /* Turns the shared search-pill into the rounded, stacked "booking widget" card
+     from the reference design: full rows instead of a single scrolling line, and a
+     full-width text CTA instead of a bare icon button. Scoped to .hero__search-mobile
+     only - the navbar's desktop instance of the same component is untouched. */
+  .hero__search-mobile.search-pill {
+    flex-direction: column;
+    align-items: stretch;
+    width: min(360px, 100%);
+    margin: 0 auto 0.5rem;
+    padding: 1.25rem;
+    border-radius: var(--radius-lg, 20px);
+    background: var(--color-surface);
+    box-shadow: var(--shadow);
+    gap: 0;
+  }
+
+  .hero__search-mobile.search-pill label {
+    width: 100%;
+    min-width: 0;
+    padding: 0.75rem 0.25rem;
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero__search-mobile.search-pill > label:last-of-type {
+    border-bottom: none;
+  }
+
+  .hero__search-mobile.search-pill label span {
+    font-size: 12px;
+  }
+
+  .hero__search-mobile.search-pill input {
+    font-size: 16px; /* keeps iOS Safari from auto-zooming on focus */
+  }
+
+  .hero__search-mobile .search-pill__dates {
+    display: flex;
+    width: 100%;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .hero__search-mobile .search-pill__dates label {
+    border-bottom: none;
+  }
+
+  .hero__search-mobile .search-pill__dates label:first-child {
+    border-right: 1px solid var(--color-border);
+  }
+
+  .hero__search-mobile.search-pill button {
+    width: 100%;
+    height: 48px;
+    margin: 1rem 0 0;
+    border-radius: 999px;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .hero__search-mobile.search-pill button svg {
+    display: none;
+  }
+
+  .hero__search-mobile .search-pill__cta-label {
+    display: inline;
   }
 
   .hero__stats {
@@ -2512,43 +2587,9 @@ tbody tr:last-child td {
     min-width: 0;
   }
 
-  /* Same single-row pill as desktop (Where / Check in / Check out / Guests / circular
-     button, all in one line) - just compressed to fit a phone instead of wrapping or
-     regrouping into multiple rows. If it's still a hair too wide on the very smallest
-     phones, the pill scrolls horizontally within itself (nowrap) rather than breaking
-     the one-row layout. */
-  .search-pill {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 4px;
-    max-width: 100%;
-    scrollbar-width: none;
-  }
-
-  .search-pill::-webkit-scrollbar {
-    display: none;
-  }
-
-  .search-pill label {
-    min-width: 64px;
-    padding: 4px 6px;
-  }
-
-  .search-pill label span {
-    font-size: 9px;
-    white-space: nowrap;
-  }
-
-  .search-pill input {
-    /* 16px+ keeps iOS Safari from auto-zooming the page on focus */
-    font-size: 16px;
-  }
-
-  .search-pill button {
-    width: 30px;
-    height: 30px;
-    margin-right: 0;
-  }
+  /* The hero's search-pill instance is fully restyled into a stacked card above
+     (.hero__search-mobile.search-pill) - nothing generic needed here anymore since
+     the navbar's instance of the same component is hidden below 960px anyway. */
 
   .amenity-grid {
     grid-template-columns: 1fr;

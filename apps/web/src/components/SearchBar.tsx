@@ -52,14 +52,20 @@ export function SearchBar({ className }: { className?: string }) {
           placeholder="Cape Town, Kruger, Garden Route..."
         />
       </label>
-      <label>
-        <span>Check in</span>
-        <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
-      </label>
-      <label>
-        <span>Check out</span>
-        <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
-      </label>
+      {/* Grouped so the stacked mobile-card variant (see .hero__search-mobile in
+          index.css) can render "Check-in — Check-out" as one row, matching the
+          reference design, while desktop keeps its existing single-row look
+          unchanged (the group is just two adjacent flex items there too). */}
+      <div className="search-pill__dates">
+        <label>
+          <span>Check in</span>
+          <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
+        </label>
+        <label>
+          <span>Check out</span>
+          <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} />
+        </label>
+      </div>
       <label>
         <span>Guests</span>
         <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} />
@@ -69,6 +75,9 @@ export function SearchBar({ className }: { className?: string }) {
           <circle cx="11" cy="11" r="7" />
           <line x1="21" y1="21" x2="16.65" y2="16.65" />
         </svg>
+        {/* Only shown by the stacked mobile-card variant - the pill/icon-only button
+            stays as-is everywhere else. */}
+        <span className="search-pill__cta-label">Find your escape</span>
       </button>
     </form>
   );

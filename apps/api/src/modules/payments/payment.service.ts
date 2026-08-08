@@ -1,7 +1,9 @@
+import crypto from 'node:crypto';
 import {
   RATING_PROMPT_AFTER_CHECKOUT_HOURS,
   REMINDER_BEFORE_CHECKIN_HOURS,
   type CheckoutResponse,
+  type PaymentProvider,
 } from '@soweto-stays/shared';
 import { BookingModel, type BookingDocument } from '@soweto-stays/db';
 import { env } from '../../common/config/env.js';
@@ -236,6 +238,92 @@ export const paymentService = {
       await this.onBookingConfirmed(confirmed);
     } else if (fields.payment_status === 'FAILED') {
       await bookingService.markPaymentFailed(bookingId);
+    }
+  },
+
+  // A dummy-but-well-formed Mongo ObjectId (never a real booking) so BookingModel.findById
+  // resolves cleanly to "not found" instead of throwing a CastError on a garbage string -
+  // that "not found" path is exactly what both notify handlers already treat as a benign,
+  // no-op outcome for an unrecognised booking.
+  //
+  // Builds a real, correctly-signed test event for whichever gateway is currently
+  // configured and runs it through the exact same handler the live webhook route calls
+  // (handleNotify / handlePayFastNotify) - so this proves the whole chain (saved secret ->
+  // signature math -> route handler) actually works, without touching a real booking or
+  // requiring a round trip to Yoco/PayFast's own servers.
+  async testWebhookConfig(provider: PaymentProvider): Promise<{ ok: boolean; message: string }> {
+    const DUMMY_BOOKING_ID = '507f1f77bcf86cd799439011';
+    const gateways = await platformSettingsService.getRawPaymentGatewaySettings();
+
+    if (provider === 'yoco') {
+      const webhookSecret = gateways.yoco.webhookSecret ?? env.YOCO_WEBHOOK_SECRET;
+      if (!webhookSecret) {
+        return {
+          ok: false,
+          message: 'Add and save a Yoco webhook secret above first, then test again.',
+        };
+      }
+
+      // Event type deliberately isn't "payment.succeeded"/"payment.failed" - after
+      // signature verification passes, handleNotify just no-ops on an unrecognised type
+      // instead of touching booking state, so a clean pass here means nothing but "the
+      // signature verified".
+      const body = Buffer.from(
+        JSON.stringify({
+          type: 'webhook-test.ping',
+          payload: { id: 'test', metadata: { bookingId: DUMMY_BOOKING_ID } },
+        }),
+      );
+      const id = `msg_test_${Date.now()}`;
+      const timestamp = Math.floor(Date.now() / 1000).toString();
+      const secretBytes = Buffer.from(webhookSecret.replace(/^whsec_/, ''), 'base64');
+      const signature = `v1,${crypto
+        .createHmac('sha256', secretBytes)
+        .update(`${id}.${timestamp}.${body.toString('utf8')}`)
+        .digest('base64')}`;
+
+      try {
+        await this.handleNotify(body, {
+          'webhook-id': id,
+          'webhook-timestamp': timestamp,
+          'webhook-signature': signature,
+        });
+        return {
+          ok: true,
+          message:
+            'Yoco webhook secret verified - a signed test event passed signature verification end-to-end.',
+        };
+      } catch (err) {
+        return { ok: false, message: err instanceof AppError ? err.message : 'Signature verification failed.' };
+      }
+    }
+
+    const { merchantId, merchantKey, passphrase } = gateways.payfast;
+    if (!merchantId) {
+      return {
+        ok: false,
+        message: 'Add and save a PayFast merchant ID above first, then test again.',
+      };
+    }
+
+    const fields: Record<string, string> = {
+      merchant_id: merchantId,
+      merchant_key: merchantKey ?? '',
+      m_payment_id: DUMMY_BOOKING_ID,
+      amount: '0.00',
+      item_name: 'Webhook test',
+      payment_status: 'TEST',
+    };
+    const signature = buildPayFastSignature(fields, passphrase);
+
+    try {
+      await this.handlePayFastNotify({ ...fields, signature });
+      return {
+        ok: true,
+        message: 'PayFast signature verified - a signed test ITN passed signature verification end-to-end.',
+      };
+    } catch (err) {
+      return { ok: false, message: err instanceof AppError ? err.message : 'Signature verification failed.' };
     }
   },
 

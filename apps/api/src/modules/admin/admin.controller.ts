@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express';
 import type {
   ModeratePropertyInput,
+  PaymentProvider,
   SuspendUserInput,
   UpdateAboutContentInput,
   UpdateContactContentInput,
@@ -18,6 +19,7 @@ import { ok, paginated } from '../../common/http/respond.js';
 import { userService, toUserDto } from '../users/user.service.js';
 import { propertyService, toPropertyDto } from '../properties/property.service.js';
 import { bookingService, toBookingDto } from '../bookings/booking.service.js';
+import { paymentService } from '../payments/payment.service.js';
 import {
   platformSettingsService,
   resolveAboutContent,
@@ -109,6 +111,15 @@ export const updatePaymentGatewaySettings = asyncHandler(async (req: Request, re
   const input = req.body as UpdatePaymentGatewaySettingsInput;
   const settings = await platformSettingsService.updatePaymentGatewaySettings(input);
   ok(res, settings);
+});
+
+export const testPaymentWebhook = asyncHandler(async (req: Request, res: Response) => {
+  const { provider } = req.body as { provider: PaymentProvider };
+  if (provider !== 'yoco' && provider !== 'payfast') {
+    throw AppError.badRequest('provider must be "yoco" or "payfast"');
+  }
+  const result = await paymentService.testWebhookConfig(provider);
+  ok(res, result);
 });
 
 export const getAboutContent = asyncHandler(async (_req: Request, res: Response) => {

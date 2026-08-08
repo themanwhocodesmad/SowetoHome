@@ -51,6 +51,7 @@ adminRouter.patch(
   validate(updatePaymentGatewaySettingsSchema),
   adminController.updatePaymentGatewaySettings,
 );
+adminRouter.post('/payment-settings/test-webhook', adminController.testPaymentWebhook);
 
 // No Zod validation on these three (or on /homepage below) - admins editing page copy
 // shouldn't be blocked by field-length rules, same reasoning as the property on-behalf
