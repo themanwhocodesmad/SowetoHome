@@ -6,8 +6,6 @@ export interface AdminAnalyticsDto {
   confirmedBookings: number;
   cancelledBookings: number;
   totalRevenue: number;
-  totalAdminFees: number;
-  totalHostPayouts: number;
 }
 
 // ---------- Payment gateway settings (Yoco + PayFast), admin-configurable from the dashboard ----------
@@ -41,7 +39,6 @@ export interface PaymentGatewaySettingsDto {
 }
 
 export interface PlatformSettingsDto {
-  adminFeePercent: number;
   cancellationFreeWindowHours: number;
   sectionSpacing: SectionSpacingMap;
   typography: TypographySettings;

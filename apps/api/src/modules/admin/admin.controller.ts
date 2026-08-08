@@ -72,7 +72,6 @@ export const listBookings = asyncHandler(async (req: Request, res: Response) => 
 export const getSettings = asyncHandler(async (_req: Request, res: Response) => {
   const settings = await platformSettingsService.getOrCreate();
   ok(res, {
-    adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
     sectionSpacing: resolveSectionSpacing(settings.sectionSpacing),
     typography: resolveTypography(settings.typography),
@@ -83,7 +82,6 @@ export const updateSettings = asyncHandler(async (req: Request, res: Response) =
   const input = req.body as UpdatePlatformSettingsInput;
   const settings = await platformSettingsService.update(input);
   ok(res, {
-    adminFeePercent: settings.adminFeePercent,
     cancellationFreeWindowHours: settings.cancellationFreeWindowHours,
     sectionSpacing: resolveSectionSpacing(settings.sectionSpacing),
     typography: resolveTypography(settings.typography),

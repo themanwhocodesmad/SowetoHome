@@ -28,9 +28,6 @@ export function toBookingDto(booking: BookingDocument): BookingDto {
     numGuests: booking.numGuests,
     nightlyRate: booking.nightlyRate,
     totalNights: booking.totalNights,
-    subtotal: booking.subtotal,
-    adminFeeAmount: booking.adminFeeAmount,
-    hostPayoutAmount: booking.hostPayoutAmount,
     totalPrice: booking.totalPrice,
     paymentStatus: booking.paymentStatus,
     paymentRef: booking.paymentRef,
@@ -75,10 +72,7 @@ export const bookingService = {
       throw AppError.conflict('These dates are no longer available for this property');
     }
 
-    const adminFeePercent = await platformSettingsService.getAdminFeePercent();
-    const subtotal = Math.round(property.stayRate * totalNights * 100) / 100;
-    const adminFeeAmount = Math.round(subtotal * (adminFeePercent / 100) * 100) / 100;
-    const hostPayoutAmount = Math.round((subtotal - adminFeeAmount) * 100) / 100;
+    const totalPrice = Math.round(property.stayRate * totalNights * 100) / 100;
 
     const booking = await bookingRepository.create({
       guestId,
@@ -89,10 +83,7 @@ export const bookingService = {
       numGuests: input.numGuests,
       nightlyRate: property.stayRate,
       totalNights,
-      subtotal,
-      adminFeeAmount,
-      hostPayoutAmount,
-      totalPrice: subtotal,
+      totalPrice,
       paymentStatus: 'pending',
       bookingStatus: 'pending_payment',
     });

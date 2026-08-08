@@ -55,6 +55,6 @@ These are called out in more detail in [claude_plan.md](claude_plan.md) §3, but
 - **Yoco integration is unverified against a live sandbox.** The webhook signature verification and
   checkout flow follow Yoco's documented pattern, but this environment has no network path to
   actually run a sandbox transaction end-to-end. Test a real payment before trusting this with money.
-- **Yoco has no payout/refund API wired up** — sending a host their share, or refunding a guest, is a
-  manual bank EFT / manual dashboard action that an admin records in the app (see the Payouts admin page).
+- **Yoco has no refund API wired up** — refunding a guest is a manual action an admin performs from the
+  Yoco merchant dashboard; the app just records the booking as refunded and notifies the guest.
 - **Emails log instead of send** until `SMTP_HOST`/`SMTP_PORT`/`SMTP_USER`/`SMTP_PASS` are filled in.

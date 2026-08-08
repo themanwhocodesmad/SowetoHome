@@ -25,7 +25,6 @@ export function AdminSettingsPage() {
     queryFn: adminApi.getSettings,
   });
 
-  const [adminFeePercent, setAdminFeePercent] = useState(0);
   const [cancellationFreeWindowHours, setCancellationFreeWindowHours] = useState(0);
   const [sectionSpacing, setSectionSpacing] = useState<SectionSpacingMap | null>(null);
   const [typography, setTypography] = useState<TypographySettings | null>(null);
@@ -35,7 +34,6 @@ export function AdminSettingsPage() {
 
   useEffect(() => {
     if (data) {
-      setAdminFeePercent(data.adminFeePercent);
       setCancellationFreeWindowHours(data.cancellationFreeWindowHours);
       setSectionSpacing(data.sectionSpacing);
       setTypography(data.typography);
@@ -45,7 +43,7 @@ export function AdminSettingsPage() {
   const handleSave = async () => {
     setStatus(null);
     try {
-      await adminApi.updateSettings({ adminFeePercent, cancellationFreeWindowHours });
+      await adminApi.updateSettings({ cancellationFreeWindowHours });
       setStatus('Saved.');
     } catch (err) {
       setStatus(err instanceof Error ? err.message : 'Could not save settings');
@@ -92,16 +90,6 @@ export function AdminSettingsPage() {
         <>
           <div className="panel" style={{ maxWidth: 420, marginBottom: '1.5rem' }}>
             {status && <p>{status}</p>}
-            <label>
-              Admin fee (%)
-              <input
-                type="number"
-                min={0}
-                max={100}
-                value={adminFeePercent}
-                onChange={(e) => setAdminFeePercent(Number(e.target.value))}
-              />
-            </label>
             <label>
               Free cancellation window (hours before check-in)
               <input

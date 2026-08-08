@@ -84,7 +84,7 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
 
       const hostEmail = renderTemplate('New booking confirmed', [
         `Hi ${data.host.name},`,
-        `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}. Net amount for this booking: ${money(data.booking.hostPayoutAmount)}.`,
+        `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}.`,
       ]);
       await sendMail(data.host.email, hostEmail.subject, hostEmail.html, hostEmail.text);
       return;

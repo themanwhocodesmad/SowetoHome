@@ -19,7 +19,7 @@ export const propertiesApi = {
   search: (query: Partial<PropertySearchQuery>) =>
     apiFetch<PaginatedResult<PropertyDto>>(`/api/properties?${toQueryString(query)}`),
   getById: (id: string) => apiFetch<PropertyDto>(`/api/properties/${id}`),
-  // Admin-only (the platform is the sole host of every listing) - see property.routes.ts.
+  listMine: () => apiFetch<PropertyDto[]>('/api/properties/mine'),
   create: (input: CreatePropertyInput) =>
     apiFetch<PropertyDto>('/api/properties', { method: 'POST', body: JSON.stringify(input) }),
   update: (id: string, input: UpdatePropertyInput) =>

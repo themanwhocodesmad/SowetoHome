@@ -11,16 +11,18 @@ import { propertyImageUpload } from './upload.js';
 
 export const propertyRouter = Router();
 
+// NOTE: the static /mine segment must be registered before the catch-all /:id route,
+// or Express would try to match it as a property id.
+propertyRouter.get('/mine', authenticate, requireRole('admin'), propertyController.listMine);
+
 propertyRouter.get('/', validate(propertySearchQuerySchema, 'query'), propertyController.search);
 
-// The platform (admin) is the sole host of every listing - there is no self-serve host
-// signup/creation flow anymore, so this is the only property-creation route.
 propertyRouter.post(
   '/',
   authenticate,
   requireRole('admin'),
   validate(createPropertySchema),
-  propertyController.create,
+  propertyController.createMine,
 );
 
 propertyRouter.get('/:id', optionalAuthenticate, propertyController.getById);

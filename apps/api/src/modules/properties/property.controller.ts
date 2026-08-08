@@ -10,9 +10,9 @@ import { created, ok, paginated } from '../../common/http/respond.js';
 import { propertyService, toPropertyDto } from './property.service.js';
 import { toPublicImagePath } from './upload.js';
 
-export const create = asyncHandler(async (req: Request, res: Response) => {
+export const createMine = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as CreatePropertyInput;
-  const property = await propertyService.create(req.authUser!.id, input);
+  const property = await propertyService.createByHost(req.authUser!.id, input);
   created(res, toPropertyDto(property));
 });
 
@@ -20,6 +20,11 @@ export const update = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as UpdatePropertyInput;
   const property = await propertyService.update(req.params.id as string, req.authUser!, input);
   ok(res, toPropertyDto(property));
+});
+
+export const listMine = asyncHandler(async (req: Request, res: Response) => {
+  const properties = await propertyService.listMine(req.authUser!.id);
+  ok(res, properties.map((p) => toPropertyDto(p)));
 });
 
 export const search = asyncHandler(async (req: Request, res: Response) => {

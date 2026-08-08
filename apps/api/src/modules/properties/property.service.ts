@@ -56,13 +56,11 @@ function assertCanManage(property: PropertyDocument, requester: AuthUser) {
 }
 
 export const propertyService = {
-  // The admin is the sole host of every listing (no separate host accounts) - a listing
-  // created here is trusted and goes straight to 'published' rather than 'pending_review'.
-  async create(adminId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
+  async createByHost(hostId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
     return propertyRepository.create({
       ...input,
-      hostId: adminId,
-      status: 'published',
+      hostId,
+      status: 'pending_review',
     });
   },
 
@@ -147,6 +145,10 @@ export const propertyService = {
     });
 
     return saved;
+  },
+
+  async listMine(hostId: string): Promise<PropertyDocument[]> {
+    return propertyRepository.listByHost(hostId);
   },
 
   async listForAdmin(page: number, limit: number, status?: string, hostId?: string) {

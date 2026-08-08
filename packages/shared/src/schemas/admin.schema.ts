@@ -54,7 +54,6 @@ export const updatePaymentGatewaySettingsSchema = z.object({
 export type UpdatePaymentGatewaySettingsInput = z.infer<typeof updatePaymentGatewaySettingsSchema>;
 
 export const updatePlatformSettingsSchema = z.object({
-  adminFeePercent: z.number().min(0).max(100).optional(),
   cancellationFreeWindowHours: z.number().int().nonnegative().optional(),
 });
 export type UpdatePlatformSettingsInput = z.infer<typeof updatePlatformSettingsSchema>;

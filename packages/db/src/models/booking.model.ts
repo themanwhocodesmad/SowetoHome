@@ -15,9 +15,6 @@ export interface IBooking {
   numGuests: number;
   nightlyRate: number;
   totalNights: number;
-  subtotal: number;
-  adminFeeAmount: number;
-  hostPayoutAmount: number;
   totalPrice: number;
   paymentStatus: PaymentStatus;
   paymentRef?: string;
@@ -42,9 +39,6 @@ const bookingSchema = new Schema<IBooking>(
     numGuests: { type: Number, required: true, min: 1 },
     nightlyRate: { type: Number, required: true },
     totalNights: { type: Number, required: true },
-    subtotal: { type: Number, required: true },
-    adminFeeAmount: { type: Number, required: true },
-    hostPayoutAmount: { type: Number, required: true },
     totalPrice: { type: Number, required: true },
     paymentStatus: { type: String, enum: PAYMENT_STATUSES, default: 'pending' },
     paymentRef: { type: String },

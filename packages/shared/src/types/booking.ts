@@ -10,9 +10,6 @@ export interface BookingDto {
   numGuests: number;
   nightlyRate: number;
   totalNights: number;
-  subtotal: number;
-  adminFeeAmount: number;
-  hostPayoutAmount: number;
   totalPrice: number;
   paymentStatus: PaymentStatus;
   paymentRef?: string;

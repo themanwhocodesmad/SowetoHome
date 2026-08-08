@@ -36,14 +36,6 @@ export function AdminAnalyticsPage() {
             <span>Total revenue</span>
             <strong>R{data.totalRevenue.toFixed(2)}</strong>
           </div>
-          <div className="stat-tile">
-            <span>Total admin fees</span>
-            <strong>R{data.totalAdminFees.toFixed(2)}</strong>
-          </div>
-          <div className="stat-tile">
-            <span>Net revenue (after admin fee)</span>
-            <strong>R{data.totalHostPayouts.toFixed(2)}</strong>
-          </div>
         </div>
       )}
     </DashboardLayout>

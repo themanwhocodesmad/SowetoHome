@@ -97,6 +97,8 @@ export function Navbar() {
         {user?.roles.includes('admin') && (
           <>
             <div className="navbar__links__divider" role="separator" />
+            <Link to="/host/listings">My Listings</Link>
+            <Link to="/host/bookings">Host Bookings</Link>
             <Link to="/admin/listings">Listings</Link>
             <Link to="/admin/users">Users</Link>
             <Link to="/admin/analytics">Analytics</Link>
