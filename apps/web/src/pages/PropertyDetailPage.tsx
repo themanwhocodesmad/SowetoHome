@@ -1,12 +1,19 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { CANCELLATION_FREE_WINDOW_HOURS } from '@soweto-stays/shared';
 import { propertiesApi } from '../api/properties.js';
 import { bookingsApi } from '../api/bookings.js';
 import { reviewsApi } from '../api/reviews.js';
 import { useAuth } from '../auth/AuthContext.js';
 import { apiBaseUrl } from '../api/client.js';
 import { openDatePicker } from '../utils/openDatePicker.js';
+import { amenityIcon, amenityLabel } from '../utils/amenityIcons.js';
+import { AvailabilityCalendar } from '../components/AvailabilityCalendar.js';
+
+// How many photos show in the header gallery before the rest fold behind "View all
+// photos" - 1 large + 4 thumbnails, matching a typical stay-listing gallery layout.
+const GALLERY_VISIBLE_COUNT = 5;
 
 export function PropertyDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -50,6 +57,8 @@ export function PropertyDetailPage() {
 
   const property = propertyQuery.data;
   const isOwner = user?.id === property.hostId;
+  const visibleImages = property.images.slice(0, GALLERY_VISIBLE_COUNT);
+  const hiddenPhotoCount = property.images.length - visibleImages.length;
 
   const handleBook = async () => {
     setBookingError(null);
@@ -71,15 +80,9 @@ export function PropertyDetailPage() {
 
   return (
     <div className="property-detail">
-      <h1>{property.title}</h1>
-      <p className="property-card__sub">
-        {property.location.suburb}, {property.location.city}
-        {property.hostName && ` · Hosted by ${property.hostName}`}
-      </p>
-
       <div className="property-detail__gallery">
-        {property.images.length > 0 ? (
-          property.images.map((img, index) => (
+        {visibleImages.length > 0 ? (
+          visibleImages.map((img, index) => (
             <button
               key={img}
               type="button"
@@ -88,10 +91,26 @@ export function PropertyDetailPage() {
               aria-label={`View photo ${index + 1} of ${property.images.length} in full screen`}
             >
               <img src={`${apiBaseUrl()}${img}`} alt={property.title} />
+              {index === visibleImages.length - 1 && hiddenPhotoCount > 0 && (
+                <span className="property-detail__gallery-more">+{hiddenPhotoCount} photos</span>
+              )}
             </button>
           ))
         ) : (
           <div className="property-card__placeholder">No photos uploaded yet.</div>
+        )}
+        {property.images.length > 0 && (
+          <button
+            type="button"
+            className="property-detail__view-all"
+            onClick={() => setLightboxIndex(0)}
+          >
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="7" height="7" rx="1" /><rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="7" height="7" rx="1" /><rect x="14" y="14" width="7" height="7" rx="1" />
+            </svg>
+            View all photos
+          </button>
         )}
       </div>
 
@@ -154,112 +173,203 @@ export function PropertyDetailPage() {
         </div>
       )}
 
-      <div className="property-detail__meta">
-        <span>
-          <strong>{property.maxGuests}</strong> guests
-        </span>
-        <span>
-          <strong>{property.bedrooms}</strong> bedrooms
-        </span>
-        <span>
-          <strong>{property.beds}</strong> beds
-        </span>
-        <span>
-          <strong>{property.bathrooms}</strong> baths
-        </span>
-        {property.ratingCount > 0 && (
-          <span>
-            ★ {property.ratingAvg.toFixed(1)} ({property.ratingCount})
-          </span>
-        )}
-      </div>
-
-      <p>{property.description}</p>
-      <p className="property-card__sub">
-        {property.minNights}-{property.maxNights} nights · Check-in {property.checkInTime}, check-out{' '}
-        {property.checkOutTime}
-      </p>
-
-      {property.amenities.length > 0 && (
-        <>
-          <strong>What this place offers</strong>
-          <ul className="amenity-grid">
-            {property.amenities.map((amenity) => (
-              <li key={amenity}>{amenity}</li>
-            ))}
-          </ul>
-        </>
-      )}
-
-      {!property.isAvailable && <p className="notice">This property is not currently accepting bookings.</p>}
-
-      {!isOwner && property.isAvailable && (
-        <section className="booking-form panel">
-          <div className="property-card__price" style={{ marginBottom: '0.75rem' }}>
-            <b>R{property.stayRate.toFixed(0)}</b> / night
-          </div>
-          {!user ? (
-            <p>
-              <Link to="/login">Sign in with Google</Link> to book this property.
+      <div className="property-detail__layout">
+        <div className="property-detail__main">
+          <header className="property-detail__head">
+            <h1>{property.title}</h1>
+            <p className="property-card__sub">
+              {property.location.suburb}, {property.location.city}
+              {property.hostName && ` · Hosted by ${property.hostName}`}
             </p>
-          ) : (
-            <>
-              {bookingError && <p className="error">{bookingError}</p>}
-              <label>
-                Check-in
-                <input
-                  type="date"
-                  value={checkIn}
-                  onChange={(e) => setCheckIn(e.target.value)}
-                  onClick={openDatePicker}
-                  onFocus={openDatePicker}
-                />
-              </label>
-              <label>
-                Check-out
-                <input
-                  type="date"
-                  value={checkOut}
-                  onChange={(e) => setCheckOut(e.target.value)}
-                  onClick={openDatePicker}
-                  onFocus={openDatePicker}
-                />
-              </label>
-              <label>
-                Guests
-                <input
-                  type="number"
-                  min={1}
-                  max={property.maxGuests}
-                  value={numGuests}
-                  onChange={(e) => setNumGuests(Number(e.target.value))}
-                />
-              </label>
-              <button
-                type="button"
-                className="button"
-                disabled={isBooking || !checkIn || !checkOut}
-                onClick={() => void handleBook()}
-              >
-                {isBooking ? 'Booking...' : 'Request to book'}
-              </button>
-            </>
-          )}
-        </section>
-      )}
+          </header>
 
-      <section className="reviews">
-        <h2>Reviews {property.ratingCount > 0 && `(★ ${property.ratingAvg.toFixed(1)})`}</h2>
-        {reviewsQuery.data?.length ? (
-          <ul>
-            {reviewsQuery.data.map((review) => (
-              <li key={review.id}>★ {review.rating} - {review.comment}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>No reviews yet.</p>
-        )}
-      </section>
+          <div className="property-detail__meta">
+            <span>
+              <strong>{property.maxGuests}</strong> guests
+            </span>
+            <span>
+              <strong>{property.bedrooms}</strong> bedrooms
+            </span>
+            <span>
+              <strong>{property.beds}</strong> beds
+            </span>
+            <span>
+              <strong>{property.bathrooms}</strong> baths
+            </span>
+            {property.ratingCount > 0 && (
+              <span>
+                ★ {property.ratingAvg.toFixed(1)} ({property.ratingCount})
+              </span>
+            )}
+          </div>
+
+          <p className="property-detail__description">{property.description}</p>
+          <p className="property-card__sub">
+            {property.minNights}-{property.maxNights} nights · Check-in {property.checkInTime}, check-out{' '}
+            {property.checkOutTime}
+          </p>
+
+          {property.amenities.length > 0 && (
+            <div className="amenity-badges">
+              {property.amenities.slice(0, 6).map((amenity) => (
+                <span className="amenity-badge" key={amenity}>
+                  {amenityIcon(amenity)}
+                  {amenityLabel(amenity)}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {property.amenities.length > 0 && (
+            <section className="property-detail__section">
+              <h2>Amenities</h2>
+              <ul className="amenity-grid">
+                {property.amenities.map((amenity) => (
+                  <li key={amenity}>
+                    {amenityIcon(amenity)}
+                    {amenityLabel(amenity)}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          <section className="property-detail__section">
+            <AvailabilityCalendar propertyId={property.id} />
+          </section>
+
+          {!property.isAvailable && <p className="notice">This property is not currently accepting bookings.</p>}
+
+          <section className="reviews property-detail__section">
+            <h2>Reviews {property.ratingCount > 0 && `(★ ${property.ratingAvg.toFixed(1)})`}</h2>
+            {reviewsQuery.data?.length ? (
+              <ul>
+                {reviewsQuery.data.map((review) => (
+                  <li key={review.id}>★ {review.rating} - {review.comment}</li>
+                ))}
+              </ul>
+            ) : (
+              <p>No reviews yet.</p>
+            )}
+          </section>
+        </div>
+
+        <aside className="property-detail__sidebar">
+          <div className="booking-form panel">
+            <div className="property-card__price" style={{ marginBottom: '0.75rem' }}>
+              <b>R{property.stayRate.toFixed(0)}</b> / night
+            </div>
+
+            {isOwner ? (
+              <p className="property-card__sub">This is your listing.</p>
+            ) : !property.isAvailable ? null : !user ? (
+              <p>
+                <Link to="/login">Sign in with Google</Link> to book this property.
+              </p>
+            ) : (
+              <>
+                {bookingError && <p className="error">{bookingError}</p>}
+                <label>
+                  Check-in
+                  <input
+                    type="date"
+                    value={checkIn}
+                    onChange={(e) => setCheckIn(e.target.value)}
+                    onClick={openDatePicker}
+                    onFocus={openDatePicker}
+                  />
+                </label>
+                <label>
+                  Check-out
+                  <input
+                    type="date"
+                    value={checkOut}
+                    onChange={(e) => setCheckOut(e.target.value)}
+                    onClick={openDatePicker}
+                    onFocus={openDatePicker}
+                  />
+                </label>
+                <label>
+                  Guests
+                  <input
+                    type="number"
+                    min={1}
+                    max={property.maxGuests}
+                    value={numGuests}
+                    onChange={(e) => setNumGuests(Number(e.target.value))}
+                  />
+                </label>
+                <button
+                  type="button"
+                  className="button"
+                  disabled={isBooking || !checkIn || !checkOut}
+                  onClick={() => void handleBook()}
+                >
+                  {isBooking ? 'Booking...' : 'Request to book'}
+                </button>
+              </>
+            )}
+          </div>
+
+          <div className="panel property-detail__facts">
+            <h4>Rooms &amp; facilities</h4>
+            <ul>
+              <li>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18v2M21 18v2M7 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" />
+                </svg>
+                {property.beds} {property.beds === 1 ? 'bed' : 'beds'} · {property.bedrooms} {property.bedrooms === 1 ? 'bedroom' : 'bedrooms'}
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12h16v3a4 4 0 0 1-4 4H8a4 4 0 0 1-4-4v-3ZM6 12V6a2 2 0 0 1 3-1.7M4 19v1M18 19v1" />
+                </svg>
+                {property.bathrooms} {property.bathrooms === 1 ? 'bathroom' : 'bathrooms'}
+              </li>
+              <li>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20 21a8 8 0 0 0-16 0" /><circle cx="12" cy="7" r="4" />
+                </svg>
+                Up to {property.maxGuests} guests
+              </li>
+            </ul>
+          </div>
+
+          <div className="panel property-detail__facts">
+            <h4>House rules</h4>
+            <ul>
+              <li>Check-in after {property.checkInTime}</li>
+              <li>Check-out by {property.checkOutTime}</li>
+              <li>
+                {property.minNights === property.maxNights
+                  ? `${property.minNights}-night stay`
+                  : `${property.minNights}-${property.maxNights} night stay`}
+              </li>
+              {property.houseRules && <li>{property.houseRules}</li>}
+            </ul>
+          </div>
+
+          <div className="panel property-detail__facts">
+            <h4>Location</h4>
+            <p className="property-card__sub" style={{ marginBottom: '0.75rem' }}>
+              {property.location.suburb}, {property.location.city}, {property.location.province}
+            </p>
+            <iframe
+              title="Property location"
+              className="property-detail__map"
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${property.location.lng - 0.01}%2C${property.location.lat - 0.01}%2C${property.location.lng + 0.01}%2C${property.location.lat + 0.01}&layer=mapnik&marker=${property.location.lat}%2C${property.location.lng}`}
+            />
+          </div>
+
+          <div className="panel property-detail__facts">
+            <h4>Things to note</h4>
+            <ul>
+              <li>Free cancellation up to {CANCELLATION_FREE_WINDOW_HOURS} hours before check-in.</li>
+              <li>Reviews open 24 hours after checkout.</li>
+            </ul>
+          </div>
+        </aside>
+      </div>
     </div>
   );
 }

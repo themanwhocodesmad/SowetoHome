@@ -26,6 +26,7 @@ propertyRouter.post(
 );
 
 propertyRouter.get('/:id', optionalAuthenticate, propertyController.getById);
+propertyRouter.get('/:id/booked-ranges', propertyController.getBookedRanges);
 
 propertyRouter.patch('/:id', authenticate, validate(updatePropertySchema), propertyController.update);
 

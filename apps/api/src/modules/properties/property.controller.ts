@@ -38,6 +38,11 @@ export const getById = asyncHandler(async (req: Request, res: Response) => {
   ok(res, toPropertyDto(property));
 });
 
+export const getBookedRanges = asyncHandler(async (req: Request, res: Response) => {
+  const ranges = await propertyService.getBookedRanges(req.params.id as string);
+  ok(res, ranges);
+});
+
 export const uploadImages = asyncHandler(async (req: Request, res: Response) => {
   const propertyId = req.params.id as string;
   const files = (req.files as Express.Multer.File[] | undefined) ?? [];

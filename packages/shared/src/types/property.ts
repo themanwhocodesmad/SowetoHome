@@ -36,3 +36,10 @@ export interface PropertyDto {
   createdAt: string;
   updatedAt: string;
 }
+
+// Powers the read-only availability calendar on the property detail page - just the date
+// ranges that are already taken (no guest/booking identity attached).
+export interface BookedRangeDto {
+  checkIn: string;
+  checkOut: string;
+}

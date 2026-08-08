@@ -1156,6 +1156,7 @@ button:disabled {
 
 /* ---------- Property detail page ---------- */
 .property-detail__gallery {
+  position: relative;
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 6px;
@@ -1183,6 +1184,44 @@ button:disabled {
 
 .property-detail__gallery-item:first-child {
   grid-row: span 2;
+}
+
+.property-detail__gallery-item {
+  position: relative;
+}
+
+.property-detail__gallery-more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(9, 26, 41, 0.55);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.property-detail__view-all {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: white;
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-heading);
+  cursor: pointer;
+}
+
+.property-detail__view-all:hover {
+  border-color: var(--color-heading);
 }
 
 /* ---------- Property photo lightbox ---------- */
@@ -1304,13 +1343,116 @@ button:disabled {
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+  color: var(--color-text);
 }
 
-.amenity-grid li::before {
-  content: '\2713';
+.amenity-grid li svg {
+  flex-shrink: 0;
   color: var(--color-accent);
+}
+
+/* Highlight row of the first few amenities, shown as pills right under the description -
+   the full icon+label grid further down (.amenity-grid) still lists every amenity. */
+.amenity-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 1rem 0;
+}
+
+.amenity-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-soft);
+  font-size: 12px;
   font-weight: 700;
+  color: var(--color-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.amenity-badge svg {
+  width: 14px;
+  height: 14px;
+  color: var(--color-accent);
+}
+
+/* ---------- Property detail: two-column layout (content + sticky booking sidebar) ---------- */
+.property-detail__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.property-detail__head h1 {
+  margin-bottom: 0.35rem;
+}
+
+.property-detail__description {
+  white-space: pre-line;
+}
+
+.property-detail__section {
+  margin-top: 2rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.property-detail__section h2 {
+  margin-top: 0;
+}
+
+.property-detail__sidebar {
+  position: sticky;
+  top: 90px;
+}
+
+.property-detail__facts h4 {
+  margin: 0 0 0.75rem;
+}
+
+.property-detail__facts ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13.5px;
+  color: var(--color-text);
+}
+
+.property-detail__facts li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.property-detail__facts li svg {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.property-detail__map {
+  width: 100%;
+  height: 160px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+}
+
+@media (max-width: 860px) {
+  .property-detail__layout {
+    grid-template-columns: 1fr;
+  }
+  .property-detail__sidebar {
+    position: static;
+  }
 }
 
 .booking-form {
@@ -1909,6 +2051,118 @@ tbody tr:last-child td {
      viewport (and past the sticky navbar/sidebar). */
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+}
+
+/* ---------- Availability calendar (property detail page) ---------- */
+.availability-calendar__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+
+.availability-calendar__header h3 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.availability-calendar__nav {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-heading);
+  white-space: nowrap;
+}
+
+.availability-calendar__nav button {
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--color-bg-soft);
+  border: 1px solid var(--color-border);
+  color: var(--color-heading);
+  justify-content: center;
+}
+
+.availability-calendar__nav button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.availability-calendar__grid {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.availability-calendar__grid th {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-muted);
+  padding-bottom: 6px;
+}
+
+.availability-calendar__grid td {
+  text-align: center;
+  padding: 2px;
+}
+
+.availability-calendar__day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  margin: 0 auto;
+  border-radius: 50%;
+  font-size: 12.5px;
+}
+
+.availability-calendar__day.is-available {
+  color: var(--color-text);
+}
+
+.availability-calendar__day.is-past {
+  color: var(--color-border);
+}
+
+.availability-calendar__day.is-booked {
+  background: var(--color-danger-bg);
+  color: var(--color-error);
+  text-decoration: line-through;
+}
+
+.availability-calendar__legend {
+  display: flex;
+  gap: 18px;
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--color-muted);
+}
+
+.availability-calendar__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.availability-calendar__swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.availability-calendar__swatch.is-available {
+  background: var(--color-accent);
+}
+
+.availability-calendar__swatch.is-booked {
+  background: var(--color-error);
 }
 
 .section-head {

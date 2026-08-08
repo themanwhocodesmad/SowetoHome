@@ -1,6 +1,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import type {
+  BookedRangeDto,
   CreatePropertyInput,
   PropertyDto,
   PropertySearchQuery,
@@ -8,7 +9,7 @@ import type {
 } from '@soweto-stays/shared';
 import { env } from '../../common/config/env.js';
 import { AppError } from '../../common/errors/AppError.js';
-import { findBookedPropertyIds } from '../bookings/availability.js';
+import { findBookedPropertyIds, getBookedRanges } from '../bookings/availability.js';
 import type { PropertyDocument } from '@soweto-stays/db';
 import { propertyRepository } from './property.repository.js';
 
@@ -82,6 +83,11 @@ export const propertyService = {
       throw AppError.notFound('Property not found');
     }
     return property;
+  },
+
+  async getBookedRanges(propertyId: string): Promise<BookedRangeDto[]> {
+    const ranges = await getBookedRanges(propertyId);
+    return ranges.map((r) => ({ checkIn: r.checkIn.toISOString(), checkOut: r.checkOut.toISOString() }));
   },
 
   async update(

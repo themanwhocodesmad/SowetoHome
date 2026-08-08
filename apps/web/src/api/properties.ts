@@ -1,4 +1,5 @@
 import type {
+  BookedRangeDto,
   CreatePropertyInput,
   PaginatedResult,
   PropertyDto,
@@ -19,6 +20,7 @@ export const propertiesApi = {
   search: (query: Partial<PropertySearchQuery>) =>
     apiFetch<PaginatedResult<PropertyDto>>(`/api/properties?${toQueryString(query)}`),
   getById: (id: string) => apiFetch<PropertyDto>(`/api/properties/${id}`),
+  getBookedRanges: (id: string) => apiFetch<BookedRangeDto[]>(`/api/properties/${id}/booked-ranges`),
   listMine: () => apiFetch<PropertyDto[]>('/api/properties/mine'),
   create: (input: CreatePropertyInput) =>
     apiFetch<PropertyDto>('/api/properties', { method: 'POST', body: JSON.stringify(input) }),

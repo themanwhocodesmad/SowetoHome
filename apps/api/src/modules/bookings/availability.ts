@@ -29,3 +29,13 @@ export async function findBookedPropertyIds(checkIn: Date, checkOut: Date): Prom
   }).distinct('propertyId');
   return propertyIds.map((id) => id.toString());
 }
+
+// Powers the public availability calendar on the property detail page - just the date
+// ranges that are taken, no guest/booking identity, so this is safe to expose unauthenticated.
+export async function getBookedRanges(propertyId: string): Promise<Array<{ checkIn: Date; checkOut: Date }>> {
+  const bookings = await BookingModel.find(
+    { propertyId, bookingStatus: { $in: ACTIVE_BOOKING_STATUSES }, checkOut: { $gte: new Date() } },
+    { checkIn: 1, checkOut: 1 },
+  ).lean();
+  return bookings.map((b) => ({ checkIn: b.checkIn, checkOut: b.checkOut }));
+}
