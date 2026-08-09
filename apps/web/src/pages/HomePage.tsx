@@ -98,9 +98,6 @@ export function HomePage() {
             <Link to="/properties" className="button button--lg">
               Explore Properties
             </Link>
-            <a href="/contact" className="button button--outline button--lg">
-              Schedule Consultation
-            </a>
           </div>
         </div>
 

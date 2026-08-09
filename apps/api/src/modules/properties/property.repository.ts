@@ -6,6 +6,13 @@ export interface PropertyFilter {
   hostId?: string;
 }
 
+// User input dropped straight into a RegExp - escape regex metacharacters (e.g. a stray "("
+// from someone typing "Cape Town (CBD)") so it's matched literally instead of throwing or
+// being interpreted as a pattern.
+function escapeRegex(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 export const propertyRepository = {
   findById(id: string): Promise<PropertyDocument | null> {
     return PropertyModel.findById(id);
@@ -48,7 +55,21 @@ export const propertyRepository = {
       status: 'published',
       isAvailable: true,
     };
-    if (query.city) filter['location.city'] = new RegExp(query.city, 'i');
+    // "city" is really a free-text "where to?" search box on the frontend - match it against
+    // every location field (plus the listing title) rather than city alone, so searching
+    // "Vilakazi", "Orlando West", or "Gauteng" all find the right listings regardless of
+    // which field the term actually lives in.
+    const searchTerm = query.city?.trim();
+    if (searchTerm) {
+      const regex = new RegExp(escapeRegex(searchTerm), 'i');
+      filter.$or = [
+        { title: regex },
+        { 'location.city': regex },
+        { 'location.suburb': regex },
+        { 'location.province': regex },
+        { 'location.address': regex },
+      ];
+    }
     if (query.province) filter['location.province'] = query.province;
     if (query.guests) filter.maxGuests = { $gte: query.guests };
     if (query.minPrice || query.maxPrice) {
