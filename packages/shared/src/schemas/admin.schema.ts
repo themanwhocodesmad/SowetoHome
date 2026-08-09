@@ -34,11 +34,12 @@ export type SuspendUserInput = z.infer<typeof suspendUserSchema>;
 // one field (e.g. flip `enabled`) without needing to resend/re-know the existing secret.
 export const updatePaymentGatewaySettingsSchema = z.object({
   activeProvider: z.enum(['yoco', 'payfast']).optional(),
+  // No webhookSecret/webhookUrl here - those are auto-registered with Yoco server-side
+  // whenever secretKey is (re)saved (see yoco.webhooks.ts), never entered by hand.
   yoco: z
     .object({
       enabled: z.boolean().optional(),
       secretKey: z.string().max(200).optional(),
-      webhookSecret: z.string().max(200).optional(),
     })
     .optional(),
   payfast: z

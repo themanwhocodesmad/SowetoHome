@@ -18,6 +18,9 @@ export interface IPaymentGatewaySettings {
     enabled: boolean;
     secretKey?: string;
     webhookSecret?: string;
+    // Auto-registered with Yoco when secretKey is saved (see yoco.webhooks.ts) - no manual
+    // webhook setup in the Yoco dashboard required.
+    webhookUrl?: string;
   };
   payfast: {
     enabled: boolean;

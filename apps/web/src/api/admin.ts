@@ -18,6 +18,7 @@ import type {
   UpdateContactContentInput,
   UpdateHomepageInput,
   UpdatePaymentGatewaySettingsInput,
+  UpdatePaymentGatewaySettingsResponseDto,
   UpdatePlatformSettingsInput,
   UpdateSectionSpacingInput,
   UpdateServicesContentInput,
@@ -72,7 +73,7 @@ export const adminApi = {
 
   getPaymentSettings: () => apiFetch<PaymentGatewaySettingsDto>('/api/admin/payment-settings'),
   updatePaymentSettings: (input: UpdatePaymentGatewaySettingsInput) =>
-    apiFetch<PaymentGatewaySettingsDto>('/api/admin/payment-settings', {
+    apiFetch<UpdatePaymentGatewaySettingsResponseDto>('/api/admin/payment-settings', {
       method: 'PATCH',
       body: JSON.stringify(input),
     }),

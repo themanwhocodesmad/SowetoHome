@@ -10,11 +10,13 @@ import type {
   UpdateContactContentInput,
   UpdateHomepageInput,
   UpdatePaymentGatewaySettingsInput,
+  UpdatePaymentGatewaySettingsResponseDto,
   UpdatePlatformSettingsInput,
   UpdateSectionSpacingInput,
   UpdateServicesContentInput,
   UpdateTypographyInput,
 } from '@soweto-stays/shared';
+import { registerYocoWebhook } from '../payments/yoco.webhooks.js';
 import {
   DEFAULT_ABOUT_CONTENT,
   DEFAULT_CONTACT_CONTENT,
@@ -101,6 +103,7 @@ export function maskPaymentGatewaySettings(
       hasSecretKey: Boolean(settings.yoco.secretKey),
       secretKeyHint: last4(settings.yoco.secretKey),
       hasWebhookSecret: Boolean(settings.yoco.webhookSecret),
+      webhookUrl: settings.yoco.webhookUrl,
       mode: settings.yoco.secretKey?.startsWith('sk_live_')
         ? 'live'
         : settings.yoco.secretKey
@@ -243,9 +246,14 @@ export const platformSettingsService = {
   // Every credential field is a deliberate overwrite - sending an empty string clears it
   // (see updatePaymentGatewaySettingsSchema in shared), so "save with the key field blank"
   // is how an admin removes a previously-saved secret.
+  //
+  // publicOrigin (e.g. "https://bookmystaysa.co.za", derived from the request in
+  // admin.controller.ts) is only used to build the Yoco webhook URL when a secret key is
+  // (re)saved - see registerYocoWebhook below. Nothing else in here needs it.
   async updatePaymentGatewaySettings(
     input: UpdatePaymentGatewaySettingsInput,
-  ): Promise<PaymentGatewaySettingsDto> {
+    publicOrigin: string,
+  ): Promise<UpdatePaymentGatewaySettingsResponseDto> {
     const settings = await getOrCreate();
     const current = resolvePaymentGatewaySettings(settings.paymentGateways);
 
@@ -254,10 +262,10 @@ export const platformSettingsService = {
       yoco: {
         enabled: input.yoco?.enabled ?? current.yoco.enabled,
         secretKey: input.yoco?.secretKey !== undefined ? input.yoco.secretKey || undefined : current.yoco.secretKey,
-        webhookSecret:
-          input.yoco?.webhookSecret !== undefined
-            ? input.yoco.webhookSecret || undefined
-            : current.yoco.webhookSecret,
+        // Never set from admin input (see updatePaymentGatewaySettingsSchema) - only ever
+        // filled in below by registerYocoWebhook, or carried over unchanged.
+        webhookSecret: current.yoco.webhookSecret,
+        webhookUrl: current.yoco.webhookUrl,
       },
       payfast: {
         enabled: input.payfast?.enabled ?? current.payfast.enabled,
@@ -277,10 +285,29 @@ export const platformSettingsService = {
       },
     };
 
+    // Auto-register (or reuse) the Yoco webhook whenever a new/changed secret key comes in,
+    // or whenever Yoco is enabled with a saved key that's never been registered yet (e.g.
+    // enabling it for the first time after the key was already on file) - an admin never has
+    // to touch the Yoco dashboard themselves.
+    let message: string | undefined;
+    const secretKeyChanged =
+      input.yoco?.secretKey !== undefined && input.yoco.secretKey !== current.yoco.secretKey;
+    const needsFirstRegistration = next.yoco.enabled && next.yoco.secretKey && !next.yoco.webhookUrl;
+
+    if (next.yoco.secretKey && (secretKeyChanged || needsFirstRegistration)) {
+      const webhookUrl = `${publicOrigin}/api/payments/yoco/notify`;
+      const registered = await registerYocoWebhook(next.yoco.secretKey, webhookUrl);
+      next.yoco.webhookUrl = registered.webhookUrl;
+      if (registered.webhookSecret) {
+        next.yoco.webhookSecret = registered.webhookSecret;
+      }
+      message = 'Yoco credentials saved and Webhook automatically registered!';
+    }
+
     settings.paymentGateways = next;
     settings.markModified('paymentGateways');
     await settings.save();
-    return maskPaymentGatewaySettings(next);
+    return { ...maskPaymentGatewaySettings(next), message };
   },
 
   async getFeaturedPropertyIds(): Promise<string[]> {

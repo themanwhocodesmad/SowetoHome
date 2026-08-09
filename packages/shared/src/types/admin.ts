@@ -19,6 +19,9 @@ export interface YocoGatewaySettingsDto {
   hasSecretKey: boolean;
   secretKeyHint?: string;
   hasWebhookSecret: boolean;
+  // Auto-registered with Yoco when the secret key is saved (see yoco.webhooks.ts) - shown
+  // read-only in the admin UI as confirmation, never entered manually.
+  webhookUrl?: string;
   // Derived from the secret key's sk_test_/sk_live_ prefix, not stored separately.
   mode?: 'test' | 'live';
 }
@@ -36,6 +39,13 @@ export interface PaymentGatewaySettingsDto {
   activeProvider: PaymentProvider;
   yoco: YocoGatewaySettingsDto;
   payfast: PayFastGatewaySettingsDto;
+}
+
+// PATCH /api/admin/payment-settings' response - same as the GET shape, plus an optional
+// human-readable status line (e.g. confirming Yoco's webhook was just auto-registered) for
+// the admin UI to surface after a save.
+export interface UpdatePaymentGatewaySettingsResponseDto extends PaymentGatewaySettingsDto {
+  message?: string;
 }
 
 export interface PlatformSettingsDto {

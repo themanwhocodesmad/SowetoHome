@@ -13,6 +13,7 @@ import type {
   UpdateTypographyInput,
 } from '@soweto-stays/shared';
 import { SITE_IMAGE_KEYS } from '@soweto-stays/shared';
+import { env } from '../../common/config/env.js';
 import { asyncHandler } from '../../common/middleware/asyncHandler.js';
 import { AppError } from '../../common/errors/AppError.js';
 import { ok, paginated } from '../../common/http/respond.js';
@@ -107,9 +108,21 @@ export const getPaymentGatewaySettings = asyncHandler(async (_req: Request, res:
   ok(res, settings);
 });
 
+// The Yoco webhook URL (see registerYocoWebhook) needs this app's own public origin -
+// prefer the configured API_PUBLIC_URL (already used for PayFast's notify_url, reliable
+// behind a reverse proxy) and only fall back to the request's Host header when that's still
+// at its localhost default (e.g. a dev environment where it was never set).
+function resolvePublicOrigin(req: Request): string {
+  if (!env.API_PUBLIC_URL.includes('localhost')) return env.API_PUBLIC_URL;
+  return `${req.protocol}://${req.headers.host}`;
+}
+
 export const updatePaymentGatewaySettings = asyncHandler(async (req: Request, res: Response) => {
   const input = req.body as UpdatePaymentGatewaySettingsInput;
-  const settings = await platformSettingsService.updatePaymentGatewaySettings(input);
+  const settings = await platformSettingsService.updatePaymentGatewaySettings(
+    input,
+    resolvePublicOrigin(req),
+  );
   ok(res, settings);
 });
 

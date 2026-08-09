@@ -4,9 +4,8 @@ import type { PaymentProvider, UpdatePaymentGatewaySettingsInput } from '@soweto
 import { adminApi } from '../api/admin.js';
 import { apiBaseUrl } from '../api/client.js';
 
-// Paste these into the corresponding field in the Yoco / PayFast merchant dashboard so
-// their servers know where to POST payment notifications - see payment.routes.ts.
-const YOCO_WEBHOOK_URL = `${apiBaseUrl()}/api/payments/yoco/notify`;
+// PayFast has no webhook-management API to automate against (unlike Yoco below), so this is
+// still a manual paste-into-the-dashboard field - see payment.routes.ts.
 const PAYFAST_NOTIFY_URL = `${apiBaseUrl()}/api/payments/payfast/notify`;
 
 function WebhookTestRow({ provider, disabled }: { provider: PaymentProvider; disabled: boolean }) {
@@ -63,7 +62,6 @@ export function PaymentGatewaySettingsPanel() {
   const [activeProvider, setActiveProvider] = useState<PaymentProvider>('yoco');
   const [yocoEnabled, setYocoEnabled] = useState(false);
   const [yocoSecretKey, setYocoSecretKey] = useState('');
-  const [yocoWebhookSecret, setYocoWebhookSecret] = useState('');
   const [payfastEnabled, setPayfastEnabled] = useState(false);
   const [payfastMerchantId, setPayfastMerchantId] = useState('');
   const [payfastMerchantKey, setPayfastMerchantKey] = useState('');
@@ -85,13 +83,16 @@ export function PaymentGatewaySettingsPanel() {
     setStatus(null);
     setIsSaving(true);
     try {
-      await adminApi.updatePaymentSettings(patch);
+      // When a Yoco secret key is (re)saved, the server automatically registers (or reuses)
+      // a webhook with Yoco itself and returns a status message confirming that - see
+      // platformSettings.service.ts's updatePaymentGatewaySettings. No manual webhook setup
+      // needed on this end.
+      const result = await adminApi.updatePaymentSettings(patch);
       await queryClient.invalidateQueries({ queryKey: ['admin', 'payment-settings'] });
       setYocoSecretKey('');
-      setYocoWebhookSecret('');
       setPayfastMerchantKey('');
       setPayfastPassphrase('');
-      setStatus('Saved.');
+      setStatus(result.message ?? 'Saved.');
     } catch (err) {
       setStatus(err instanceof Error ? err.message : 'Could not save payment gateway settings');
     } finally {
@@ -105,7 +106,6 @@ export function PaymentGatewaySettingsPanel() {
       yoco: {
         enabled: yocoEnabled,
         ...(yocoSecretKey ? { secretKey: yocoSecretKey } : {}),
-        ...(yocoWebhookSecret ? { webhookSecret: yocoWebhookSecret } : {}),
       },
       payfast: {
         enabled: payfastEnabled,
@@ -158,26 +158,26 @@ export function PaymentGatewaySettingsPanel() {
                 value={yocoSecretKey}
                 onChange={(e) => setYocoSecretKey(e.target.value)}
                 placeholder={
-                  data.yoco.hasSecretKey ? `Currently set (${data.yoco.secretKeyHint}) — leave blank to keep` : 'sk_test_...'
+                  data.yoco.hasSecretKey ? `Currently set (${data.yoco.secretKeyHint}) — leave blank to keep` : 'sk_live_...'
                 }
                 autoComplete="off"
               />
             </label>
-            <label>
-              Webhook secret
-              <input
-                type="password"
-                value={yocoWebhookSecret}
-                onChange={(e) => setYocoWebhookSecret(e.target.value)}
-                placeholder={data.yoco.hasWebhookSecret ? 'Currently set — leave blank to keep' : 'whsec_...'}
-                autoComplete="off"
-              />
-            </label>
-            <label>
-              Webhook URL <span className="listing-form__hint">paste into Yoco → Webhooks</span>
-              <input value={YOCO_WEBHOOK_URL} readOnly onFocus={(e) => e.target.select()} />
-            </label>
-            <WebhookTestRow provider="yoco" disabled={!data.yoco.hasWebhookSecret && !yocoWebhookSecret} />
+            <p className="listing-form__hint" style={{ margin: '0 0 0.75rem' }}>
+              That's it - saving a secret key automatically registers a webhook with Yoco for
+              you (or reuses one that's already registered). No dashboard setup needed.
+            </p>
+            {data.yoco.hasWebhookSecret && (
+              <label>
+                Webhook status
+                <input
+                  value={data.yoco.webhookUrl ? `Registered → ${data.yoco.webhookUrl}` : 'Registered'}
+                  readOnly
+                  onFocus={(e) => e.target.select()}
+                />
+              </label>
+            )}
+            <WebhookTestRow provider="yoco" disabled={!data.yoco.hasWebhookSecret} />
           </div>
 
           <div className="panel" style={{ marginBottom: '1rem' }}>
