@@ -94,6 +94,16 @@ export function PropertyDetailPage() {
               {index === visibleImages.length - 1 && hiddenPhotoCount > 0 && (
                 <span className="property-detail__gallery-more">+{hiddenPhotoCount} photos</span>
               )}
+              {/* Mobile shows a single full-width photo (see the max-width:560px rule in
+                  index.css, which hides every item but the first) - so the "+N photos"
+                  count needs to live on the first image there instead of the last, and
+                  count every photo beyond it rather than just the ones hidden from the
+                  desktop grid. Hidden by default via CSS, shown only at that breakpoint. */}
+              {index === 0 && property.images.length > 1 && (
+                <span className="property-detail__gallery-more property-detail__gallery-more--mobile">
+                  +{property.images.length - 1} photos
+                </span>
+              )}
             </button>
           ))
         ) : (

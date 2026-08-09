@@ -6,6 +6,15 @@ export const CANCELLATION_FREE_WINDOW_HOURS = 48;
 export const REMINDER_BEFORE_CHECKIN_HOURS = 24;
 export const RATING_PROMPT_AFTER_CHECKOUT_HOURS = 24;
 
+// A "pending_payment" booking holds its dates (blocks other guests, marks the property
+// unavailable) from the moment it's requested - without a cutoff, an abandoned or failed
+// checkout would hold those dates forever, since nothing else ever moves the booking out of
+// pending_payment. This caps how long an unpaid hold counts as "active" - see
+// availability.ts's activeBookingFilter, used everywhere a property's booked dates are
+// computed. The booking record itself is untouched (still visible as pending_payment in the
+// guest's/host's booking list) - this only affects whether it blocks the calendar.
+export const PENDING_PAYMENT_HOLD_MINUTES = 30;
+
 // Editable marketing-page image slots, exposed via the admin "Site Images" page so the
 // client can swap these demo photos themselves without a code deploy. Add a new slot here
 // to make it editable - no other backend change needed, storage is a flexible key/value map.

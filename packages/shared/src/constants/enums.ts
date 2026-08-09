@@ -17,8 +17,12 @@ export const BOOKING_STATUSES = [
 ] as const;
 export type BookingStatus = (typeof BOOKING_STATUSES)[number];
 
-// Statuses that "hold" a property's date range - used both to block double-booking and to
-// exclude a property from date-filtered search results. Cancelled/refunded bookings free the dates.
+// Statuses that CAN hold a property's date range - kept for reference/anywhere a general
+// "is this a live booking" status list is useful. The actual date-blocking logic (property
+// search, overlap checks, the availability calendar) does NOT use this list directly anymore
+// - see apps/api/src/modules/bookings/availability.ts's activeBookingFilter, which also caps
+// how long a pending_payment booking counts as active (PENDING_PAYMENT_HOLD_MINUTES) so an
+// abandoned/failed checkout doesn't hold real dates hostage forever.
 export const ACTIVE_BOOKING_STATUSES: BookingStatus[] = ['pending_payment', 'confirmed', 'completed'];
 
 export const PROVINCES = [

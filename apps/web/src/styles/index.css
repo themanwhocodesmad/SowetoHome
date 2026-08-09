@@ -1202,6 +1202,14 @@ button:disabled {
   font-size: 14px;
 }
 
+/* The mobile-only "+N photos" overlay (on the first/only visible image there) is hidden
+   everywhere above the 560px breakpoint - see the max-width query near the bottom of this
+   file, which is where it (and hiding the rest of the grid down to one photo) actually
+   takes effect. */
+.property-detail__gallery-more--mobile {
+  display: none;
+}
+
 .property-detail__view-all {
   position: absolute;
   right: 14px;
@@ -2648,6 +2656,17 @@ tbody tr:last-child td {
   }
   .property-detail__gallery-item:first-child {
     grid-row: auto;
+  }
+  /* Single full-width photo on mobile, not the whole stacked grid - see
+     PropertyDetailPage.tsx's mobile-only "+N photos" overlay on this same item. */
+  .property-detail__gallery-item:not(:first-child) {
+    display: none;
+  }
+  .property-detail__gallery-item:first-child .property-detail__gallery-more:not(.property-detail__gallery-more--mobile) {
+    display: none;
+  }
+  .property-detail__gallery-more--mobile {
+    display: flex;
   }
   .listing-form__row--3,
   .listing-form__row--4 {
