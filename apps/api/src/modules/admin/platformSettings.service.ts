@@ -17,6 +17,8 @@ import type {
   UpdateTypographyInput,
 } from '@soweto-stays/shared';
 import { registerYocoWebhook } from '../payments/yoco.webhooks.js';
+import { AppError } from '../../common/errors/AppError.js';
+import { logger } from '../../common/logger.js';
 import {
   DEFAULT_ABOUT_CONTENT,
   DEFAULT_CONTACT_CONTENT,
@@ -286,22 +288,45 @@ export const platformSettingsService = {
     };
 
     // Auto-register (or reuse) the Yoco webhook whenever a new/changed secret key comes in,
-    // or whenever Yoco is enabled with a saved key that's never been registered yet (e.g.
-    // enabling it for the first time after the key was already on file) - an admin never has
-    // to touch the Yoco dashboard themselves.
+    // or whenever we don't have a usable webhook secret yet (covers both "never registered"
+    // and "a past registration attempt only got as far as saving the URL, not the secret").
+    // Gated on missing webhookSecret specifically, not just webhookUrl - once a secret is
+    // actually on file, re-saving the same key (which an admin re-pasting it while
+    // troubleshooting will do) must NOT re-trigger this, since Yoco has a cap on how many
+    // webhook subscriptions an account can have and a second POST for the same URL fails
+    // with subscription_limit_exceeded - registerYocoWebhook falls back to looking up the
+    // existing one when that happens, but there's no reason to pay that round trip (or risk
+    // it failing) on every single settings save once it's already working.
     let message: string | undefined;
     const secretKeyChanged =
       input.yoco?.secretKey !== undefined && input.yoco.secretKey !== current.yoco.secretKey;
-    const needsFirstRegistration = next.yoco.enabled && next.yoco.secretKey && !next.yoco.webhookUrl;
+    const needsRegistration = next.yoco.enabled && next.yoco.secretKey && !next.yoco.webhookSecret;
 
-    if (next.yoco.secretKey && (secretKeyChanged || needsFirstRegistration)) {
-      const webhookUrl = `${publicOrigin}/api/payments/yoco/notify`;
-      const registered = await registerYocoWebhook(next.yoco.secretKey, webhookUrl);
-      next.yoco.webhookUrl = registered.webhookUrl;
-      if (registered.webhookSecret) {
-        next.yoco.webhookSecret = registered.webhookSecret;
+    if (next.yoco.secretKey && (secretKeyChanged || needsRegistration)) {
+      // Failure here must NOT block the rest of this save (enabled toggle, secret key,
+      // PayFast fields, ...) - a previous version threw straight out of this function on any
+      // registration error, which meant e.g. flipping "Enabled" off then back on while
+      // troubleshooting a Yoco-side error could silently fail to persist at all. Worst case
+      // now: the credentials/toggle save correctly and the admin sees why the webhook part
+      // specifically didn't register, via the message, instead of a generic failure (or a
+      // change that silently didn't take).
+      try {
+        const webhookUrl = `${publicOrigin}/api/payments/yoco/notify`;
+        const registered = await registerYocoWebhook(next.yoco.secretKey, webhookUrl);
+        next.yoco.webhookUrl = registered.webhookUrl;
+        if (registered.webhookSecret) {
+          next.yoco.webhookSecret = registered.webhookSecret;
+          message = 'Yoco credentials saved and Webhook automatically registered!';
+        } else {
+          message =
+            'Yoco credentials saved. A matching webhook already exists on your Yoco account, but its secret could not be retrieved automatically - use "Test webhook" to confirm it works, or remove and re-add the webhook from the Yoco dashboard if it doesn\'t.';
+        }
+      } catch (err) {
+        logger.error({ err }, 'Yoco webhook auto-registration failed during settings save');
+        message = `Credentials saved, but the Yoco webhook could not be auto-registered: ${
+          err instanceof AppError ? err.message : 'unexpected error - check server logs.'
+        }`;
       }
-      message = 'Yoco credentials saved and Webhook automatically registered!';
     }
 
     settings.paymentGateways = next;

@@ -70,16 +70,23 @@ export async function registerYocoWebhook(
   }
 
   // Most likely reason for a non-auth failure here: Yoco already has a webhook registered at
-  // this URL (or this account already has one registered) - fall back to looking it up
-  // instead of treating that as a hard failure, so re-saving the same secret key (e.g. after
-  // a redeploy, or just clicking Save again) doesn't error out.
+  // this URL (or this account already has one registered) - confirmed live, Yoco returns
+  // 400 { code: "subscription_limit_exceeded" } for exactly this case (an account can only
+  // have so many webhook subscriptions, and we'd already used one up on an earlier save).
+  // Fall back to looking it up instead of treating that as a hard failure, so re-saving the
+  // same secret key (e.g. after a redeploy, or just clicking Save again) doesn't error out.
+  const createErrorBody = await createRes.text().catch(() => undefined);
   logger.warn(
-    { status: createRes.status, body: await createRes.text().catch(() => undefined) },
+    { status: createRes.status, body: createErrorBody },
     'Yoco webhook creation failed - checking for an existing registration before giving up',
   );
 
   const listRes = await fetch(YOCO_WEBHOOKS_API, { headers: authHeaders(secretKey) });
   if (!listRes.ok) {
+    logger.error(
+      { status: listRes.status, body: await listRes.text().catch(() => undefined) },
+      'Yoco webhook lookup (fallback after a failed create) also failed',
+    );
     throw AppError.badRequest(
       'Could not register a Yoco webhook with that secret key, and no existing webhook could be found either.',
     );
@@ -90,8 +97,15 @@ export async function registerYocoWebhook(
   const existing = records.find((w) => w.url === webhookUrl) ?? records[0];
 
   if (!existing) {
+    logger.error({ webhookUrl, recordCount: records.length }, 'No existing Yoco webhook matched this URL');
     throw AppError.badRequest('Yoco rejected the webhook registration and no existing matching webhook was found.');
   }
 
-  return { webhookUrl, webhookSecret: extractSecret(existing) };
+  const webhookSecret = extractSecret(existing);
+  logger.warn(
+    { existingId: existing.id, gotSecret: Boolean(webhookSecret) },
+    'Reusing an existing Yoco webhook registration found via lookup',
+  );
+
+  return { webhookUrl, webhookSecret };
 }
