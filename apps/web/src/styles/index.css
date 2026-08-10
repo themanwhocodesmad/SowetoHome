@@ -1438,10 +1438,15 @@ button:disabled {
   margin-top: 0;
 }
 
+/* Not sticky (was previously "position: sticky; top: 90px") - a sticky sidebar sharing its
+   grid row with the availability calendar/reviews rows below it visually overlapped/painted
+   on top of the calendar while scrolling in real browser windows. Reproducing that requires
+   an actual scroll in a normal-height viewport - Playwright's fullPage screenshots resize
+   the viewport to fit everything instead of scrolling, so they never exercised the sticky
+   behavior and missed this. Not worth re-attempting sticky positioning here; a static
+   sidebar has no such risk. */
 .property-detail__sidebar {
   grid-area: sidebar;
-  position: sticky;
-  top: 90px;
 }
 
 .property-detail__reviews,
@@ -1503,9 +1508,6 @@ button:disabled {
       'sidebar'
       'reviews'
       'calendar';
-  }
-  .property-detail__sidebar {
-    position: static;
   }
 }
 
