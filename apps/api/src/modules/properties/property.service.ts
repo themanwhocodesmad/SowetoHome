@@ -57,11 +57,18 @@ function assertCanManage(property: PropertyDocument, requester: AuthUser) {
 }
 
 export const propertyService = {
+  // Despite the name (kept from when hosts could self-serve create listings), this route is
+  // admin-only now (see property.routes.ts's requireRole('admin') on POST /) - the admin is
+  // the sole host of every listing. Publishing immediately rather than going through
+  // pending_review avoids the pointless step of an admin having to approve their own
+  // listing. update() below still resets to pending_review on a non-admin edit, but that
+  // path is currently unreachable for the same reason - kept in case host self-serve
+  // creation ever comes back.
   async createByHost(hostId: string, input: CreatePropertyInput): Promise<PropertyDocument> {
     return propertyRepository.create({
       ...input,
       hostId,
-      status: 'pending_review',
+      status: 'published',
     });
   },
 
