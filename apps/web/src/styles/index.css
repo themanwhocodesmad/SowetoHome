@@ -1391,19 +1391,21 @@ button:disabled {
 }
 
 /* ---------- Property detail: two-column layout (content + sticky booking sidebar) ---------- */
-/* Named areas rather than relying on implicit auto-placement + grid-column:1/-1 spanning -
-   explicit and unambiguous about exactly where each block sits relative to the others,
-   both on desktop (main+sidebar side by side, reviews and the calendar as full-width rows
-   underneath) and on mobile (see the max-width:860px override below, which redeclares this
-   as a single column - "main sidebar reviews calendar" top to bottom, so the booking slot
-   and reviews land above the calendar there without any separate reordering logic). */
+/* Named areas rather than relying on implicit auto-placement - explicit and unambiguous
+   about exactly where each block sits relative to the others. Desktop: the calendar sits
+   in the left column right under the main content (filling what would otherwise be blank
+   space next to the taller sidebar), with "sidebar" spanning both those rows since it
+   appears in column 2 for both - reviews stays a full-width row underneath everything. On
+   mobile (see the max-width:860px override below) this is redeclared as a single column -
+   "main sidebar reviews calendar" top to bottom - so the booking slot and reviews land
+   above the calendar there, independent of the desktop arrangement. */
 .property-detail__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
   grid-template-areas:
     'main sidebar'
-    'reviews reviews'
-    'calendar calendar';
+    'calendar sidebar'
+    'reviews reviews';
   gap: 2.5rem;
   align-items: start;
 }
