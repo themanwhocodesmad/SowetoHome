@@ -1391,11 +1391,33 @@ button:disabled {
 }
 
 /* ---------- Property detail: two-column layout (content + sticky booking sidebar) ---------- */
+/* Named areas rather than relying on implicit auto-placement + grid-column:1/-1 spanning -
+   explicit and unambiguous about exactly where each block sits relative to the others,
+   both on desktop (main+sidebar side by side, reviews and the calendar as full-width rows
+   underneath) and on mobile (see the max-width:860px override below, which redeclares this
+   as a single column - "main sidebar reviews calendar" top to bottom, so the booking slot
+   and reviews land above the calendar there without any separate reordering logic). */
 .property-detail__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 320px;
+  grid-template-areas:
+    'main sidebar'
+    'reviews reviews'
+    'calendar calendar';
   gap: 2.5rem;
   align-items: start;
+}
+
+.property-detail__main {
+  grid-area: main;
+}
+
+.property-detail__reviews {
+  grid-area: reviews;
+}
+
+.property-detail__calendar {
+  grid-area: calendar;
 }
 
 .property-detail__head h1 {
@@ -1417,22 +1439,24 @@ button:disabled {
 }
 
 .property-detail__sidebar {
+  grid-area: sidebar;
   position: sticky;
   top: 90px;
 }
 
-/* Full-width rows below the main/sidebar pair (reviews, then the availability calendar) -
-   grid-column spans both tracks so they sit under the whole layout on desktop, and on
-   mobile (where the grid collapses to one column) their DOM order is what actually decides
-   the stacking order - see PropertyDetailPage.tsx. */
-.property-detail__below {
-  grid-column: 1 / -1;
+.property-detail__reviews,
+.property-detail__calendar {
   margin-top: 1rem;
   padding-top: 2rem;
   border-top: 1px solid var(--color-border);
+  /* Grid items stretch to fill their area's cross-axis size by default (align-items:start
+     on the container only overrides the block axis) - min-width:0 stops a wide child (the
+     calendar table, the map iframe) from forcing its column wider than the track. */
+  min-width: 0;
 }
 
-.property-detail__below h2 {
+.property-detail__reviews h2,
+.property-detail__calendar h2 {
   margin-top: 0;
 }
 
@@ -1472,6 +1496,13 @@ button:disabled {
 @media (max-width: 860px) {
   .property-detail__layout {
     grid-template-columns: 1fr;
+    /* Single column - order top to bottom is what was asked: main content, then the
+       booking slot + rooms/rules/location/etc (sidebar), then reviews, then the calendar. */
+    grid-template-areas:
+      'main'
+      'sidebar'
+      'reviews'
+      'calendar';
   }
   .property-detail__sidebar {
     position: static;

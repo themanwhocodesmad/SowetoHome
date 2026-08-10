@@ -363,12 +363,15 @@ export function PropertyDetailPage() {
           </div>
         </aside>
 
-        {/* Full-width rows below the main/sidebar pair, in this exact order, rather than
-            living inside .property-detail__main - on mobile (where the layout collapses to
-            one column, see the max-width:860px rule in index.css) that puts the booking
-            slot and reviews ahead of the calendar in the natural stacking order, matching
-            what was asked, without needing separate mobile-only CSS reordering. */}
-        <section className="reviews property-detail__below">
+        {/* Full-width rows below the main/sidebar pair - each given its own explicit
+            grid-area (see .property-detail__layout in index.css) rather than relying on
+            CSS Grid's implicit auto-placement to figure out where a grid-column:1/-1 item
+            should land relative to the sidebar. Named areas make the position unambiguous
+            on both desktop (main+sidebar side by side, these two full-width underneath) and
+            mobile (single column, in exactly this order - booking slot and reviews land
+            above the calendar automatically since the sidebar comes before both in the
+            area list there). */}
+        <section className="reviews property-detail__reviews">
           <h2>Reviews {property.ratingCount > 0 && `(★ ${property.ratingAvg.toFixed(1)})`}</h2>
           {reviewsQuery.data?.length ? (
             <ul>
@@ -381,7 +384,7 @@ export function PropertyDetailPage() {
           )}
         </section>
 
-        <section className="property-detail__below">
+        <section className="property-detail__calendar">
           <AvailabilityCalendar propertyId={property.id} />
         </section>
       </div>
