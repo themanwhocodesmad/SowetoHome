@@ -1421,6 +1421,21 @@ button:disabled {
   top: 90px;
 }
 
+/* Full-width rows below the main/sidebar pair (reviews, then the availability calendar) -
+   grid-column spans both tracks so they sit under the whole layout on desktop, and on
+   mobile (where the grid collapses to one column) their DOM order is what actually decides
+   the stacking order - see PropertyDetailPage.tsx. */
+.property-detail__below {
+  grid-column: 1 / -1;
+  margin-top: 1rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--color-border);
+}
+
+.property-detail__below h2 {
+  margin-top: 0;
+}
+
 .property-detail__facts h4 {
   margin: 0 0 0.75rem;
 }
@@ -2131,7 +2146,9 @@ tbody tr:last-child td {
 }
 
 .availability-calendar__day.is-available {
-  color: var(--color-text);
+  background: var(--color-accent);
+  color: #ffffff;
+  font-weight: 700;
 }
 
 .availability-calendar__day.is-past {

@@ -244,24 +244,7 @@ export function PropertyDetailPage() {
             </section>
           )}
 
-          <section className="property-detail__section">
-            <AvailabilityCalendar propertyId={property.id} />
-          </section>
-
           {!property.isAvailable && <p className="notice">This property is not currently accepting bookings.</p>}
-
-          <section className="reviews property-detail__section">
-            <h2>Reviews {property.ratingCount > 0 && `(★ ${property.ratingAvg.toFixed(1)})`}</h2>
-            {reviewsQuery.data?.length ? (
-              <ul>
-                {reviewsQuery.data.map((review) => (
-                  <li key={review.id}>★ {review.rating} - {review.comment}</li>
-                ))}
-              </ul>
-            ) : (
-              <p>No reviews yet.</p>
-            )}
-          </section>
         </div>
 
         <aside className="property-detail__sidebar">
@@ -379,6 +362,28 @@ export function PropertyDetailPage() {
             </ul>
           </div>
         </aside>
+
+        {/* Full-width rows below the main/sidebar pair, in this exact order, rather than
+            living inside .property-detail__main - on mobile (where the layout collapses to
+            one column, see the max-width:860px rule in index.css) that puts the booking
+            slot and reviews ahead of the calendar in the natural stacking order, matching
+            what was asked, without needing separate mobile-only CSS reordering. */}
+        <section className="reviews property-detail__below">
+          <h2>Reviews {property.ratingCount > 0 && `(★ ${property.ratingAvg.toFixed(1)})`}</h2>
+          {reviewsQuery.data?.length ? (
+            <ul>
+              {reviewsQuery.data.map((review) => (
+                <li key={review.id}>★ {review.rating} - {review.comment}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>No reviews yet.</p>
+          )}
+        </section>
+
+        <section className="property-detail__below">
+          <AvailabilityCalendar propertyId={property.id} />
+        </section>
       </div>
     </div>
   );
