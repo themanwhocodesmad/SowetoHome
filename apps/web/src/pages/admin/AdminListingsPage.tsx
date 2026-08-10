@@ -68,6 +68,9 @@ export function AdminListingsPage() {
                   <span className={pillClass(property.status)}>{property.status}</span>
                 </td>
                 <td style={{ whiteSpace: 'nowrap' }}>
+                  <Link to={`/host/listings/${property.id}/edit`} className="button button--outline">
+                    Edit
+                  </Link>{' '}
                   {property.status !== 'published' && (
                     <button type="button" onClick={() => void moderate(property.id, 'published')}>
                       Approve
