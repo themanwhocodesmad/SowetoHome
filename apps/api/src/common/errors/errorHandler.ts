@@ -17,10 +17,19 @@ export function notFoundHandler(req: Request, _res: Response, next: NextFunction
 
 export function errorHandler(err: unknown, req: Request, res: Response, _next: NextFunction) {
   if (err instanceof ZodError) {
+    // The generic "Validation failed" string used to be the ENTIRE message shown to the
+    // user - the actual per-field reasons only ever reached `details`, which the frontend's
+    // apiFetch() never reads (it just throws new Error(body.error.message)). Building the
+    // real field-by-field summary into `message` itself means every caller gets it for
+    // free, with no frontend change needed - `details` (still Zod's .flatten()) stays
+    // available for anything that wants to render it more richly per-field later.
+    const summary = err.errors
+      .map((issue) => `${issue.path.length ? issue.path.join('.') : 'value'}: ${issue.message}`)
+      .join('; ');
     res.status(400).json({
       success: false,
       error: {
-        message: 'Validation failed',
+        message: summary || 'Validation failed',
         code: 'VALIDATION_ERROR',
         details: err.flatten(),
       },
@@ -29,10 +38,13 @@ export function errorHandler(err: unknown, req: Request, res: Response, _next: N
   }
 
   if (err instanceof MongooseError.ValidationError) {
+    const summary = Object.entries(err.errors)
+      .map(([field, e]) => `${field}: ${e.message}`)
+      .join('; ');
     res.status(400).json({
       success: false,
       error: {
-        message: 'Some required fields are missing or invalid',
+        message: summary || 'Some required fields are missing or invalid',
         code: 'VALIDATION_ERROR',
         details: Object.fromEntries(
           Object.entries(err.errors).map(([field, e]) => [field, e.message]),
