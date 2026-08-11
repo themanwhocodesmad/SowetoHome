@@ -7,10 +7,15 @@ interface ReviewFields {
   createdAt: Date;
 }
 
-// Guest rates the property they stayed at.
+// Guest rates the property they stayed at. guestId/bookingId are synthetic (random, not
+// tied to a real user/booking) on an admin-added fake review - authorName/authorAvatarUrl
+// carry its display identity instead, since there's no real User to look one up from.
 export interface IPropertyReview extends ReviewFields {
   guestId: Types.ObjectId;
   propertyId: Types.ObjectId;
+  authorName?: string;
+  authorAvatarUrl?: string;
+  isFake?: boolean;
 }
 
 // Guest rates the host they stayed with.
@@ -39,6 +44,9 @@ const propertyReviewSchema = new Schema<IPropertyReview>(
     propertyId: { type: Schema.Types.ObjectId, ref: 'Property', required: true, index: true },
     rating: ratingField,
     comment: commentField,
+    authorName: { type: String, maxlength: 80 },
+    authorAvatarUrl: { type: String },
+    isFake: { type: Boolean, default: false },
   },
   { timestamps: { createdAt: true, updatedAt: false } },
 );

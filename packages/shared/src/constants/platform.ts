@@ -15,6 +15,10 @@ export const RATING_PROMPT_AFTER_CHECKOUT_HOURS = 24;
 // guest's/host's booking list) - this only affects whether it blocks the calendar.
 export const PENDING_PAYMENT_HOLD_MINUTES = 30;
 
+// Cap on how many admin-added fake reviews a single listing can carry - see
+// review.service.ts's addFakeReview. Counted separately from real (booking-backed) reviews.
+export const MAX_FAKE_REVIEWS_PER_PROPERTY = 10;
+
 // Editable marketing-page image slots, exposed via the admin "Site Images" page so the
 // client can swap these demo photos themselves without a code deploy. Add a new slot here
 // to make it editable - no other backend change needed, storage is a flexible key/value map.

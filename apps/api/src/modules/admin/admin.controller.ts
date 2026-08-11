@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express';
 import type {
+  AddFakeReviewInput,
   ModeratePropertyInput,
   PaymentProvider,
   SuspendUserInput,
@@ -21,6 +22,7 @@ import { userService, toUserDto } from '../users/user.service.js';
 import { propertyService, toPropertyDto } from '../properties/property.service.js';
 import { bookingService, toBookingDto } from '../bookings/booking.service.js';
 import { paymentService } from '../payments/payment.service.js';
+import { reviewService } from '../reviews/review.service.js';
 import {
   platformSettingsService,
   resolveAboutContent,
@@ -32,6 +34,7 @@ import {
 } from './platformSettings.service.js';
 import { adminService } from './admin.service.js';
 import { toPublicSiteImagePath } from './siteImage.upload.js';
+import { toPublicReviewAvatarPath } from './reviewAvatar.upload.js';
 
 export const listUsers = asyncHandler(async (req: Request, res: Response) => {
   const page = Number(req.query.page ?? 1);
@@ -62,6 +65,23 @@ export const moderateProperty = asyncHandler(async (req: Request, res: Response)
   const { status } = req.body as ModeratePropertyInput;
   const property = await propertyService.setStatus(req.params.id as string, status);
   ok(res, toPropertyDto(property));
+});
+
+export const addFakeReview = asyncHandler(async (req: Request, res: Response) => {
+  const input = req.body as AddFakeReviewInput;
+  const review = await reviewService.addFakeReview(req.params.id as string, input);
+  ok(res, review);
+});
+
+export const removeFakeReview = asyncHandler(async (req: Request, res: Response) => {
+  await reviewService.removeFakeReview(req.params.id as string, req.params.reviewId as string);
+  ok(res, { removed: true });
+});
+
+export const uploadReviewAvatar = asyncHandler(async (req: Request, res: Response) => {
+  const file = req.file as Express.Multer.File | undefined;
+  if (!file) throw AppError.badRequest('No image file was uploaded');
+  ok(res, { avatarUrl: toPublicReviewAvatarPath(file.filename) });
 });
 
 export const listBookings = asyncHandler(async (req: Request, res: Response) => {

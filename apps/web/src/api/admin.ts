@@ -1,5 +1,6 @@
 import type {
   AboutContentDto,
+  AddFakeReviewInput,
   AdminAnalyticsDto,
   AdminHomepageDto,
   ContactContentDto,
@@ -9,6 +10,7 @@ import type {
   PaymentProvider,
   PlatformSettingsDto,
   PropertyDto,
+  ReviewDto,
   SectionSpacingMap,
   ServicesContentDto,
   SiteImagesDto,
@@ -48,6 +50,24 @@ export const adminApi = {
       method: 'POST',
       body: JSON.stringify(input),
     }),
+
+  addFakeReview: (propertyId: string, input: AddFakeReviewInput) =>
+    apiFetch<ReviewDto>(`/api/admin/properties/${propertyId}/reviews`, {
+      method: 'POST',
+      body: JSON.stringify(input),
+    }),
+  removeFakeReview: (propertyId: string, reviewId: string) =>
+    apiFetch<{ removed: boolean }>(`/api/admin/properties/${propertyId}/reviews/${reviewId}`, {
+      method: 'DELETE',
+    }),
+  uploadReviewAvatar: (file: File) => {
+    const formData = new FormData();
+    formData.append('avatar', file);
+    return apiFetch<{ avatarUrl: string }>('/api/admin/review-avatar', {
+      method: 'POST',
+      body: formData,
+    });
+  },
 
   listBookings: (page = 1, limit = 20, status?: string) =>
     apiFetch<PaginatedResult<BookingDto>>(

@@ -18,6 +18,8 @@ export const EMAIL_TEMPLATES = [
   'cancellation-confirmed',
   'refund-processed',
   'admin-listing-pending',
+  'admin-new-signup',
+  'admin-new-booking',
   'newsletter-confirmation',
 ] as const;
 export type EmailTemplate = (typeof EMAIL_TEMPLATES)[number];

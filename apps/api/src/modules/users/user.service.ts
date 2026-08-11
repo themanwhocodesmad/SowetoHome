@@ -24,6 +24,15 @@ function enqueueWelcomeEmail(userId: string): void {
   });
 }
 
+// Same best-effort treatment - lets every current admin know a new account was created,
+// regardless of which one (if any) happens to be a given property's hostId. See
+// email.processor.ts's 'admin-new-signup' case, which looks up every admin at send time.
+function enqueueAdminNewSignupEmail(userId: string): void {
+  void enqueueEmail('admin-new-signup', { userId }).catch((err) => {
+    logger.warn({ err, userId }, 'Failed to enqueue admin-new-signup email');
+  });
+}
+
 // Unlike the welcome email, a reset request failing to send IS the whole point of the
 // endpoint, so this one is still fire-and-forget for latency but logs at error level.
 function enqueuePasswordResetEmail(userId: string, resetUrl: string): void {
@@ -60,6 +69,7 @@ export const userService = {
     if (existing) return existing;
     const user = await userRepository.createFromGoogleProfile(profile);
     enqueueWelcomeEmail(user._id.toString());
+    enqueueAdminNewSignupEmail(user._id.toString());
     return user;
   },
 
@@ -74,6 +84,7 @@ export const userService = {
       passwordHash,
     });
     enqueueWelcomeEmail(user._id.toString());
+    enqueueAdminNewSignupEmail(user._id.toString());
     return user;
   },
 

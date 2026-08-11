@@ -1540,6 +1540,91 @@ button:disabled {
   border-bottom: none;
 }
 
+.reviews__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.reviews__avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.reviews__avatar--placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+  font-size: 13px;
+}
+
+/* ---------- Admin: fake reviews (property edit page) ---------- */
+.fake-reviews-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem;
+}
+
+.fake-reviews-list__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.fake-reviews-list__item:last-child {
+  border-bottom: none;
+}
+
+.fake-reviews-list__avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.fake-reviews-list__avatar--placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-primary);
+  color: white;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.fake-reviews-list__body {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+}
+
+.fake-reviews-list__body p {
+  margin: 2px 0 0;
+  color: var(--color-text);
+}
+
+.fake-reviews-list__remove {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--color-error);
+  background: none;
+  border: 1px solid var(--color-border);
+}
+
+.fake-reviews-form {
+  border-top: 1px solid var(--color-border);
+  padding-top: 1rem;
+}
+
 /* ---------- Value proposition ---------- */
 .value-prop {
   background: #ffffff;

@@ -29,6 +29,17 @@ function money(amount: number): string {
   return `R${amount.toFixed(2)}`;
 }
 
+// Every current admin - not just whichever one happens to be a given property's hostId
+// (the sole-host-is-an-admin model means that's usually the same person, but there can be
+// more than one admin account, and all of them should hear about signups/bookings, not just
+// whoever the property happens to be attributed to).
+async function notifyAdmins(subject: string, bodyLines: string[]): Promise<void> {
+  const admins = await UserModel.find({ roles: 'admin' });
+  if (admins.length === 0) return;
+  const email = renderTemplate(subject, bodyLines);
+  await Promise.all(admins.map((admin) => sendMail(admin.email, email.subject, email.html, email.text)));
+}
+
 // Looks up current data at send time rather than trusting the job payload (see
 // packages/shared/src/queues.ts) - a booking cancelled after enqueue is reflected here.
 export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
@@ -82,11 +93,10 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       ]);
       await sendMail(data.guest.email, guestEmail.subject, guestEmail.html, guestEmail.text);
 
-      const hostEmail = renderTemplate('New booking confirmed', [
-        `Hi ${data.host.name},`,
+      await notifyAdmins('Booking confirmed', [
         `${data.guest.name} has booked ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}.`,
+        `Total paid: ${money(data.booking.totalPrice)}.`,
       ]);
-      await sendMail(data.host.email, hostEmail.subject, hostEmail.html, hostEmail.text);
       return;
     }
 
@@ -120,8 +130,29 @@ export async function processEmailJob(payload: EmailJobPayload): Promise<void> {
       return;
 
     case 'admin-listing-pending':
-      // Reserved for a future admin-moderation slice - nothing enqueues this yet.
+      // Reserved for a future admin-moderation slice - nothing enqueues this yet (listings
+      // publish immediately now - see property.service.ts's createByHost).
       return;
+
+    case 'admin-new-signup': {
+      if (!context.userId) return;
+      const user = await UserModel.findById(context.userId);
+      if (!user) return;
+      await notifyAdmins('New sign-up on Book My Stay', [
+        `${user.name} (${user.email}) just created an account.`,
+      ]);
+      return;
+    }
+
+    case 'admin-new-booking': {
+      const data = context.bookingId ? await resolveBookingContext(context.bookingId) : null;
+      if (!data) return;
+      await notifyAdmins('New booking request', [
+        `${data.guest.name} (${data.guest.email}) requested to book ${data.property.title} from ${formatDate(data.booking.checkIn)} to ${formatDate(data.booking.checkOut)}.`,
+        `Total: ${money(data.booking.totalPrice)}. Awaiting payment.`,
+      ]);
+      return;
+    }
 
     case 'newsletter-confirmation': {
       if (!context.newsletterSubscriberId) return;

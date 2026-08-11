@@ -376,7 +376,25 @@ export function PropertyDetailPage() {
           {reviewsQuery.data?.length ? (
             <ul>
               {reviewsQuery.data.map((review) => (
-                <li key={review.id}>★ {review.rating} - {review.comment}</li>
+                <li key={review.id} className="reviews__item">
+                  {review.authorAvatarUrl ? (
+                    <img
+                      className="reviews__avatar"
+                      src={`${apiBaseUrl()}${review.authorAvatarUrl}`}
+                      alt={review.authorName ?? 'Reviewer'}
+                    />
+                  ) : (
+                    review.authorName && (
+                      <span className="reviews__avatar reviews__avatar--placeholder">
+                        {review.authorName.charAt(0).toUpperCase()}
+                      </span>
+                    )
+                  )}
+                  <span>
+                    {review.authorName && <strong>{review.authorName} · </strong>}
+                    ★ {review.rating} - {review.comment}
+                  </span>
+                </li>
               ))}
             </ul>
           ) : (

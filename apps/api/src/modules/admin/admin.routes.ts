@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import {
+  addFakeReviewSchema,
   moderatePropertySchema,
   suspendUserSchema,
   updatePaymentGatewaySettingsSchema,
@@ -11,6 +12,7 @@ import { authenticate, requireRole } from '../../common/middleware/auth.js';
 import { validate } from '../../common/middleware/validate.js';
 import * as adminController from './admin.controller.js';
 import { siteImageUpload } from './siteImage.upload.js';
+import { reviewAvatarUpload } from './reviewAvatar.upload.js';
 
 export const adminRouter = Router();
 
@@ -25,6 +27,14 @@ adminRouter.post(
   validate(moderatePropertySchema),
   adminController.moderateProperty,
 );
+
+adminRouter.post(
+  '/properties/:id/reviews',
+  validate(addFakeReviewSchema),
+  adminController.addFakeReview,
+);
+adminRouter.delete('/properties/:id/reviews/:reviewId', adminController.removeFakeReview);
+adminRouter.post('/review-avatar', reviewAvatarUpload, adminController.uploadReviewAvatar);
 
 adminRouter.get('/bookings', adminController.listBookings);
 

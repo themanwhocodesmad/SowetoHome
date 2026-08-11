@@ -1,6 +1,13 @@
-import type { ReviewDto, SubmitReviewInput } from '@soweto-stays/shared';
-import { RATING_PROMPT_AFTER_CHECKOUT_HOURS } from '@soweto-stays/shared';
-import { BookingModel, PropertyModel, UserModel, type BookingDocument } from '@soweto-stays/db';
+import { Types } from 'mongoose';
+import type { AddFakeReviewInput, ReviewDto, SubmitReviewInput } from '@soweto-stays/shared';
+import { MAX_FAKE_REVIEWS_PER_PROPERTY, RATING_PROMPT_AFTER_CHECKOUT_HOURS } from '@soweto-stays/shared';
+import {
+  BookingModel,
+  PropertyModel,
+  PropertyReviewModel,
+  UserModel,
+  type BookingDocument,
+} from '@soweto-stays/db';
 import { AppError } from '../../common/errors/AppError.js';
 import { reviewRepository } from './review.repository.js';
 
@@ -12,6 +19,9 @@ interface ReviewDocLike {
   rating: number;
   comment?: string;
   createdAt: Date;
+  authorName?: string;
+  authorAvatarUrl?: string;
+  isFake?: boolean;
 }
 
 function toDto(
@@ -29,6 +39,9 @@ function toDto(
     rating: review.rating,
     comment: review.comment,
     createdAt: review.createdAt.toISOString(),
+    authorName: review.authorName,
+    authorAvatarUrl: review.authorAvatarUrl,
+    isFake: review.isFake,
   };
 }
 
@@ -54,6 +67,23 @@ async function bumpPropertyRating(propertyId: string, rating: number): Promise<v
   property.ratingAvg = nextAverage(property.ratingAvg, property.ratingCount, rating);
   property.ratingCount += 1;
   await property.save();
+}
+
+// Recomputes from every current PropertyReview (real + fake alike) rather than nudging
+// ratingAvg/ratingCount incrementally - used by addFakeReview/removeFakeReview since a fake
+// review can be deleted later (bumpPropertyRating above has no matching "un-bump", and
+// getting that math right incrementally in both directions isn't worth it when a direct
+// aggregate is simple and can't drift).
+async function recomputePropertyRating(propertyId: string): Promise<void> {
+  const propertyObjectId = new Types.ObjectId(propertyId);
+  const [stats] = await PropertyReviewModel.aggregate<{ avg: number; count: number }>([
+    { $match: { propertyId: propertyObjectId } },
+    { $group: { _id: null, avg: { $avg: '$rating' }, count: { $sum: 1 } } },
+  ]);
+  await PropertyModel.findByIdAndUpdate(propertyId, {
+    ratingAvg: stats ? Math.round(stats.avg * 100) / 100 : 0,
+    ratingCount: stats?.count ?? 0,
+  });
 }
 
 async function bumpHostRating(hostId: string, rating: number): Promise<void> {
@@ -146,5 +176,42 @@ export const reviewService = {
   async listForGuest(guestId: string): Promise<ReviewDto[]> {
     const reviews = await reviewRepository.listGuestReviews(guestId);
     return reviews.map((r) => toDto('guest', r, r.hostId.toString(), r.guestId.toString()));
+  },
+
+  // Admin-only (see admin.routes.ts) - seeds a listing with a realistic-looking review that
+  // has no real booking/guest behind it. bookingId/guestId are synthetic (fresh, unused
+  // ObjectIds) purely to satisfy the schema's required/unique fields - authorName carries
+  // the actual display identity instead.
+  async addFakeReview(propertyId: string, input: AddFakeReviewInput): Promise<ReviewDto> {
+    const property = await PropertyModel.findById(propertyId);
+    if (!property) throw AppError.notFound('Property not found');
+
+    const existingFakeCount = await PropertyReviewModel.countDocuments({ propertyId, isFake: true });
+    if (existingFakeCount >= MAX_FAKE_REVIEWS_PER_PROPERTY) {
+      throw AppError.badRequest(`A listing can have at most ${MAX_FAKE_REVIEWS_PER_PROPERTY} added reviews`);
+    }
+
+    const review = await reviewRepository.createPropertyReview({
+      bookingId: new Types.ObjectId(),
+      guestId: new Types.ObjectId(),
+      propertyId,
+      rating: input.rating,
+      comment: input.comment,
+      authorName: input.authorName,
+      authorAvatarUrl: input.authorAvatarUrl,
+      isFake: true,
+    });
+    await recomputePropertyRating(propertyId);
+    return toDto('property', review, review.guestId.toString(), propertyId);
+  },
+
+  async removeFakeReview(propertyId: string, reviewId: string): Promise<void> {
+    const deleted = await PropertyReviewModel.findOneAndDelete({
+      _id: reviewId,
+      propertyId,
+      isFake: true,
+    });
+    if (!deleted) throw AppError.notFound('Review not found');
+    await recomputePropertyRating(propertyId);
   },
 };

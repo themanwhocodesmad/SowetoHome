@@ -5,6 +5,7 @@ import type { CreatePropertyInput } from '@soweto-stays/shared';
 import { propertiesApi } from '../../api/properties.js';
 import { apiBaseUrl } from '../../api/client.js';
 import { ListingForm } from '../../components/ListingForm.js';
+import { FakeReviewsPanel } from '../../components/FakeReviewsPanel.js';
 import { DashboardLayout } from '../../components/DashboardLayout.js';
 import { HOST_NAV_ITEMS } from '../../components/dashboardNav.js';
 import { pillClass } from '../../components/pillVariant.js';
@@ -119,6 +120,8 @@ export function EditListingPage() {
       <div className="panel">
         <ListingForm initialValues={property} onSubmit={handleSubmit} submitLabel="Save changes" />
       </div>
+
+      <FakeReviewsPanel propertyId={property.id} />
     </DashboardLayout>
   );
 }

@@ -88,6 +88,9 @@ export const bookingService = {
       bookingStatus: 'pending_payment',
     });
     await enqueueEmail('booking-requested', { bookingId: booking._id.toString() });
+    // Every current admin, not just this property's hostId - see email.processor.ts's
+    // 'admin-new-booking' case.
+    await enqueueEmail('admin-new-booking', { bookingId: booking._id.toString() });
     return booking;
   },
 
